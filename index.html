@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI Cleaning — Command Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #07090f;
+    --panel:     #0d1117;
+    --panel2:    #111620;
+    --border:    rgba(255,255,255,0.07);
+    --gold:      #c9a84c;
+    --gold-dim:  rgba(201,168,76,0.15);
+    --teal:      #2dd4bf;
+    --teal-dim:  rgba(45,212,191,0.12);
+    --red:       #f43f5e;
+    --red-dim:   rgba(244,63,94,0.12);
+    --amber:     #f59e0b;
+    --amber-dim: rgba(245,158,11,0.12);
+    --white:     #f0f2f5;
+    --muted:     #5a6478;
+    --muted2:    #8892a4;
+    --working:   #2dd4bf;
+    --break:     #f59e0b;
+    --offline:   #5a6478;
+  }
+
+  html, body {
+    height: 100%; background: var(--bg);
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── LAYOUT ── */
+  .app {
+    display: grid;
+    grid-template-rows: 56px 1fr;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .topbar-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 2px;
+    color: var(--gold);
+  }
+  .topbar-sep { width: 1px; height: 22px; background: var(--border); }
+  .topbar-label {
+    font-size: 12px; color: var(--muted2);
+    font-weight: 500; letter-spacing: 0.5px;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+  /* ── HAMBURGER ── */
+  .hamburger-btn {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 5px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .hamburger-btn:hover { background: var(--gold-dim); border-color: rgba(201,168,76,0.3); }
+  .hamburger-btn span {
+    display: block; width: 16px; height: 1.5px;
+    background: var(--muted2); border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .hamburger-btn:hover span { background: var(--gold); }
+
+  /* ── DROPDOWN MENU ── */
+  .dropdown-menu {
+    position: fixed; top: 58px; right: 16px;
+    background: var(--panel);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 14px; padding: 8px;
+    z-index: 200; min-width: 210px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    display: none;
+  }
+  .dropdown-menu.open { display: block; animation: fadeDown 0.18s ease; }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 13px; border-radius: 9px;
+    cursor: pointer; transition: background 0.12s;
+    font-size: 13px; font-weight: 500; color: var(--white);
+  }
+  .dropdown-item:hover { background: var(--gold-dim); color: var(--gold); }
+  .dropdown-item-icon { font-size: 16px; width: 22px; text-align: center; }
+  .dropdown-sep { height: 1px; background: var(--border); margin: 6px 0; }
+
+  /* ── MODAL BACKDROP ── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(7,9,15,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 300; display: none;
+    align-items: center; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ── MODAL ── */
+  .modal {
+    background: var(--panel);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    width: 480px; max-width: calc(100vw - 32px);
+    max-height: 90vh; overflow-y: auto;
+    padding: 28px; position: relative;
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 8px; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted2); font-size: 14px;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--red-dim); color: var(--red); }
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; letter-spacing: 1.5px;
+    color: var(--white); margin-bottom: 4px;
+  }
+  .modal-title span { color: var(--gold); }
+  .modal-subtitle { font-size: 12px; color: var(--muted2); margin-bottom: 22px; }
+
+  /* ── REVIEW LINK SECTION ── */
+  .review-link-block {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin-bottom: 22px;
+  }
+  .review-link-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .review-link-set {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .review-link-input {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 9px;
+    padding: 10px 12px; color: var(--white);
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color 0.15s;
+  }
+  .review-link-input:focus { border-color: rgba(201,168,76,0.5); }
+  .review-link-input::placeholder { color: var(--muted); }
+  .btn-save-link {
+    background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 9px; padding: 10px 14px;
+    color: var(--gold); font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-save-link:hover { background: rgba(201,168,76,0.25); }
+
+  .review-link-saved {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .review-link-url {
+    font-size: 12px; color: var(--teal);
+    font-family: 'DM Mono', monospace;
+    word-break: break-all; flex: 1; line-height: 1.4;
+  }
+  .review-link-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-link-action {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 7px; padding: 6px 10px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .btn-link-action.change { color: var(--amber); }
+  .btn-link-action.change:hover { background: var(--amber-dim); border-color: rgba(245,158,11,0.3); }
+  .btn-link-action.remove { color: var(--red); }
+  .btn-link-action.remove:hover { background: var(--red-dim); border-color: rgba(244,63,94,0.3); }
+
+  /* ── SEND FORM ── */
+  .send-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: flex; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .form-label { font-size: 10px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
+  .form-input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 9px;
+    padding: 11px 13px; color: var(--white);
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color 0.15s; width: 100%;
+  }
+  .form-input:focus { border-color: rgba(201,168,76,0.5); }
+  .form-input::placeholder { color: var(--muted); }
+
+  .message-preview {
+    background: rgba(45,212,191,0.06);
+    border: 1px solid rgba(45,212,191,0.2);
+    border-radius: 12px; padding: 13px 15px;
+    font-size: 12px; color: var(--teal); line-height: 1.6;
+  }
+  .message-preview-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.8px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  .send-method-tabs { display: flex; gap: 8px; margin-bottom: 2px; }
+  .send-tab {
+    flex: 1; padding: 9px; border-radius: 9px; text-align: center;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    color: var(--muted2); transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .send-tab.active { background: var(--gold-dim); border-color: rgba(201,168,76,0.4); color: var(--gold); }
+
+  .btn-send-review {
+    background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.15));
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 12px; padding: 14px;
+    color: var(--gold); font-size: 14px; font-weight: 700;
+    cursor: pointer; text-align: center; transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif; letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-send-review:hover { background: linear-gradient(135deg, rgba(201,168,76,0.4), rgba(201,168,76,0.25)); transform: translateY(-1px); }
+  .btn-send-review:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .send-success {
+    background: rgba(45,212,191,0.08);
+    border: 1px solid rgba(45,212,191,0.25);
+    border-radius: 12px; padding: 14px;
+    text-align: center; color: var(--teal);
+    font-size: 13px; font-weight: 600; display: none;
+  }
+
+  .no-link-notice {
+    text-align: center; padding: 20px;
+    color: var(--muted2); font-size: 13px; line-height: 1.6;
+  }
+  .live-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(45,212,191,0.08);
+    border: 1px solid rgba(45,212,191,0.25);
+    border-radius: 20px; padding: 4px 12px 4px 8px;
+    font-size: 12px; color: var(--teal); font-weight: 600;
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--teal);
+    animation: live-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+  .refresh-timer {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--muted);
+  }
+  .clock-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--muted2);
+    font-weight: 500;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-head {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 1.5px; color: var(--muted2);
+    margin-bottom: 10px;
+  }
+  .stats-row { display: flex; gap: 8px; }
+  .stat-chip {
+    flex: 1; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 10px; text-align: center;
+  }
+  .stat-chip-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; line-height: 1;
+  }
+  .stat-chip-val.working { color: var(--working); }
+  .stat-chip-val.break   { color: var(--break); }
+  .stat-chip-val.total   { color: var(--white); }
+  .stat-chip-label { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: 0.5px; }
+
+  .sidebar-scroll { flex: 1; overflow-y: auto; padding: 10px 10px; }
+  .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── EMPLOYEE CARDS ── */
+  .emp-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 13px 14px;
+    margin-bottom: 8px; cursor: pointer;
+    transition: all 0.18s; position: relative;
+    overflow: hidden;
+  }
+  .emp-card::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 3px 0 0 3px;
+    transition: background 0.2s;
+  }
+  .emp-card.working::before { background: var(--working); }
+  .emp-card.onbreak::before { background: var(--break); }
+  .emp-card.offline::before { background: var(--offline); }
+  .emp-card:hover, .emp-card.selected {
+    border-color: rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.04);
+  }
+  .emp-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+  .emp-card-name { font-size: 14px; font-weight: 600; color: var(--white); line-height: 1.2; }
+  .emp-card-id { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+  .status-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 3px 8px; border-radius: 20px;
+    flex-shrink: 0; margin-left: 8px;
+  }
+  .status-badge.working { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(45,212,191,0.3); }
+  .status-badge.onbreak { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+  .status-badge.offline { background: rgba(90,100,120,0.15); color: var(--muted2); border: 1px solid var(--border); }
+  .emp-card-addr {
+    font-size: 11px; color: var(--muted2); margin-bottom: 8px;
+    line-height: 1.4; display: flex; gap: 5px; align-items: flex-start;
+  }
+  .emp-card-addr-icon { flex-shrink: 0; margin-top: 1px; }
+  .emp-card-metrics { display: flex; gap: 6px; flex-wrap: wrap; }
+  .emp-metric {
+    display: flex; flex-direction: column;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 9px; flex: 1; min-width: 70px;
+  }
+  .emp-metric-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--gold);
+    line-height: 1;
+  }
+  .emp-metric-label { font-size: 9px; color: var(--muted); margin-top: 3px; letter-spacing: 0.3px; }
+  .emp-card-job {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted2);
+    display: flex; gap: 5px; align-items: center;
+  }
+  .emp-card-job strong { color: var(--white); font-weight: 500; }
+
+  /* empty state */
+  .sidebar-empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted);
+  }
+  .sidebar-empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+  .sidebar-empty-text { font-size: 13px; line-height: 1.6; }
+
+  /* ── MAP AREA ── */
+  .map-area {
+    position: relative; overflow: hidden;
+    background: #0b0e15;
+  }
+  #map {
+    width: 100%; height: 100%;
+    filter: brightness(0.85) saturate(0.8);
+  }
+
+  /* Map overlay header */
+  .map-overlay-head {
+    position: absolute; top: 16px; left: 16px; right: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none; z-index: 5;
+  }
+  .map-info-pill {
+    background: rgba(13,17,23,0.85);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 8px 14px;
+    font-size: 12px; color: var(--muted2);
+    pointer-events: all;
+  }
+  .map-info-pill strong { color: var(--white); }
+  .map-refresh-btn {
+    background: rgba(13,17,23,0.85);
+    border: 1px solid rgba(201,168,76,0.3);
+    backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 8px 14px;
+    font-size: 12px; color: var(--gold); font-weight: 600;
+    cursor: pointer; pointer-events: all;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .map-refresh-btn:hover { background: var(--gold-dim); }
+  .refresh-spin { display: inline-block; }
+  .refresh-spin.spinning { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DETAIL PANEL (slide up on card click) ── */
+  .detail-panel {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 0 20px 32px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    z-index: 20; max-height: 60%;
+    overflow-y: auto;
+  }
+  .detail-panel.open { transform: translateY(0); }
+  .detail-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 14px auto 18px;
+  }
+  .detail-close {
+    position: absolute; top: 16px; right: 20px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 8px; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted2); font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .detail-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; letter-spacing: 1px; color: var(--white);
+    margin-bottom: 4px; line-height: 1;
+  }
+  .detail-name span { color: var(--gold); }
+  .detail-id { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .detail-cell {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .detail-cell-label { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 5px; }
+  .detail-cell-val { font-size: 15px; font-weight: 600; color: var(--white); }
+  .detail-cell-val.gold { color: var(--gold); font-family: 'DM Mono', monospace; }
+  .detail-cell-val.teal { color: var(--teal); }
+  .detail-cell-val.amber { color: var(--amber); }
+  .detail-section-title {
+    font-size: 10px; color: var(--muted); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 10px; margin-top: 16px;
+  }
+  .detail-location-card {
+    background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 13px 14px; margin-bottom: 12px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .detail-location-icon {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .detail-location-icon.teal { background: var(--teal-dim); }
+  .detail-location-icon.gold { background: var(--gold-dim); }
+  .detail-location-addr { font-size: 13px; color: var(--white); font-weight: 500; line-height: 1.4; }
+  .detail-location-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .detail-gmaps-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px; padding: 6px 12px; margin-top: 8px;
+    font-size: 12px; color: var(--gold); font-weight: 600;
+    cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── LOADING OVERLAY ── */
+  .loading-overlay {
+    position: absolute; inset: 0; z-index: 30;
+    background: rgba(7,9,15,0.85); backdrop-filter: blur(4px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+  }
+  .loading-overlay.hidden { display: none; }
+  .loading-spinner {
+    width: 42px; height: 42px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .loading-text { font-size: 13px; color: var(--muted2); }
+
+  /* ── ERROR TOAST ── */
+  .error-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.35);
+    border-radius: 12px; padding: 10px 18px;
+    font-size: 13px; color: #fda4af;
+    z-index: 100; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  .error-toast.show { opacity: 1; }
+
+  /* ── MOBILE ADJUSTMENTS ── */
+  @media (max-width: 640px) {
+    .app {
+      grid-template-columns: 1fr;
+      grid-template-rows: 56px 1fr 1fr;
+    }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .map-area { }
+  }
+
+  /* ── MAP MARKER STYLES (injected into Leaflet) ── */
+  .pi-marker {
+    position: relative;
+  }
+  .pi-marker-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .pi-marker-dot.working { background: var(--working); }
+  .pi-marker-dot.onbreak { background: var(--break); }
+  .pi-marker-dot.offline { background: var(--offline); }
+  .pi-marker-label {
+    position: absolute; bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(13,17,23,0.9); border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 11px; font-weight: 600; color: #fff;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .pi-marker-pulse {
+    position: absolute; inset: -4px;
+    border-radius: 50%;
+    animation: marker-pulse 2s ease-out infinite;
+  }
+  .pi-marker-pulse.working { background: rgba(45,212,191,0.35); }
+  .pi-marker-pulse.onbreak { background: rgba(245,158,11,0.35); }
+  @keyframes marker-pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    70% { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Last updated tag */
+  .last-updated {
+    font-size: 10px; color: var(--muted); margin-top: 2px;
+  }
+</style>
+
+<!-- Leaflet CSS (free map, no API key needed) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  onerror="this.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'">
+<script>
+// Load Leaflet with CDN fallback
+(function() {
+  function tryLoad(urls, idx) {
+    if (idx >= urls.length) {
+      window._leafletFailed = true;
+      document.dispatchEvent(new Event('leaflet-failed'));
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = urls[idx];
+    s.onload = function() { document.dispatchEvent(new Event('leaflet-ready')); };
+    s.onerror = function() { tryLoad(urls, idx + 1); };
+    document.head.appendChild(s);
+  }
+  tryLoad([
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js'
+  ], 0);
+})();
+</script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── TOP BAR ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PI CLEANING</div>
+      <div class="topbar-sep"></div>
+      <div class="topbar-label">Command Centre</div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <div class="refresh-timer" id="refresh-timer">Refreshing in 30s</div>
+      <div class="clock-display" id="clock-display">—</div>
+      <div class="hamburger-btn" id="hamburger-btn" onclick="toggleMenu(event)">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── DROPDOWN MENU ── -->
+  <div class="dropdown-menu" id="dropdown-menu">
+    <div class="dropdown-item" onclick="openReviewsModal()">
+      <span class="dropdown-item-icon">⭐</span> Request Reviews
+    </div>
+  </div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-title">Active Staff</div>
+      <div class="stats-row">
+        <div class="stat-chip">
+          <div class="stat-chip-val working" id="stat-working">0</div>
+          <div class="stat-chip-label">Working</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-val break" id="stat-break">0</div>
+          <div class="stat-chip-label">On Break</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-val total" id="stat-total">0</div>
+          <div class="stat-chip-label">Total</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-scroll" id="emp-list">
+      <div class="sidebar-empty">
+        <div class="sidebar-empty-icon">📡</div>
+        <div class="sidebar-empty-text">Connecting to live feed…</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAP ── -->
+  <main class="map-area">
+    <div id="map"></div>
+
+    <div class="map-overlay-head">
+      <div class="map-info-pill">
+        <strong id="map-active-count">0</strong> employees on map
+      </div>
+      <button class="map-refresh-btn" onclick="manualRefresh()">
+        <span class="refresh-spin" id="refresh-icon">↻</span> Refresh Now
+      </button>
+    </div>
+
+    <!-- Employee detail panel (slides up when card clicked) -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-handle"></div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+
+      <div class="detail-name" id="dp-name">—</div>
+      <div class="detail-id" id="dp-id">—</div>
+
+      <div class="detail-grid">
+        <div class="detail-cell">
+          <div class="detail-cell-label">STATUS</div>
+          <div class="detail-cell-val" id="dp-status">—</div>
+        </div>
+        <div class="detail-cell">
+          <div class="detail-cell-label">SHIFT DURATION</div>
+          <div class="detail-cell-val gold" id="dp-shift-duration">—</div>
+        </div>
+        <div class="detail-cell">
+          <div class="detail-cell-label">CLOCKED IN</div>
+          <div class="detail-cell-val" id="dp-clock-in">—</div>
+        </div>
+        <div class="detail-cell">
+          <div class="detail-cell-label">TOTAL BREAK</div>
+          <div class="detail-cell-val amber" id="dp-total-break">—</div>
+        </div>
+      </div>
+
+      <div class="detail-section-title">Current Location</div>
+      <div class="detail-location-card">
+        <div class="detail-location-icon teal">📍</div>
+        <div>
+          <div class="detail-location-addr" id="dp-live-addr">—</div>
+          <div class="detail-location-sub" id="dp-gps-coords">—</div>
+          <a class="detail-gmaps-btn" id="dp-gmaps-link" href="#" target="_blank">
+            ↗ Open in Google Maps
+          </a>
+        </div>
+      </div>
+
+      <div class="detail-section-title">Current Job</div>
+      <div class="detail-location-card">
+        <div class="detail-location-icon gold">🧹</div>
+        <div>
+          <div class="detail-location-addr" id="dp-job-addr">—</div>
+          <div class="detail-location-sub" id="dp-job-since">—</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Fetching live staff data…</div>
+    </div>
+
+  </main>
+
+</div>
+
+<div class="error-toast" id="error-toast"></div>
+
+<!-- ── REQUEST REVIEWS MODAL ── -->
+<div class="modal-backdrop" id="reviews-backdrop" onclick="closeReviewsModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeReviewsModal()">&#x2715;</button>
+    <div class="modal-title">Request <span>Reviews</span></div>
+    <div class="modal-subtitle">Send your Google Review link to clients in one tap</div>
+
+    <!-- Google Review Link Block -->
+    <div class="review-link-block">
+      <div class="review-link-label">Your Google Review Link</div>
+
+      <!-- No link saved yet — input -->
+      <div id="link-setup">
+        <div class="review-link-set">
+          <input class="review-link-input" id="link-input" type="url"
+            placeholder="https://g.page/r/…/review" />
+          <button class="btn-save-link" onclick="saveReviewLink()">Save Link</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;">
+          Paste your Google review link — it is saved permanently on this device until you remove it.
+        </div>
+      </div>
+
+      <!-- Link saved -->
+      <div id="link-saved" style="display:none">
+        <div class="review-link-saved">
+          <div class="review-link-url" id="link-display">—</div>
+          <div class="review-link-actions">
+            <button class="btn-link-action change" onclick="changeReviewLink()">Change</button>
+            <button class="btn-link-action remove" onclick="removeReviewLink()">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send Form -->
+    <div id="send-section" style="display:none">
+      <div class="send-method-tabs">
+        <button class="send-tab active" id="tab-sms" onclick="setTab('sms')">SMS</button>
+        <button class="send-tab" id="tab-email" onclick="setTab('email')">Email</button>
+      </div>
+
+      <div class="send-form" style="margin-top:14px">
+        <div class="form-group">
+          <label class="form-label">Client / Business Name</label>
+          <input class="form-input" id="client-name" type="text" placeholder="e.g. Westfield Doncaster" />
+        </div>
+
+        <div class="form-group" id="mobile-group">
+          <label class="form-label">Mobile Number</label>
+          <input class="form-input" id="client-mobile" type="tel" placeholder="+61 4XX XXX XXX" />
+        </div>
+
+        <div class="form-group" id="email-group" style="display:none">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="client-email" type="email" placeholder="client@example.com" />
+        </div>
+
+        <div>
+          <div class="message-preview-label">Message Preview</div>
+          <div class="message-preview" id="message-preview">—</div>
+        </div>
+
+        <button class="btn-send-review" id="send-btn" onclick="sendReview()">
+          &#9733; Send Review Request
+        </button>
+        <div class="send-success" id="send-success">
+          Review request sent! Opening your SMS / email app now.
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompt to add link first -->
+    <div class="no-link-notice" id="no-link-notice">
+      Add your Google Review link above to start sending requests.
+    </div>
+
+  </div>
+</div>
+
+
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG — same Apps Script URL as employee app
+// ══════════════════════════════════════════
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwOKy-LdKcREXyjFKmj15EDD3NKBacvpvpkX3n_jO5wGf6rw2kfp_FdzYKloOAlPAw8oA/exec';
+const REFRESH_INTERVAL = 30; // seconds
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let employees   = [];      // live data from Apps Script
+let markers     = {};      // leaflet markers keyed by employeeId
+let map         = null;
+let refreshCountdown = REFRESH_INTERVAL;
+let selectedId  = null;
+let refreshLoop = null;
+let countdownLoop = null;
+
+// ══════════════════════════════════════════
+//  MAP INIT
+// ══════════════════════════════════════════
+function initMap() {
+  if (typeof L === 'undefined') {
+    console.error('Leaflet not loaded — map disabled.');
+    document.getElementById('loading-overlay').classList.add('hidden');
+    return;
+  }
+  map = L.map('map', {
+    center: [-37.8136, 144.9631], // Melbourne default
+    zoom: 11,
+    zoomControl: false
+  });
+
+  // Dark tile layer — CartoDB Dark Matter (free, no API key)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  // Custom zoom control position
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+}
+
+// ══════════════════════════════════════════
+//  DATA FETCHING
+// ══════════════════════════════════════════
+function fetchStaffData() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('spinning');
+
+  fetch(SHEETS_URL + '?mode=getLiveStaff&t=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      icon.classList.remove('spinning');
+      document.getElementById('loading-overlay').classList.add('hidden');
+
+      if (data.status === 'ok') {
+        employees = data.employees || [];
+        renderAll();
+      } else {
+        showError('Apps Script error: ' + (data.message || 'Unknown'));
+      }
+    })
+    .catch(err => {
+      icon.classList.remove('spinning');
+      document.getElementById('loading-overlay').classList.add('hidden');
+      showError('Could not connect to Apps Script. Check URL.');
+      console.error(err);
+    });
+}
+
+function manualRefresh() {
+  refreshCountdown = REFRESH_INTERVAL;
+  fetchStaffData();
+}
+
+// ══════════════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════════════
+function renderAll() {
+  renderStats();
+  renderSidebar();
+  renderMapMarkers();
+  // If detail panel open, refresh it
+  if (selectedId) {
+    const emp = employees.find(e => e.id === selectedId);
+    if (emp) openDetail(emp);
+    else closeDetail();
+  }
+}
+
+// ══════════════════════════════════════════
+//  STATS BAR
+// ══════════════════════════════════════════
+function renderStats() {
+  const working = employees.filter(e => e.status === 'working').length;
+  const onBreak = employees.filter(e => e.status === 'onbreak').length;
+  document.getElementById('stat-working').textContent = working;
+  document.getElementById('stat-break').textContent   = onBreak;
+  document.getElementById('stat-total').textContent   = employees.length;
+  document.getElementById('map-active-count').textContent = employees.filter(e => e.lat && e.lng).length;
+}
+
+// ══════════════════════════════════════════
+//  SIDEBAR CARDS
+// ══════════════════════════════════════════
+function renderSidebar() {
+  const container = document.getElementById('emp-list');
+
+  if (!employees.length) {
+    container.innerHTML = `
+      <div class="sidebar-empty">
+        <div class="sidebar-empty-icon">😴</div>
+        <div class="sidebar-empty-text">No staff currently clocked in.<br>Check back when a shift starts.</div>
+      </div>`;
+    return;
+  }
+
+  // Sort: working first, then break, then offline
+  const sorted = [...employees].sort((a, b) => {
+    const order = { working: 0, onbreak: 1, offline: 2 };
+    return (order[a.status] || 2) - (order[b.status] || 2);
+  });
+
+  container.innerHTML = sorted.map(emp => {
+    const statusLabel = emp.status === 'working' ? 'WORKING'
+                      : emp.status === 'onbreak' ? 'ON BREAK' : 'OFFLINE';
+    const currentJob = emp.currentJob || emp.jobAddress || 'No job recorded';
+    const shiftTime  = emp.clockInTime ? timeSince(emp.clockInTime) : '—';
+    const breakTime  = emp.totalBreak || '0:00';
+    const liveAddr   = emp.liveAddress || (emp.lat ? `${emp.lat}, ${emp.lng}` : 'No GPS data yet');
+    const isSelected = emp.id === selectedId;
+
+    return `
+    <div class="emp-card ${emp.status} ${isSelected ? 'selected' : ''}" onclick="selectEmployee('${emp.id}')">
+      <div class="emp-card-top">
+        <div>
+          <div class="emp-card-name">${emp.name}</div>
+          <div class="emp-card-id">${emp.id}</div>
+        </div>
+        <div class="status-badge ${emp.status}">${statusLabel}</div>
+      </div>
+      <div class="emp-card-addr">
+        <span class="emp-card-addr-icon">📍</span>
+        <span>${liveAddr}</span>
+      </div>
+      <div class="emp-card-metrics">
+        <div class="emp-metric">
+          <div class="emp-metric-val">${shiftTime}</div>
+          <div class="emp-metric-label">ON SHIFT</div>
+        </div>
+        <div class="emp-metric">
+          <div class="emp-metric-val">${breakTime}</div>
+          <div class="emp-metric-label">BREAK TIME</div>
+        </div>
+        <div class="emp-metric">
+          <div class="emp-metric-val">${emp.jobCount || 0}</div>
+          <div class="emp-metric-label">JOBS</div>
+        </div>
+      </div>
+      ${currentJob ? `
+      <div class="emp-card-job">
+        🧹 <strong>${currentJob}</strong>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  MAP MARKERS
+// ══════════════════════════════════════════
+function renderMapMarkers() {
+  if (!map || typeof L === 'undefined') return;
+  const bounds = [];
+
+  employees.forEach(emp => {
+    if (!emp.lat || !emp.lng) return;
+    const lat = parseFloat(emp.lat);
+    const lng = parseFloat(emp.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    bounds.push([lat, lng]);
+
+    const statusClass = emp.status === 'working' ? 'working'
+                      : emp.status === 'onbreak' ? 'onbreak' : 'offline';
+
+    const iconHtml = `
+      <div class="pi-marker">
+        <div class="pi-marker-label">${emp.name.split(' ')[0]}</div>
+        ${emp.status !== 'offline' ? `<div class="pi-marker-pulse ${statusClass}"></div>` : ''}
+        <div class="pi-marker-dot ${statusClass}"></div>
+      </div>`;
+
+    const leafIcon = L.divIcon({
+      html: iconHtml,
+      className: '',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+
+    if (markers[emp.id]) {
+      // Update existing marker position
+      markers[emp.id].setLatLng([lat, lng]);
+      markers[emp.id].setIcon(leafIcon);
+    } else {
+      // Create new marker
+      markers[emp.id] = L.marker([lat, lng], { icon: leafIcon })
+        .addTo(map)
+        .on('click', () => selectEmployee(emp.id));
+    }
+  });
+
+  // Remove markers for employees no longer active
+  Object.keys(markers).forEach(id => {
+    if (!employees.find(e => e.id === id && e.lat && e.lng)) {
+      map.removeLayer(markers[id]);
+      delete markers[id];
+    }
+  });
+
+  // Fit map to show all employees
+  if (bounds.length > 0 && !selectedId) {
+    if (bounds.length === 1) {
+      map.setView(bounds[0], 14);
+    } else {
+      map.fitBounds(bounds, { padding: [60, 60] });
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+//  EMPLOYEE SELECTION
+// ══════════════════════════════════════════
+function selectEmployee(id) {
+  selectedId = id;
+  const emp = employees.find(e => e.id === id);
+  if (!emp) return;
+  openDetail(emp);
+  renderSidebar(); // re-render to highlight selected card
+
+  // Fly map to employee
+  if (map && emp.lat && emp.lng) {
+    map.flyTo([parseFloat(emp.lat), parseFloat(emp.lng)], 15, { duration: 1.2 });
+  }
+}
+
+function openDetail(emp) {
+  const panel = document.getElementById('detail-panel');
+
+  // Name
+  const parts = emp.name.split(' ');
+  const firstName = parts[0];
+  const lastName  = parts.slice(1).join(' ');
+  document.getElementById('dp-name').innerHTML = `${firstName} <span>${lastName}</span>`;
+  document.getElementById('dp-id').textContent = emp.id;
+
+  // Status
+  const dpStatus = document.getElementById('dp-status');
+  dpStatus.textContent = emp.status === 'working' ? '🟢 Working'
+                       : emp.status === 'onbreak' ? '🟡 On Break' : '⚫ Offline';
+  dpStatus.className = 'detail-cell-val ' + (emp.status === 'working' ? 'teal' : emp.status === 'onbreak' ? 'amber' : '');
+
+  // Times
+  document.getElementById('dp-shift-duration').textContent = emp.clockInTime ? timeSince(emp.clockInTime) : '—';
+  document.getElementById('dp-clock-in').textContent = emp.clockInTime ? fmt12(new Date(emp.clockInTime)) : '—';
+  document.getElementById('dp-total-break').textContent = emp.totalBreak || '0:00';
+
+  // Live location
+  const liveAddr = emp.liveAddress || (emp.lat ? 'GPS acquired' : 'No GPS data');
+  document.getElementById('dp-live-addr').textContent = liveAddr;
+  document.getElementById('dp-gps-coords').textContent = emp.lat && emp.lng
+    ? `${emp.lat}, ${emp.lng} · Updated ${emp.lastGpsUpdate ? timeSince(emp.lastGpsUpdate) + ' ago' : 'just now'}`
+    : 'No GPS coordinates yet';
+
+  // Maps link
+  if (emp.lat && emp.lng) {
+    const mapsUrl = `https://maps.google.com/?q=${emp.lat},${emp.lng}`;
+    document.getElementById('dp-gmaps-link').href = mapsUrl;
+    document.getElementById('dp-gmaps-link').style.display = 'inline-flex';
+  } else {
+    document.getElementById('dp-gmaps-link').style.display = 'none';
+  }
+
+  // Current job
+  const jobAddr = emp.currentJob || emp.jobAddress || 'No job recorded yet';
+  document.getElementById('dp-job-addr').textContent = jobAddr;
+  document.getElementById('dp-job-since').textContent = emp.clockInTime
+    ? `Clocked in ${timeSince(emp.clockInTime)} ago`
+    : '';
+
+  panel.classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  selectedId = null;
+  renderSidebar();
+}
+
+// ══════════════════════════════════════════
+//  CLOCK & COUNTDOWN
+// ══════════════════════════════════════════
+function startClock() {
+  function tick() {
+    const now = new Date();
+    document.getElementById('clock-display').textContent =
+      now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+function startRefreshLoop() {
+  refreshCountdown = REFRESH_INTERVAL;
+
+  countdownLoop = setInterval(() => {
+    refreshCountdown--;
+    document.getElementById('refresh-timer').textContent =
+      refreshCountdown > 0 ? `Refreshing in ${refreshCountdown}s` : 'Refreshing…';
+    if (refreshCountdown <= 0) {
+      refreshCountdown = REFRESH_INTERVAL;
+      fetchStaffData();
+    }
+  }, 1000);
+}
+
+// ══════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════
+function timeSince(isoString) {
+  const secs = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+  if (secs < 60) return `${secs}s`;
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins}m`;
+  const hrs  = Math.floor(mins / 60);
+  const rem  = mins % 60;
+  return `${hrs}h ${rem}m`;
+}
+
+function fmt12(date) {
+  return date.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+function showError(msg) {
+  const toast = document.getElementById('error-toast');
+  toast.textContent = '⚠ ' + msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+// ══════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  startClock();
+  fetchStaffData();
+  startRefreshLoop();
+});
+
+// Wait for Leaflet to load before initialising map
+document.addEventListener('leaflet-ready', initMap);
+document.addEventListener('leaflet-failed', function() {
+  var mapEl = document.getElementById('map');
+  if (mapEl) {
+    mapEl.style.display = 'flex';
+    mapEl.style.alignItems = 'center';
+    mapEl.style.justifyContent = 'center';
+    mapEl.innerHTML = '<div style="text-align:center;color:var(--muted2);font-size:13px;padding:20px">' +
+      '🗺 Map unavailable — could not load Leaflet.<br>' +
+      '<span style="font-size:11px;color:var(--muted)">Check your internet connection.</span></div>';
+  }
+  document.getElementById('loading-overlay').classList.add('hidden');
+});
+
+// ══════════════════════════════════════════
+//  HAMBURGER MENU
+// ══════════════════════════════════════════
+function toggleMenu(e) {
+  e.stopPropagation();
+  document.getElementById('dropdown-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('dropdown-menu').classList.remove('open');
+});
+
+// ══════════════════════════════════════════
+//  REQUEST REVIEWS
+// ══════════════════════════════════════════
+const REVIEW_LINK_KEY = 'pi_review_link';
+let currentTab = 'sms';
+
+function openReviewsModal() {
+  document.getElementById('dropdown-menu').classList.remove('open');
+  document.getElementById('reviews-backdrop').classList.add('open');
+  loadReviewLink();
+  updateMessagePreview();
+}
+
+function closeReviewsModal(e) {
+  if (e && e.target !== document.getElementById('reviews-backdrop')) return;
+  document.getElementById('reviews-backdrop').classList.remove('open');
+  document.getElementById('send-success').style.display = 'none';
+}
+
+function loadReviewLink() {
+  const saved = localStorage.getItem(REVIEW_LINK_KEY);
+  if (saved) {
+    document.getElementById('link-setup').style.display = 'none';
+    document.getElementById('link-saved').style.display = 'block';
+    document.getElementById('link-display').textContent = saved;
+    document.getElementById('send-section').style.display = 'block';
+    document.getElementById('no-link-notice').style.display = 'none';
+  } else {
+    document.getElementById('link-setup').style.display = 'block';
+    document.getElementById('link-saved').style.display = 'none';
+    document.getElementById('send-section').style.display = 'none';
+    document.getElementById('no-link-notice').style.display = 'block';
+  }
+}
+
+function saveReviewLink() {
+  const val = document.getElementById('link-input').value.trim();
+  if (!val) { alert('Please enter a Google Review link.'); return; }
+  localStorage.setItem(REVIEW_LINK_KEY, val);
+  document.getElementById('link-input').value = '';
+  loadReviewLink();
+  updateMessagePreview();
+}
+
+function changeReviewLink() {
+  const current = localStorage.getItem(REVIEW_LINK_KEY) || '';
+  document.getElementById('link-input').value = current;
+  localStorage.removeItem(REVIEW_LINK_KEY);
+  loadReviewLink();
+}
+
+function removeReviewLink() {
+  if (!confirm('Remove your saved review link?')) return;
+  localStorage.removeItem(REVIEW_LINK_KEY);
+  loadReviewLink();
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-sms').classList.toggle('active', tab === 'sms');
+  document.getElementById('tab-email').classList.toggle('active', tab === 'email');
+  document.getElementById('mobile-group').style.display = tab === 'sms' ? 'flex' : 'none';
+  document.getElementById('email-group').style.display  = tab === 'email' ? 'flex' : 'none';
+  updateMessagePreview();
+}
+
+function updateMessagePreview() {
+  const link = localStorage.getItem(REVIEW_LINK_KEY) || '[your review link]';
+  const name = (document.getElementById('client-name') || {}).value || '';
+  const greeting = name ? 'Hi ' + name + ', ' : '';
+  const msg = greeting +
+    'Thank you for choosing PI Cleaning Services! We appreciate your business. ' +
+    'We would love to hear your feedback — please leave us a review here: ' + link +
+    '  ⭐ We strive for 5 stars!';
+  const el = document.getElementById('message-preview');
+  if (el) el.textContent = msg;
+}
+
+// Update preview as client name changes
+document.addEventListener('input', (e) => {
+  if (e.target && e.target.id === 'client-name') updateMessagePreview();
+});
+
+function sendReview() {
+  const link  = localStorage.getItem(REVIEW_LINK_KEY);
+  const name  = (document.getElementById('client-name').value || '').trim();
+  const greeting = name ? 'Hi ' + name + ', ' : '';
+  const msg = greeting +
+    'Thank you for choosing PI Cleaning Services! We appreciate your business. ' +
+    'We would love to hear your feedback — please leave us a review here: ' + link +
+    '  \u2b50 We strive for 5 stars!';
+
+  if (currentTab === 'sms') {
+    const mobile = document.getElementById('client-mobile').value.trim();
+    if (!mobile) { alert('Please enter a mobile number.'); return; }
+    const encoded = encodeURIComponent(msg);
+    // Works on iOS (sms:number&body=) and Android (sms:number?body=)
+    const ua = navigator.userAgent;
+    const sep = /iphone|ipad|ipod/i.test(ua) ? '&' : '?';
+    window.open('sms:' + mobile + sep + 'body=' + encoded);
+  } else {
+    const email = document.getElementById('client-email').value.trim();
+    if (!email) { alert('Please enter an email address.'); return; }
+    const subject = encodeURIComponent('PI Cleaning Services — Leave Us a Review');
+    const body    = encodeURIComponent(msg);
+    window.open('mailto:' + email + '?subject=' + subject + '&body=' + body);
+  }
+
+  document.getElementById('send-success').style.display = 'block';
+  document.getElementById('client-name').value   = '';
+  document.getElementById('client-mobile').value = '';
+  document.getElementById('client-email').value  = '';
+  setTimeout(() => {
+    document.getElementById('send-success').style.display = 'none';
+  }, 4000);
+}
+
+</script>
+</body>
+</html>
