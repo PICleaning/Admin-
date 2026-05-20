@@ -797,7 +797,7 @@ document.head.appendChild(link);
     </div>
     <div class="dropdown-sep" id="url-manage-sep" style="display:none"></div>
     <div class="dropdown-item" id="url-manage-item" style="display:none" onclick="openManageUrl()">
-      <span class="dropdown-item-icon">🔗</span> Remove or Change URL
+      <span class="dropdown-item-icon">🔗</span> Edit Google Review URL
     </div>
   </div>
 
@@ -1003,7 +1003,7 @@ document.head.appendChild(link);
     <div class="no-link-notice" id="no-link-notice">
       No review link saved yet.<br>
       <span style="font-size:11px;color:var(--muted)">
-        Tap ☰ → <strong style="color:var(--gold)">Remove or Change URL</strong> to add your Google Review link.
+        Tap ☰ → <strong style="color:var(--gold)">Edit Google Review URL</strong> to add your Google Review link.
       </span>
     </div>
 
@@ -1404,7 +1404,7 @@ document.addEventListener('click', () => {
 const REVIEW_LINK_KEY = 'pi_review_link';
 let currentTab = 'sms';
 
-// ── Sync dropdown "Remove or Change URL" visibility ──
+// ── Sync dropdown "Edit Google Review URL" visibility ──
 function syncDropdownUrlItem() {
   const saved = !!localStorage.getItem(REVIEW_LINK_KEY);
   const item = document.getElementById('url-manage-item');
@@ -1435,7 +1435,7 @@ function syncReviewsModal() {
   syncDropdownUrlItem();
 }
 
-// ── MANAGE URL MODAL (from hamburger → "Remove or Change URL") ──
+// ── MANAGE URL MODAL (from hamburger → "Edit Google Review URL") ──
 function openManageUrl() {
   document.getElementById('dropdown-menu').classList.remove('open');
   document.getElementById('manage-url-backdrop').classList.add('open');
@@ -1456,7 +1456,7 @@ function syncManageModal() {
 
 function saveReviewLinkFromManage() {
   const val = document.getElementById('mu-link-input').value.trim();
-  if (!val) { alert('Please paste your Google Review link.'); return; }
+  if (!val) { alert('Please paste your Google Reviews URL.'); return; }
   try { new URL(val); } catch(e) { alert('Please enter a valid URL (starting with https://).'); return; }
   localStorage.setItem(REVIEW_LINK_KEY, val);
   syncManageModal();
@@ -1518,7 +1518,7 @@ function updateMessagePreview() {
     el.textContent =
       greeting +
       'Thank you for choosing PI Cleaning Services! We appreciate your business. ' +
-      'We would love to hear your feedback — please leave us a review: ' +
+      'Please tap the review link below to share your experience with us: ' +
       (link || '[review link]') +
       ' ⭐ We strive for 5 stars!';
   }
@@ -1543,10 +1543,11 @@ function sendReview() {
     // SMS is plain text only — URL is the hyperlink in native messages apps
     const smsBody =
       greeting +
-      'Thank you for choosing PI Cleaning Services! We appreciate your business. ' +
-      'We would love to hear your feedback — please leave us a review: ' +
-      link +
-      ' ⭐ We strive for 5 stars!';
+      'Thank you for choosing PI Cleaning Services. We truly appreciate your support. ' +
+      'Please tap the review link below to share your experience with us:\n\n' +
+      '⭐ Leave a Google Review:\n' +
+      link + '\n\n' +
+      'Thank you,\nPI Cleaning Services Team';
 
     const encoded = encodeURIComponent(smsBody);
     const sep = /iphone|ipad|ipod/i.test(navigator.userAgent) ? '&' : '?';
@@ -1561,9 +1562,9 @@ function sendReview() {
     // We also wrap it so the anchor text is readable even as plain text
     const emailBody =
       greeting +
-      'Thank you for choosing PI Cleaning Services! We truly appreciate your business and hope we exceeded your expectations.\n\n' +
-      'We would love to hear your feedback — it only takes a minute and means the world to us.\n\n' +
-      '⭐ Leave us a Google Review: ' + link + '\n\n' +
+      'Thank you for choosing PI Cleaning Services. We truly appreciate your business and support.\n\n' +
+      'We would love to hear your feedback. Please click the review link below to leave us a Google Review.\n\n' +
+      '⭐ Leave a Google Review: ' + link + '\n\n' +
       'Thank you,\nPI Cleaning Services Team';
 
     window.open(
