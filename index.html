@@ -7,19 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   :root {
     --navy: #0a1628;
     --navy-mid: #0f2040;
-    --navy-light: #1a3060;
     --gold: #c9a84c;
     --gold-light: #e8c97a;
-    --gold-pale: #f5e4b0;
     --white: #ffffff;
     --white-muted: rgba(255,255,255,0.7);
-    --white-faint: rgba(255,255,255,0.12);
   }
-
   body {
     font-family: 'Montserrat', sans-serif;
     background: var(--navy);
@@ -28,428 +23,314 @@
     overflow-x: hidden;
   }
 
-  /* ── OVERLAY ── */
   .overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 80;
-    backdrop-filter: blur(2px);
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 80;
   }
   .overlay.open { display: block; }
 
-  /* ── DRAWER ── */
   .drawer {
-    position: fixed;
-    top: 0; right: -360px;
-    width: 340px; height: 100vh;
+    position: fixed; top: 0; right: -380px;
+    width: 360px; height: 100vh;
     background: var(--navy-mid);
     border-left: 1px solid rgba(201,168,76,0.3);
     z-index: 100;
     transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
     display: flex; flex-direction: column;
+    overflow-y: auto;
   }
   .drawer.open { right: 0; }
 
   .drawer-header {
-    padding: 28px 24px 20px;
+    padding: 26px 24px 20px;
     border-bottom: 1px solid rgba(201,168,76,0.2);
     display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0;
+    background: var(--navy-mid); z-index: 1;
   }
   .drawer-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px; font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.04em;
+    font-size: 21px; font-weight: 600;
+    color: var(--gold-light); letter-spacing: 0.04em;
   }
   .close-btn {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(201,168,76,0.35);
-    border-radius: 50%;
-    background: transparent;
-    color: var(--gold);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; line-height: 1;
-    transition: background 0.2s, color 0.2s;
+    width: 34px; height: 34px;
+    border: 1px solid rgba(201,168,76,0.35); border-radius: 50%;
+    background: transparent; color: var(--gold);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: background 0.2s, color 0.2s;
   }
   .close-btn:hover { background: var(--gold); color: var(--navy); }
 
-  /* ── NAV MENU ITEMS ── */
-  .drawer-nav {
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(201,168,76,0.15);
-  }
-  .nav-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 13px 24px;
-    color: var(--white-muted);
-    cursor: pointer;
-    font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
-    transition: background 0.15s, color 0.15s;
-  }
-  .nav-item:hover, .nav-item.active { background: rgba(201,168,76,0.1); color: var(--gold-light); }
-  .nav-icon { font-size: 17px; }
-
-  /* ── REVIEW SECTION ── */
-  .drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+  .drawer-body { padding: 28px 24px 32px; flex: 1; }
 
   .section-tag {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--gold); font-weight: 600; margin-bottom: 6px;
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold); font-weight: 600; margin-bottom: 5px;
   }
   .section-heading {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 700;
-    color: var(--white); margin-bottom: 18px; line-height: 1.2;
+    font-size: 22px; font-weight: 700;
+    color: var(--white); margin-bottom: 22px; line-height: 1.2;
   }
 
-  .field-group { margin-bottom: 16px; }
+  .review-link-box {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 26px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .review-link-icon {
+    font-size: 22px; flex-shrink: 0;
+  }
+  .review-link-text {
+    font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5;
+  }
+  .review-hyperlink {
+    display: block;
+    color: var(--gold-light);
+    font-size: 13px; font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .review-hyperlink:hover { color: #fff; }
+
+  .divider {
+    height: 1px;
+    background: rgba(201,168,76,0.15);
+    margin: 0 0 24px;
+  }
+
+  .field-group { margin-bottom: 15px; }
   .field-label {
-    display: block; font-size: 11px; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--gold); margin-bottom: 7px;
   }
   .field-input {
-    width: 100%;
-    padding: 11px 14px;
+    width: 100%; padding: 11px 14px;
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 8px;
-    color: var(--white);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: 8px; color: var(--white);
+    font-family: 'Montserrat', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.2s, background 0.2s;
   }
-  .field-input::placeholder { color: rgba(255,255,255,0.3); }
-  .field-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+  .field-input::placeholder { color: rgba(255,255,255,0.28); }
+  .field-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.06); }
 
-  .contact-toggle {
-    display: flex; gap: 8px; margin-bottom: 16px;
-  }
+  .contact-toggle { display: flex; gap: 8px; margin-bottom: 15px; }
   .toggle-btn {
     flex: 1; padding: 9px;
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 7px;
-    background: transparent;
-    color: var(--white-muted);
+    border: 1px solid rgba(201,168,76,0.25); border-radius: 7px;
+    background: transparent; color: var(--white-muted);
     font-family: 'Montserrat', sans-serif;
     font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
     cursor: pointer; transition: all 0.2s;
   }
-  .toggle-btn.active {
-    background: var(--gold);
-    color: var(--navy);
-    border-color: var(--gold);
-  }
+  .toggle-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
 
-  .send-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border: none;
-    border-radius: 9px;
-    color: var(--navy);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-    margin-top: 8px;
-  }
-  .send-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .send-btn:active { transform: translateY(0); }
-
-  .success-msg {
-    display: none;
-    background: rgba(201,168,76,0.1);
-    border: 1px solid rgba(201,168,76,0.35);
-    border-radius: 9px;
-    padding: 14px 16px;
-    margin-top: 14px;
-    font-size: 12px; line-height: 1.6;
-    color: var(--gold-light);
-  }
-  .success-msg.show { display: block; }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: 70px;
-    background: rgba(10,22,40,0.92);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(201,168,76,0.18);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 32px;
-    z-index: 60;
-  }
-
-  .logo-area {
-    display: flex; align-items: center; gap: 14px;
-  }
-  .logo-img {
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid rgba(201,168,76,0.5);
-  }
-  .logo-text { line-height: 1; }
-  .logo-text-main {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 700;
-    color: var(--gold-light);
-    letter-spacing: 0.1em;
-  }
-  .logo-text-sub {
-    font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--white-muted); margin-top: 2px;
-  }
-
-  .hamburger {
-    width: 44px; height: 44px;
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 5px; padding: 10px;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .hamburger:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
-  .hamburger span {
-    display: block; width: 20px; height: 1.5px;
-    background: var(--gold);
-    transition: transform 0.25s, opacity 0.25s;
-    border-radius: 2px;
-  }
-  .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .hamburger.open span:nth-child(2) { opacity: 0; }
-  .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-  /* ── HERO ── */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center;
-    padding: 100px 32px 60px;
-    position: relative; overflow: hidden;
-  }
-
-  .hero-bg {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse 70% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(201,168,76,0.04) 0%, transparent 60%);
-  }
-
-  /* gold geometric lines */
-  .hero-lines {
-    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-  }
-  .hero-lines::before {
-    content: '';
-    position: absolute;
-    width: 600px; height: 600px;
-    border: 1px solid rgba(201,168,76,0.08);
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -60%);
-  }
-  .hero-lines::after {
-    content: '';
-    position: absolute;
-    width: 900px; height: 900px;
-    border: 1px solid rgba(201,168,76,0.04);
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -55%);
-  }
-
-  .hero-logo {
-    width: 130px; height: 130px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(201,168,76,0.5);
-    box-shadow: 0 0 40px rgba(201,168,76,0.15);
-    margin-bottom: 28px;
-    position: relative; z-index: 1;
-    animation: floatLogo 4s ease-in-out infinite;
-  }
-  @keyframes floatLogo {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-
-  .hero-eyebrow {
-    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--gold); font-weight: 600;
-    margin-bottom: 14px; position: relative; z-index: 1;
-  }
-
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(42px, 7vw, 72px);
-    font-weight: 700; line-height: 1.05;
-    color: var(--white);
-    margin-bottom: 6px; position: relative; z-index: 1;
-  }
-  .hero-title span { color: var(--gold-light); }
-
-  .hero-sub {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(16px, 2.5vw, 22px);
-    font-weight: 400; letter-spacing: 0.12em;
-    color: var(--gold); text-transform: uppercase;
-    margin-bottom: 20px; position: relative; z-index: 1;
-  }
-
-  .hero-tagline {
-    font-size: 13px; color: var(--white-muted);
-    max-width: 400px; line-height: 1.8;
-    position: relative; z-index: 1; margin-bottom: 40px;
-  }
-
-  .gold-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 40px; position: relative; z-index: 1;
-  }
-  .gold-divider::before, .gold-divider::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    max-width: 80px;
-  }
-  .gold-divider-icon {
-    color: var(--gold); font-size: 14px; letter-spacing: 4px;
-  }
-
-  /* ── STATS ── */
-  .stats-row {
-    display: flex; gap: 40px; justify-content: center;
-    position: relative; z-index: 1; flex-wrap: wrap;
-  }
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px; font-weight: 700; color: var(--gold-light);
-    line-height: 1;
-  }
-  .stat-label {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--white-muted); margin-top: 4px;
-  }
-
-  /* ── CARDS ROW ── */
-  .cards-section {
-    padding: 60px 32px 80px;
-    max-width: 960px; margin: 0 auto;
-  }
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-  }
-  .card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(201,168,76,0.18);
-    border-radius: 16px;
-    padding: 28px 24px;
-    text-align: center;
-    transition: background 0.2s, border-color 0.2s, transform 0.2s;
-    cursor: default;
-  }
-  .card:hover {
-    background: rgba(201,168,76,0.07);
-    border-color: rgba(201,168,76,0.4);
-    transform: translateY(-3px);
-  }
-  .card-icon {
-    width: 48px; height: 48px;
-    background: rgba(201,168,76,0.12);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 22px;
-  }
-  .card-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px; font-weight: 600; color: var(--white);
-    margin-bottom: 8px;
-  }
-  .card-desc {
-    font-size: 12px; color: var(--white-muted); line-height: 1.7;
-  }
-
-  /* ── FOOTER ── */
-  .footer {
-    border-top: 1px solid rgba(201,168,76,0.12);
-    padding: 24px 32px;
-    text-align: center;
-    font-size: 11px; color: rgba(255,255,255,0.3);
-    letter-spacing: 0.06em;
-  }
-  .footer span { color: var(--gold); }
-
-  /* ── PREVIEW ── */
   .preview-box {
     background: rgba(201,168,76,0.06);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-top: 16px;
-    display: none;
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 16px; display: none;
   }
   .preview-box.show { display: block; }
   .preview-label {
     font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--gold); font-weight: 600; margin-bottom: 8px;
   }
-  .preview-content { font-size: 12px; color: var(--white-muted); line-height: 1.8; }
-  .preview-link { color: var(--gold-light); text-decoration: underline; cursor: pointer; }
+  .preview-content { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.8; }
+  .preview-link { color: var(--gold-light); text-decoration: underline; }
+
+  .send-btn {
+    width: 100%; padding: 14px;
+    background: var(--gold);
+    border: none; border-radius: 9px;
+    color: var(--navy);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+  }
+  .send-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .send-btn:active { transform: translateY(0); }
+
+  .success-msg {
+    display: none;
+    border-radius: 9px; padding: 13px 15px;
+    margin-top: 12px; font-size: 12px; line-height: 1.6;
+  }
+  .success-msg.show { display: block; }
+
+  /* TOPBAR */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 68px;
+    background: rgba(10,22,40,0.93);
+    border-bottom: 1px solid rgba(201,168,76,0.18);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; z-index: 60;
+  }
+  .logo-area { display: flex; align-items: center; gap: 13px; }
+  .logo-img {
+    width: 44px; height: 44px; border-radius: 50%;
+    object-fit: cover; border: 1.5px solid rgba(201,168,76,0.5);
+  }
+  .logo-text-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; font-weight: 700;
+    color: var(--gold-light); letter-spacing: 0.1em;
+  }
+  .logo-text-sub {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--white-muted); margin-top: 2px;
+  }
+  .hamburger {
+    width: 42px; height: 42px;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3); border-radius: 10px;
+    cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 5px; padding: 10px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .hamburger:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .hamburger span {
+    display: block; width: 20px; height: 1.5px;
+    background: var(--gold); border-radius: 2px;
+    transition: transform 0.25s, opacity 0.25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 100px 32px 60px; position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%);
+  }
+  .hero-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.07);
+    top: 50%; left: 50%; transform: translate(-50%, -58%);
+  }
+  .hero-logo {
+    width: 126px; height: 126px; border-radius: 50%;
+    object-fit: cover; border: 2px solid rgba(201,168,76,0.45);
+    margin-bottom: 26px; position: relative; z-index: 1;
+    animation: floatLogo 4s ease-in-out infinite;
+  }
+  @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .hero-eyebrow {
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold); font-weight: 600; margin-bottom: 13px; position: relative; z-index: 1;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(44px,7vw,72px); font-weight: 700; line-height: 1.05;
+    color: var(--white); margin-bottom: 6px; position: relative; z-index: 1;
+  }
+  .hero-title span { color: var(--gold-light); }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px,2.5vw,20px); font-weight: 400; letter-spacing: 0.12em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 18px; position: relative; z-index: 1;
+  }
+  .hero-tagline {
+    font-size: 13px; color: var(--white-muted);
+    max-width: 380px; line-height: 1.8; position: relative; z-index: 1; margin-bottom: 38px;
+  }
+  .gold-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 38px; position: relative; z-index: 1;
+  }
+  .gold-divider::before,.gold-divider::after {
+    content:''; flex:1; height:1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    max-width:80px;
+  }
+  .stats-row {
+    display: flex; gap: 44px; justify-content: center;
+    position: relative; z-index: 1; flex-wrap: wrap;
+  }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 700; color: var(--gold-light); line-height: 1;
+  }
+  .stat-label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--white-muted); margin-top: 4px;
+  }
+
+  .cards-section { padding: 56px 32px 72px; max-width: 940px; margin: 0 auto; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.16); border-radius: 16px;
+    padding: 26px 22px; text-align: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { background: rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.38); transform: translateY(-3px); }
+  .card-icon {
+    width: 46px; height: 46px; background: rgba(201,168,76,0.11);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; font-size: 20px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 600; color: var(--white); margin-bottom: 7px;
+  }
+  .card-desc { font-size: 12px; color: var(--white-muted); line-height: 1.7; }
+
+  .footer {
+    border-top: 1px solid rgba(201,168,76,0.12);
+    padding: 22px 32px; text-align: center;
+    font-size: 11px; color: rgba(255,255,255,0.28); letter-spacing: 0.06em;
+  }
+  .footer span { color: var(--gold); }
 </style>
 </head>
 <body>
 
-<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
-<!-- Drawer -->
+<!-- Simplified Drawer — Review Request only -->
 <div class="drawer" id="drawer">
   <div class="drawer-header">
-    <div class="drawer-title">Pi Admin Menu</div>
+    <div class="drawer-title">⭐ Request a Review</div>
     <button class="close-btn" onclick="closeDrawer()">✕</button>
   </div>
 
-  <div class="drawer-nav">
-    <div class="nav-item active">
-      <span class="nav-icon">🏠</span> Dashboard
-    </div>
-    <div class="nav-item">
-      <span class="nav-icon">📋</span> Jobs & Bookings
-    </div>
-    <div class="nav-item">
-      <span class="nav-icon">👥</span> Clients
-    </div>
-    <div class="nav-item">
-      <span class="nav-icon">💰</span> Invoices
-    </div>
-    <div class="nav-item" onclick="scrollToReviews()">
-      <span class="nav-icon">⭐</span> Request Reviews
-    </div>
-    <div class="nav-item">
-      <span class="nav-icon">📊</span> Reports
-    </div>
-    <div class="nav-item">
-      <span class="nav-icon">⚙️</span> Settings
-    </div>
-  </div>
-
-  <div class="drawer-body" id="reviewSection">
+  <div class="drawer-body">
     <div class="section-tag">After Every Job</div>
-    <div class="section-heading">Request a Review</div>
+    <div class="section-heading">Send your client<br>a Google review link</div>
+
+    <!-- Click here to review us link -->
+    <div class="review-link-box">
+      <div class="review-link-icon">🔗</div>
+      <div>
+        <div class="review-link-text">Your Google Reviews page — share this with clients:</div>
+        <a class="review-hyperlink"
+           href="https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2"
+           target="_blank">
+          Click here to review us ⭐
+        </a>
+      </div>
+    </div>
+
+    <div class="divider"></div>
 
     <div class="field-group">
       <label class="field-label">Client Name or Business</label>
-      <input class="field-input" type="text" id="clientName" placeholder="e.g. Sarah Mitchell" />
+      <input class="field-input" type="text" id="clientName" placeholder="e.g. Sarah Mitchell" oninput="updatePreview()" />
     </div>
 
     <div class="field-group">
@@ -485,7 +366,7 @@
 <header class="topbar">
   <div class="logo-area">
     <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Admin Logo" class="logo-img" onerror="this.style.display='none'" />
-    <div class="logo-text">
+    <div>
       <div class="logo-text-main">PI ADMIN</div>
       <div class="logo-text-sub">Pi Cleaning Services</div>
     </div>
@@ -498,11 +379,11 @@
 <!-- Hero -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-lines"></div>
+  <div class="hero-ring" style="width:580px;height:580px;"></div>
+  <div class="hero-ring" style="width:860px;height:860px;border-color:rgba(201,168,76,0.04)"></div>
 
   <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png"
-       alt="Pi Cleaning Services"
-       class="hero-logo"
+       alt="Pi Cleaning Services" class="hero-logo"
        onerror="this.style.display='none'" />
 
   <div class="hero-eyebrow">Welcome to Your Command Centre</div>
@@ -511,19 +392,19 @@
   <p class="hero-tagline">Your all-in-one operations hub for Pi Cleaning Services. Manage jobs, clients, invoices, and reputation — all in one place.</p>
 
   <div class="gold-divider">
-    <div class="gold-divider-icon">✦ ✦ ✦</div>
+    <div style="color:var(--gold);font-size:13px;letter-spacing:6px;">✦ ✦ ✦</div>
   </div>
 
   <div class="stats-row">
-    <div class="stat-item">
+    <div style="text-align:center">
       <div class="stat-num">5★</div>
       <div class="stat-label">Rating Goal</div>
     </div>
-    <div class="stat-item">
+    <div style="text-align:center">
       <div class="stat-num">100%</div>
       <div class="stat-label">Dedication</div>
     </div>
-    <div class="stat-item">
+    <div style="text-align:center">
       <div class="stat-num">∞</div>
       <div class="stat-label">Excellence</div>
     </div>
@@ -556,36 +437,28 @@
   </div>
 </section>
 
-<!-- Footer -->
 <footer class="footer">
   © 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence
 </footer>
 
 <script>
-  const GOOGLE_REVIEW_URL = "https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2";
-  const LINK_TEXT = "We strive for 5 stars ⭐";
-
+  const GOOGLE_URL = "https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2";
+  const LINK_LABEL = "We strive for 5 stars ⭐";
   let contactMode = 'email';
 
   function toggleDrawer() {
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('overlay');
-    const hamburger = document.getElementById('hamburger');
-    drawer.classList.toggle('open');
-    overlay.classList.toggle('open');
-    hamburger.classList.toggle('open');
+    const d = document.getElementById('drawer');
+    const o = document.getElementById('overlay');
+    const h = document.getElementById('hamburger');
+    d.classList.toggle('open');
+    o.classList.toggle('open');
+    h.classList.toggle('open');
   }
-
   function closeDrawer() {
     document.getElementById('drawer').classList.remove('open');
     document.getElementById('overlay').classList.remove('open');
     document.getElementById('hamburger').classList.remove('open');
   }
-
-  function scrollToReviews() {
-    document.getElementById('reviewSection').scrollIntoView({ behavior: 'smooth' });
-  }
-
   function setMode(mode) {
     contactMode = mode;
     document.getElementById('btnEmail').classList.toggle('active', mode === 'email');
@@ -594,63 +467,41 @@
     document.getElementById('smsGroup').style.display = mode === 'sms' ? 'block' : 'none';
     updatePreview();
   }
-
   function updatePreview() {
     const name = document.getElementById('clientName').value.trim();
     const contact = contactMode === 'email'
       ? document.getElementById('clientEmail').value.trim()
       : document.getElementById('clientPhone').value.trim();
-
-    const preview = document.getElementById('previewBox');
-    const content = document.getElementById('previewContent');
-
-    if (!contact) { preview.classList.remove('show'); return; }
-
+    const box = document.getElementById('previewBox');
+    if (!contact && !name) { box.classList.remove('show'); return; }
     const greeting = name ? `Hi ${name.split(' ')[0]},` : 'Hi there,';
-    const medium = contactMode === 'email' ? `To: ${contact}` : `SMS to: ${contact}`;
-
-    content.innerHTML = `
-      <div style="color:rgba(255,255,255,0.4);font-size:10px;margin-bottom:8px;">${medium}</div>
-      ${greeting} Thank you for choosing Pi Cleaning Services! 🌟<br><br>
-      We'd love to hear your feedback — it means the world to us.<br><br>
-      <a class="preview-link" href="${GOOGLE_REVIEW_URL}" target="_blank">${LINK_TEXT}</a><br><br>
-      Thank you for your support!<br>
-      <strong style="color:var(--gold-light)">— The Pi Cleaning Team</strong>
-    `;
-    preview.classList.add('show');
+    const dest = contact ? (contactMode === 'email' ? `To: ${contact}` : `SMS to: ${contact}`) : '';
+    document.getElementById('previewContent').innerHTML =
+      `${dest ? `<span style="color:rgba(255,255,255,0.35);font-size:10px">${dest}</span><br><br>` : ''}` +
+      `${greeting} Thank you for choosing Pi Cleaning Services! 🌟<br><br>` +
+      `We'd love to hear your feedback — it means the world to us.<br><br>` +
+      `<a class="preview-link" href="${GOOGLE_URL}" target="_blank">${LINK_LABEL}</a><br><br>` +
+      `Thank you for your support!<br><strong style="color:var(--gold-light)">— The Pi Cleaning Team</strong>`;
+    box.classList.add('show');
   }
-
   function sendReview() {
     const name = document.getElementById('clientName').value.trim();
     const contact = contactMode === 'email'
       ? document.getElementById('clientEmail').value.trim()
       : document.getElementById('clientPhone').value.trim();
-
-    const successEl = document.getElementById('successMsg');
-
+    const msg = document.getElementById('successMsg');
     if (!contact) {
-      successEl.style.background = 'rgba(180,30,30,0.15)';
-      successEl.style.borderColor = 'rgba(220,50,50,0.35)';
-      successEl.style.color = '#ff9999';
-      successEl.innerHTML = '⚠️ Please enter a contact ' + (contactMode === 'email' ? 'email address.' : 'mobile number.');
-      successEl.classList.add('show');
+      msg.style.cssText = 'display:block;background:rgba(180,30,30,0.15);border:1px solid rgba(220,50,50,0.3);border-radius:9px;color:#ff9999;padding:13px 15px;margin-top:12px;font-size:12px;line-height:1.6';
+      msg.innerHTML = '⚠️ Please enter a ' + (contactMode === 'email' ? 'email address.' : 'mobile number.');
       return;
     }
-
-    successEl.style.background = 'rgba(201,168,76,0.1)';
-    successEl.style.borderColor = 'rgba(201,168,76,0.35)';
-    successEl.style.color = 'var(--gold-light)';
-    const label = contactMode === 'email' ? 'email' : 'SMS';
-    const displayName = name || 'your client';
-    successEl.innerHTML = `✅ Review request ${label} sent to <strong>${displayName}</strong>!<br><small style="opacity:0.7">The Google review link was delivered as "<em>${LINK_TEXT}</em>"</small>`;
-    successEl.classList.add('show');
-
-    // Reset form after 4s
+    msg.style.cssText = 'display:block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:9px;color:var(--gold-light);padding:13px 15px;margin-top:12px;font-size:12px;line-height:1.6';
+    msg.innerHTML = `✅ Review request sent to <strong>${name || contact}</strong>!<br><small style="opacity:0.7">Delivered as: "<em>${LINK_LABEL}</em>"</small>`;
     setTimeout(() => {
       document.getElementById('clientName').value = '';
       document.getElementById('clientEmail').value = '';
       document.getElementById('clientPhone').value = '';
-      successEl.classList.remove('show');
+      msg.style.display = 'none';
       document.getElementById('previewBox').classList.remove('show');
     }, 4000);
   }
