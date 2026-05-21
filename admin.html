@@ -795,10 +795,7 @@ document.head.appendChild(link);
     <div class="dropdown-item" onclick="openReviewsModal()">
       <span class="dropdown-item-icon">⭐</span> Request Reviews
     </div>
-    <div class="dropdown-sep" id="url-manage-sep" style="display:none"></div>
-    <div class="dropdown-item" id="url-manage-item" style="display:none" onclick="openManageUrl()">
-      <span class="dropdown-item-icon">🔗</span> Edit Google Review URL
-    </div>
+
   </div>
 
   <!-- ── SIDEBAR ── -->
@@ -919,41 +916,7 @@ document.head.appendChild(link);
 
 <div class="error-toast" id="error-toast"></div>
 
-<!-- ── MANAGE URL MODAL ── -->
-<div class="modal-backdrop" id="manage-url-backdrop" onclick="closeManageUrl(event)">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:420px">
-    <button class="modal-close" onclick="closeManageUrl()">&#x2715;</button>
-    <div class="modal-title">Google <span>Review URL</span></div>
-    <div class="modal-subtitle">Manage your saved review link</div>
 
-    <!-- No link saved -->
-    <div id="mu-setup">
-      <div class="review-link-set" style="margin-bottom:8px">
-        <input class="review-link-input" id="mu-link-input" type="url"
-          placeholder="https://g.page/r/…/review" />
-        <button class="btn-save-link" onclick="saveReviewLinkFromManage()">Save</button>
-      </div>
-      <div style="font-size:11px;color:var(--muted)">
-        Your link is stored only on this device and never shared. It will remain saved until you remove it.
-      </div>
-    </div>
-
-    <!-- Link saved — show confirmation pill + actions -->
-    <div id="mu-saved" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:16px">
-        <span style="font-size:18px">✅</span>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--white);margin-bottom:2px">Review link saved</div>
-          <div style="font-size:11px;color:var(--muted)">Customers will receive a clickable link in their message.</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-link-action change" style="flex:1;padding:11px;border-radius:10px;font-size:12px" onclick="promptChangeUrl()">✏️ Change URL</button>
-        <button class="btn-link-action remove" style="flex:1;padding:11px;border-radius:10px;font-size:12px" onclick="confirmRemoveUrl()">🗑 Remove URL</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ── REQUEST REVIEWS MODAL ── -->
 <div class="modal-backdrop" id="reviews-backdrop" onclick="closeReviewsModal(event)">
@@ -999,35 +962,7 @@ document.head.appendChild(link);
       </div>
     </div>
 
-    <!-- Prompt to add link first -->
-    <div class="no-link-notice" id="no-link-notice">
-      No review link saved yet.<br>
-      <span style="font-size:11px;color:var(--muted)">
-        Add your Google Review link below to get started.
-      </span>
-      <div class="review-link-set" style="margin-top:14px">
-        <input class="review-link-input" id="inline-link-input" type="url"
-          placeholder="https://g.page/r/…/review" />
-        <button class="btn-save-link" onclick="saveReviewLinkInline()">Save</button>
-      </div>
-    </div>
 
-    <!-- Edit URL button shown when link is already saved -->
-    <div id="edit-url-row" style="display:none;margin-top:4px">
-      <button class="btn-link-action change" onclick="openInlineEditUrl()" style="width:100%;border-radius:9px;padding:9px 14px;font-size:12px;text-align:center">
-        🔗 Change Google Review URL
-      </button>
-      <div id="inline-edit-section" style="display:none;margin-top:10px">
-        <div class="review-link-set">
-          <input class="review-link-input" id="inline-edit-input" type="url"
-            placeholder="https://g.page/r/…/review" />
-          <button class="btn-save-link" onclick="saveInlineEditUrl()">Save</button>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px">
-          Paste your new Google Reviews URL and tap Save.
-        </div>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -1423,17 +1358,10 @@ document.addEventListener('click', () => {
 // ══════════════════════════════════════════
 //  REQUEST REVIEWS
 // ══════════════════════════════════════════
-const REVIEW_LINK_KEY = 'pi_review_link';
+const GOOGLE_REVIEW_URL = 'https://www.google.com/search?sca_esv=2f3abc7c66b26160&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n4IngwpSVOrgjQjw0rlRXR0wq-6ew:1779326206473&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjKuefTmsmUAxU6TWwGHemJKQQQ0bkNegQIKRAI&biw=1440&bih=778&dpr=2';
 let currentTab = 'sms';
 
-// ── Sync dropdown "Edit Google Review URL" visibility ──
-function syncDropdownUrlItem() {
-  const saved = !!localStorage.getItem(REVIEW_LINK_KEY);
-  const item = document.getElementById('url-manage-item');
-  const sep  = document.getElementById('url-manage-sep');
-  if (item) item.style.display = saved ? 'flex' : 'none';
-  if (sep)  sep.style.display  = saved ? 'block' : 'none';
-}
+function syncDropdownUrlItem() { /* URL is hardcoded — no sync needed */ }
 
 // ── REVIEWS MODAL ──
 function openReviewsModal() {
@@ -1451,95 +1379,16 @@ function closeReviewsModal(e) {
 }
 
 function syncReviewsModal() {
-  const saved = !!localStorage.getItem(REVIEW_LINK_KEY);
-  document.getElementById('send-section').style.display   = saved ? 'block' : 'none';
-  document.getElementById('no-link-notice').style.display  = saved ? 'none'  : 'block';
-  document.getElementById('edit-url-row').style.display    = saved ? 'block' : 'none';
-  // Reset inline edit state when modal syncs
-  const editSection = document.getElementById('inline-edit-section');
-  if (editSection) editSection.style.display = 'none';
-  syncDropdownUrlItem();
+  document.getElementById('send-section').style.display = 'block';
 }
 
-function saveReviewLinkInline() {
-  const val = document.getElementById('inline-link-input').value.trim();
-  if (!val) { alert('Please paste your Google Reviews URL.'); return; }
-  try { new URL(val); } catch(e) { alert('Please enter a valid URL (starting with https://).'); return; }
-  localStorage.setItem(REVIEW_LINK_KEY, val);
-  document.getElementById('inline-link-input').value = '';
-  syncReviewsModal();
-  syncDropdownUrlItem();
-  updateMessagePreview();
-}
 
-function openInlineEditUrl() {
-  const editSection = document.getElementById('inline-edit-section');
-  const isOpen = editSection.style.display !== 'none';
-  editSection.style.display = isOpen ? 'none' : 'block';
-  if (!isOpen) {
-    const current = localStorage.getItem(REVIEW_LINK_KEY) || '';
-    document.getElementById('inline-edit-input').value = current;
-    document.getElementById('inline-edit-input').focus();
-  }
-}
 
-function saveInlineEditUrl() {
-  const val = document.getElementById('inline-edit-input').value.trim();
-  if (!val) { alert('Please paste your Google Reviews URL.'); return; }
-  try { new URL(val); } catch(e) { alert('Please enter a valid URL (starting with https://).'); return; }
-  localStorage.setItem(REVIEW_LINK_KEY, val);
-  document.getElementById('inline-edit-section').style.display = 'none';
-  syncReviewsModal();
-  syncDropdownUrlItem();
-  updateMessagePreview();
-}
 
-// ── MANAGE URL MODAL (from hamburger → "Edit Google Review URL") ──
-function openManageUrl() {
-  document.getElementById('dropdown-menu').classList.remove('open');
-  document.getElementById('manage-url-backdrop').classList.add('open');
-  syncManageModal();
-}
 
-function closeManageUrl(e) {
-  if (e && e.target !== document.getElementById('manage-url-backdrop')) return;
-  document.getElementById('manage-url-backdrop').classList.remove('open');
-}
 
-function syncManageModal() {
-  const saved = localStorage.getItem(REVIEW_LINK_KEY);
-  document.getElementById('mu-setup').style.display = saved ? 'none'  : 'block';
-  document.getElementById('mu-saved').style.display = saved ? 'block' : 'none';
-  if (!saved) document.getElementById('mu-link-input').value = '';
-}
 
-function saveReviewLinkFromManage() {
-  const val = document.getElementById('mu-link-input').value.trim();
-  if (!val) { alert('Please paste your Google Reviews URL.'); return; }
-  try { new URL(val); } catch(e) { alert('Please enter a valid URL (starting with https://).'); return; }
-  localStorage.setItem(REVIEW_LINK_KEY, val);
-  syncManageModal();
-  syncDropdownUrlItem();
-  updateMessagePreview();
-}
 
-function promptChangeUrl() {
-  const current = localStorage.getItem(REVIEW_LINK_KEY) || '';
-  document.getElementById('mu-link-input').value = current;
-  localStorage.removeItem(REVIEW_LINK_KEY);
-  syncManageModal();
-}
-
-function confirmRemoveUrl() {
-  if (!confirm('Remove your saved Google Review link?\nYou can add it again any time via the menu.')) return;
-  localStorage.removeItem(REVIEW_LINK_KEY);
-  syncManageModal();
-  syncDropdownUrlItem();
-  // Refresh reviews modal state if it happens to be open
-  syncReviewsModal();
-  // Close manage modal
-  document.getElementById('manage-url-backdrop').classList.remove('open');
-}
 
 // ── TABS (SMS / Email) ──
 function setTab(tab) {
@@ -1555,7 +1404,7 @@ function setTab(tab) {
 // SMS: plain text with raw URL (SMS doesn't support hyperlinks)
 // Email: shows "Leave us a Review" label as hyperlink representation
 function updateMessagePreview() {
-  const link = localStorage.getItem(REVIEW_LINK_KEY) || null;
+  const link = GOOGLE_REVIEW_URL || null;
   const name = (document.getElementById('client-name') || {}).value || '';
   const el   = document.getElementById('message-preview');
   if (!el) return;
@@ -1573,15 +1422,13 @@ function updateMessagePreview() {
         : '&#9733; <em style="color:var(--muted)">[review link will appear here]</em>') +
       '<br><br>Thank you, <br><strong>PI Cleaning Services Team</strong>';
   } else {
-    // SMS: show as styled link label in preview (actual SMS uses raw URL since SMS is plain text)
-    el.innerHTML =
+    // SMS: plain text, link renders as tappable in messages app
+    el.textContent =
       greeting +
       'Thank you for choosing PI Cleaning Services! We appreciate your business. ' +
-      'Please tap the link below to share your experience with us:<br><br>' +
-      (link
-        ? '&#9733; <a href="' + link + '" target="_blank" style="color:var(--teal);font-weight:600">Leave Us a Google Review</a>'
-        : '&#9733; <em style="color:var(--muted)">[review link will appear here]</em>') +
-      '<br><br>⭐ We strive for 5 stars!';
+      'Please tap the review link below to share your experience with us: ' +
+      (link || '[review link]') +
+      ' ⭐ We strive for 5 stars!';
   }
 }
 
@@ -1592,7 +1439,7 @@ document.addEventListener('input', (e) => {
 
 // ── SEND ──
 function sendReview() {
-  const link = localStorage.getItem(REVIEW_LINK_KEY);
+  const link = GOOGLE_REVIEW_URL;
   if (!link) { alert('No review link saved. Add it via the menu first.'); return; }
   const name     = (document.getElementById('client-name').value || '').trim();
   const greeting = name ? 'Hi ' + name + ', ' : 'Hi there, ';
@@ -1601,12 +1448,12 @@ function sendReview() {
     const mobile = document.getElementById('client-mobile').value.trim();
     if (!mobile) { alert('Please enter a mobile number.'); return; }
 
-    // SMS is plain text only — messaging apps auto-hyperlink the URL
+    // SMS is plain text only — URL is the hyperlink in native messages apps
     const smsBody =
       greeting +
       'Thank you for choosing PI Cleaning Services. We truly appreciate your support. ' +
-      'Tap the link below to leave us a Google Review — it only takes a minute!\n\n' +
-      '⭐ Leave Us a Google Review\n' +
+      'Please tap the review link below to share your experience with us:\n\n' +
+      '⭐ Leave a Google Review:\n' +
       link + '\n\n' +
       'Thank you,\nPI Cleaning Services Team';
 
@@ -1618,14 +1465,14 @@ function sendReview() {
     const email = document.getElementById('client-email').value.trim();
     if (!email) { alert('Please enter an email address.'); return; }
 
-    const subject = 'PI Cleaning Services — Leave Us a Google Review';
-    // Email body: clean label above the URL so email clients show it as a neat hyperlink
+    const subject = 'PI Cleaning Services — Leave Us a Review';
+    // Email body uses plain text with the URL; most email clients auto-hyperlink
+    // We also wrap it so the anchor text is readable even as plain text
     const emailBody =
       greeting +
       'Thank you for choosing PI Cleaning Services. We truly appreciate your business and support.\n\n' +
-      'We would love to hear your feedback — it only takes a minute and means the world to us.\n\n' +
-      '⭐ Leave Us a Google Review:\n' +
-      link + '\n\n' +
+      'We would love to hear your feedback. Please click the review link below to leave us a Google Review.\n\n' +
+      '⭐ Leave a Google Review: ' + link + '\n\n' +
       'Thank you,\nPI Cleaning Services Team';
 
     window.open(
@@ -1644,8 +1491,6 @@ function sendReview() {
   }, 4000);
 }
 
-// Sync dropdown on page load
-document.addEventListener('DOMContentLoaded', syncDropdownUrlItem);
 
 
 // ══════════════════════════════════════════
