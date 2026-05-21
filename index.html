@@ -5,201 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pi Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --navy: #0a1628;
-    --navy-mid: #0f2040;
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --white: #ffffff;
-    --white-muted: rgba(255,255,255,0.7);
+    --navy:#0a1628; --navy-mid:#0f2040;
+    --gold:#c9a84c; --gold-light:#e8c97a;
+    --white:#ffffff; --white-muted:rgba(255,255,255,0.7);
   }
-  body {
-    font-family: 'Montserrat', sans-serif;
-    background: var(--navy);
-    color: var(--white);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  body { font-family:'Montserrat',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; overflow-x:hidden; }
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:80; }
   .overlay.open { display:block; }
-
-  .drawer {
-    position:fixed; top:0; right:-380px;
-    width:360px; height:100vh;
-    background:var(--navy-mid);
-    border-left:1px solid rgba(201,168,76,0.3);
-    z-index:100;
-    transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
-    display:flex; flex-direction:column; overflow-y:auto;
-  }
+  .drawer { position:fixed; top:0; right:-380px; width:360px; height:100vh; background:var(--navy-mid); border-left:1px solid rgba(201,168,76,0.3); z-index:100; transition:right 0.35s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow-y:auto; }
   .drawer.open { right:0; }
-
-  .drawer-header {
-    padding:24px 22px 18px;
-    border-bottom:1px solid rgba(201,168,76,0.2);
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; background:var(--navy-mid); z-index:1;
-  }
-  .drawer-title {
-    font-family:'Cormorant Garamond',serif;
-    font-size:20px; font-weight:600;
-    color:var(--gold-light); letter-spacing:0.04em;
-  }
-  .close-btn {
-    width:32px; height:32px;
-    border:1px solid rgba(201,168,76,0.35); border-radius:50%;
-    background:transparent; color:var(--gold);
-    cursor:pointer; display:flex; align-items:center; justify-content:center;
-    font-size:15px; transition:background 0.2s,color 0.2s;
-  }
+  .drawer-header { padding:24px 22px 18px; border-bottom:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--navy-mid); z-index:1; }
+  .drawer-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--gold-light); letter-spacing:0.04em; }
+  .close-btn { width:32px; height:32px; border:1px solid rgba(201,168,76,0.35); border-radius:50%; background:transparent; color:var(--gold); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:background 0.2s,color 0.2s; }
   .close-btn:hover { background:var(--gold); color:var(--navy); }
-
   .drawer-body { padding:24px 22px 32px; flex:1; }
-
-  .review-link-box {
-    background:rgba(201,168,76,0.08);
-    border:1px solid rgba(201,168,76,0.28);
-    border-radius:11px; padding:14px 16px;
-    margin-bottom:22px;
-    display:flex; align-items:center; gap:11px;
-  }
+  .section-tag { font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:5px; }
+  .section-heading { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:700; color:var(--white); margin-bottom:20px; line-height:1.2; }
+  .review-link-box { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.28); border-radius:11px; padding:14px 16px; margin-bottom:22px; display:flex; align-items:center; gap:11px; }
   .review-link-text { font-size:11px; color:rgba(255,255,255,0.55); line-height:1.5; }
-  .review-hyperlink {
-    display:block; color:var(--gold-light);
-    font-size:13px; font-weight:600;
-    text-decoration:underline; text-underline-offset:3px;
-    margin-top:4px; transition:color 0.2s;
-  }
+  .review-hyperlink { display:block; color:var(--gold-light); font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; margin-top:4px; transition:color 0.2s; }
   .review-hyperlink:hover { color:#fff; }
-
   .divider { height:1px; background:rgba(201,168,76,0.15); margin:0 0 22px; }
-
   .field-group { margin-bottom:14px; }
-  .field-label {
-    display:block; font-size:10px; font-weight:600;
-    letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:6px;
-  }
-  .field-input {
-    width:100%; padding:11px 13px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(201,168,76,0.22);
-    border-radius:8px; color:var(--white);
-    font-family:'Montserrat',sans-serif; font-size:13px;
-    outline:none; transition:border-color 0.2s,background 0.2s;
-  }
+  .field-label { display:block; font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+  .field-input { width:100%; padding:11px 13px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.22); border-radius:8px; color:var(--white); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s,background 0.2s; }
   .field-input::placeholder { color:rgba(255,255,255,0.28); }
   .field-input:focus { border-color:var(--gold); background:rgba(201,168,76,0.06); }
-
   .contact-toggle { display:flex; gap:8px; margin-bottom:14px; }
-  .toggle-btn {
-    flex:1; padding:9px;
-    border:1px solid rgba(201,168,76,0.25); border-radius:7px;
-    background:transparent; color:var(--white-muted);
-    font-family:'Montserrat',sans-serif;
-    font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
-    cursor:pointer; transition:all 0.2s;
-  }
+  .toggle-btn { flex:1; padding:9px; border:1px solid rgba(201,168,76,0.25); border-radius:7px; background:transparent; color:var(--white-muted); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
   .toggle-btn.active { background:var(--gold); color:var(--navy); border-color:var(--gold); }
 
+  /* EMAILJS SETUP BANNER */
+  .setup-banner { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.35); border-radius:11px; padding:14px 16px; margin-bottom:16px; }
+  .setup-banner-title { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .setup-banner p { font-size:11px; color:rgba(255,255,255,0.6); line-height:1.7; }
+  .setup-banner a { color:var(--gold-light); text-decoration:underline; }
+  .setup-fields { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+  .setup-input { width:100%; padding:9px 11px; background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.2); border-radius:7px; color:var(--white); font-family:'Montserrat',sans-serif; font-size:11px; outline:none; }
+  .setup-input::placeholder { color:rgba(255,255,255,0.25); }
+  .setup-input:focus { border-color:var(--gold); }
+  .setup-save-btn { width:100%; padding:9px; background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.4); border-radius:7px; color:var(--gold-light); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:background 0.2s; margin-top:4px; }
+  .setup-save-btn:hover { background:rgba(201,168,76,0.25); }
+  .setup-saved { font-size:10px; color:#7edb7e; margin-top:6px; display:none; }
+
   /* CONFIRM PROMPT */
-  .confirm-prompt {
-    display:none;
-    background:rgba(10,22,40,0.97);
-    border:1px solid rgba(201,168,76,0.45);
-    border-radius:14px;
-    padding:20px 18px;
-    margin-top:16px;
-    animation:slideUp 0.25s ease;
-  }
+  .confirm-prompt { display:none; background:rgba(10,22,40,0.97); border:1px solid rgba(201,168,76,0.45); border-radius:14px; padding:20px 18px; margin-top:16px; animation:slideUp 0.25s ease; }
   .confirm-prompt.show { display:block; }
   @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-  .confirm-title {
-    font-family:'Cormorant Garamond',serif;
-    font-size:17px; font-weight:700; color:var(--gold-light);
-    margin-bottom:14px; text-align:center;
-  }
-  .confirm-preview {
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(201,168,76,0.15);
-    border-radius:9px; padding:14px;
-    font-size:12px; color:rgba(255,255,255,0.72); line-height:1.9;
-    margin-bottom:16px;
-  }
-  .confirm-preview .to-line {
-    font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--gold); font-weight:600; margin-bottom:10px;
-  }
-  .confirm-preview .plink {
-    color:var(--gold-light); text-decoration:underline; text-underline-offset:2px;
-  }
-  .confirm-preview .pfrom {
-    font-size:10px; color:rgba(255,255,255,0.35); margin-top:10px;
-  }
-
+  .confirm-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:700; color:var(--gold-light); margin-bottom:14px; text-align:center; }
+  .confirm-preview { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.15); border-radius:9px; padding:14px; font-size:12px; color:rgba(255,255,255,0.72); line-height:1.9; margin-bottom:16px; }
+  .confirm-preview .to-line { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:10px; }
+  .confirm-preview .plink { color:var(--gold-light); text-decoration:underline; text-underline-offset:2px; }
+  .confirm-preview .pfrom { font-size:10px; color:rgba(255,255,255,0.35); margin-top:10px; }
   .confirm-btns { display:flex; gap:10px; }
-  .btn-send {
-    flex:1; padding:12px;
-    background:var(--gold); border:none; border-radius:8px;
-    color:var(--navy); font-family:'Montserrat',sans-serif;
-    font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
-    cursor:pointer; transition:opacity 0.2s,transform 0.15s;
-  }
+  .btn-send { flex:1; padding:12px; background:var(--gold); border:none; border-radius:8px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:opacity 0.2s,transform 0.15s; }
   .btn-send:hover { opacity:0.88; transform:translateY(-1px); }
-  .btn-cancel {
-    flex:1; padding:12px;
-    background:transparent;
-    border:1px solid rgba(201,168,76,0.35); border-radius:8px;
-    color:rgba(255,255,255,0.6); font-family:'Montserrat',sans-serif;
-    font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
-    cursor:pointer; transition:background 0.2s,color 0.2s;
-  }
+  .btn-send:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-cancel { flex:1; padding:12px; background:transparent; border:1px solid rgba(201,168,76,0.35); border-radius:8px; color:rgba(255,255,255,0.6); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:background 0.2s,color 0.2s; }
   .btn-cancel:hover { background:rgba(255,255,255,0.06); color:#fff; }
-
-  /* AMEND MODE */
-  .send-btn {
-    width:100%; padding:13px;
-    background:var(--gold); border:none; border-radius:9px;
-    color:var(--navy); font-family:'Montserrat',sans-serif;
-    font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
-    cursor:pointer; transition:opacity 0.2s,transform 0.15s;
-    margin-top:14px; display:none;
-  }
+  .send-btn { width:100%; padding:13px; background:var(--gold); border:none; border-radius:9px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:opacity 0.2s,transform 0.15s; margin-top:14px; display:none; }
   .send-btn.show { display:block; }
   .send-btn:hover { opacity:0.88; transform:translateY(-1px); }
-
-  .success-toast {
-    display:none;
-    background:rgba(201,168,76,0.1);
-    border:1px solid rgba(201,168,76,0.3);
-    border-radius:9px; padding:13px 15px;
-    margin-top:12px; font-size:12px; line-height:1.6;
-    color:var(--gold-light);
-  }
-  .success-toast.show { display:block; }
+  .toast { display:none; border-radius:9px; padding:13px 15px; margin-top:12px; font-size:12px; line-height:1.6; }
+  .toast.show { display:block; }
+  .toast.success { background:rgba(50,180,80,0.1); border:1px solid rgba(50,180,80,0.3); color:#7edb7e; }
+  .toast.error { background:rgba(180,50,50,0.12); border:1px solid rgba(220,60,60,0.3); color:#ff9999; }
 
   /* TOPBAR */
-  .topbar {
-    position:fixed; top:0; left:0; right:0; height:68px;
-    background:rgba(10,22,40,0.93);
-    border-bottom:1px solid rgba(201,168,76,0.18);
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 28px; z-index:60;
-  }
+  .topbar { position:fixed; top:0; left:0; right:0; height:68px; background:rgba(10,22,40,0.93); border-bottom:1px solid rgba(201,168,76,0.18); display:flex; align-items:center; justify-content:space-between; padding:0 28px; z-index:60; }
   .logo-area { display:flex; align-items:center; gap:13px; }
   .logo-img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(201,168,76,0.5); }
   .logo-text-main { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:700; color:var(--gold-light); letter-spacing:0.1em; }
   .logo-text-sub { font-size:9px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--white-muted); margin-top:2px; }
-  .hamburger {
-    width:42px; height:42px; background:transparent;
-    border:1px solid rgba(201,168,76,0.3); border-radius:10px;
-    cursor:pointer; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:5px; padding:10px;
-    transition:border-color 0.2s,background 0.2s;
-  }
+  .hamburger { width:42px; height:42px; background:transparent; border:1px solid rgba(201,168,76,0.3); border-radius:10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:10px; transition:border-color 0.2s,background 0.2s; }
   .hamburger:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
   .hamburger span { display:block; width:20px; height:1.5px; background:var(--gold); border-radius:2px; transition:transform 0.25s,opacity 0.25s; }
   .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
@@ -244,8 +126,8 @@
   </div>
 
   <div class="drawer-body">
-    <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;">After Every Job</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--white);margin-bottom:20px;line-height:1.2;">Send your client<br>a Google review link</div>
+    <div class="section-tag">After Every Job</div>
+    <div class="section-heading">Send your client<br>a Google review link</div>
 
     <div class="review-link-box">
       <div style="font-size:20px;flex-shrink:0;">🔗</div>
@@ -258,6 +140,19 @@
     </div>
 
     <div class="divider"></div>
+
+    <!-- EmailJS Setup (email mode only) -->
+    <div class="setup-banner" id="emailjsSetup" style="display:none">
+      <div class="setup-banner-title">📧 One-time Email Setup</div>
+      <p>To send real emails, create a free account at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> then enter your credentials below. Free plan = 200 emails/month.</p>
+      <div class="setup-fields">
+        <input class="setup-input" id="ejsPublicKey" placeholder="Public Key (from Account → API Keys)" />
+        <input class="setup-input" id="ejsServiceId" placeholder="Service ID (e.g. service_xxxxxx)" />
+        <input class="setup-input" id="ejsTemplateId" placeholder="Template ID (e.g. template_xxxxxx)" />
+        <button class="setup-save-btn" onclick="saveEmailJS()">💾 Save Credentials</button>
+        <div class="setup-saved" id="setupSaved">✅ Saved! Ready to send emails.</div>
+      </div>
+    </div>
 
     <div class="field-group">
       <label class="field-label">Client Name or Business</label>
@@ -284,14 +179,17 @@
         <label class="field-label">Mobile Number</label>
         <input class="field-input" type="tel" id="clientPhone" placeholder="+61 4xx xxx xxx" oninput="checkReady()" />
       </div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:4px;">
+        📱 <strong style="color:var(--gold-light)">How SMS works:</strong> Tapping "Send Now" will open your phone's native Messages app with the message pre-filled. Just hit send — done!
+      </div>
     </div>
 
-    <!-- Auto-triggered confirm prompt -->
+    <!-- Auto confirm prompt -->
     <div class="confirm-prompt" id="confirmPrompt">
-      <div class="confirm-title">Review and send — or cancel?</div>
+      <div class="confirm-title">Review &amp; Send — or Cancel?</div>
       <div class="confirm-preview" id="confirmPreview"></div>
       <div class="confirm-btns">
-        <button class="btn-send" onclick="doSend()">⭐ Send Now</button>
+        <button class="btn-send" id="btnSendNow" onclick="doSend()">⭐ Send Now</button>
         <button class="btn-cancel" onclick="doCancel()">✕ Cancel &amp; Amend</button>
       </div>
     </div>
@@ -299,7 +197,7 @@
     <!-- Shown after cancel -->
     <button class="send-btn" id="sendBtn" onclick="showConfirm()">⭐ Review &amp; Send</button>
 
-    <div class="success-toast" id="successToast"></div>
+    <div class="toast" id="toast"></div>
   </div>
 </div>
 
@@ -312,7 +210,7 @@
       <div class="logo-text-sub">Pi Cleaning Services</div>
     </div>
   </div>
-  <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="Open menu">
+  <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
     <span></span><span></span><span></span>
   </button>
 </header>
@@ -322,7 +220,7 @@
   <div class="hero-bg"></div>
   <div class="hero-ring" style="width:580px;height:580px;"></div>
   <div class="hero-ring" style="width:860px;height:860px;border-color:rgba(201,168,76,0.04)"></div>
-  <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Cleaning Services" class="hero-logo" onerror="this.style.display='none'" />
+  <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Cleaning" class="hero-logo" onerror="this.style.display='none'" />
   <div class="hero-eyebrow">Welcome to Your Command Centre</div>
   <h1 class="hero-title">Pi <span>Admin</span></h1>
   <div class="hero-sub">Control. Manage. Excel.</div>
@@ -337,10 +235,10 @@
 
 <section class="cards-section">
   <div class="cards-grid">
-    <div class="card"><div class="card-icon">📋</div><div class="card-title">Job Management</div><div class="card-desc">Track every booking, schedule, and completion status with ease.</div></div>
+    <div class="card"><div class="card-icon">📋</div><div class="card-title">Job Management</div><div class="card-desc">Track every booking, schedule and completion status with ease.</div></div>
     <div class="card"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
     <div class="card"><div class="card-icon">💰</div><div class="card-title">Invoicing</div><div class="card-desc">Generate and send professional invoices to your clients.</div></div>
-    <div class="card"><div class="card-icon">📊</div><div class="card-title">Reports</div><div class="card-desc">Insights on revenue, client retention, and business growth.</div></div>
+    <div class="card"><div class="card-icon">📊</div><div class="card-title">Reports</div><div class="card-desc">Insights on revenue, client retention and business growth.</div></div>
   </div>
 </section>
 
@@ -354,6 +252,19 @@ let contactMode = 'email';
 let debounceTimer = null;
 let amendMode = false;
 
+// Load saved EmailJS creds from memory
+let ejsCreds = { publicKey:'', serviceId:'', templateId:'' };
+
+function saveEmailJS() {
+  ejsCreds.publicKey   = document.getElementById('ejsPublicKey').value.trim();
+  ejsCreds.serviceId   = document.getElementById('ejsServiceId').value.trim();
+  ejsCreds.templateId  = document.getElementById('ejsTemplateId').value.trim();
+  if (ejsCreds.publicKey) {
+    emailjs.init({ publicKey: ejsCreds.publicKey });
+    document.getElementById('setupSaved').style.display = 'block';
+  }
+}
+
 function toggleDrawer() {
   ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.toggle('open'));
 }
@@ -363,39 +274,46 @@ function closeDrawer() {
 
 function setMode(mode) {
   contactMode = mode;
-  document.getElementById('btnEmail').classList.toggle('active', mode === 'email');
-  document.getElementById('btnSms').classList.toggle('active', mode === 'sms');
-  document.getElementById('emailGroup').style.display = mode === 'email' ? 'block' : 'none';
-  document.getElementById('smsGroup').style.display = mode === 'sms' ? 'block' : 'none';
-  document.getElementById('confirmPrompt').classList.remove('show');
-  document.getElementById('sendBtn').classList.remove('show');
-  amendMode = false;
+  document.getElementById('btnEmail').classList.toggle('active', mode==='email');
+  document.getElementById('btnSms').classList.toggle('active', mode==='sms');
+  document.getElementById('emailGroup').style.display = mode==='email' ? 'block' : 'none';
+  document.getElementById('smsGroup').style.display   = mode==='sms'   ? 'block' : 'none';
+  document.getElementById('emailjsSetup').style.display = mode==='email' ? 'block' : 'none';
+  resetPrompt();
   checkReady();
 }
 
+// Show EmailJS setup for email mode on load
+document.getElementById('emailjsSetup').style.display = 'block';
+
 function getValues() {
-  const name = document.getElementById('clientName').value.trim();
-  const contact = contactMode === 'email'
-    ? document.getElementById('clientEmail').value.trim()
-    : document.getElementById('clientPhone').value.trim();
-  return { name, contact };
+  return {
+    name: document.getElementById('clientName').value.trim(),
+    contact: contactMode==='email'
+      ? document.getElementById('clientEmail').value.trim()
+      : document.getElementById('clientPhone').value.trim()
+  };
 }
 
 function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-function isValidPhone(p) { return p.replace(/\s/g,'').length >= 8; }
+function isValidPhone(p) { return p.replace(/[\s\-\+\(\)]/g,'').length >= 8; }
 
 function isReady() {
-  const { name, contact } = getValues();
+  const {name, contact} = getValues();
   if (!name || !contact) return false;
-  if (contactMode === 'email') return isValidEmail(contact);
-  return isValidPhone(contact);
+  return contactMode==='email' ? isValidEmail(contact) : isValidPhone(contact);
+}
+
+function buildSmsBody(name) {
+  const first = name.split(' ')[0];
+  return `Hi ${first},\n\nThank you so much for choosing Pi Cleaning Services! We truly appreciate your trust in us.\n\nWe'd love to hear about your experience — tap the link below to leave us a quick review:\n\n${GOOGLE_URL}\n\nClick here to review us ⭐ — we strive for 5 stars!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
 }
 
 function buildPreviewHTML(name, contact) {
   const first = name.split(' ')[0];
-  const toLine = contactMode === 'email'
+  const toLine = contactMode==='email'
     ? `From: ${FROM_EMAIL} &rarr; To: ${contact}`
-    : `SMS to: ${contact}`;
+    : `SMS to: ${contact} (opens native Messages app)`;
   return `
     <div class="to-line">${toLine}</div>
     Hi ${first},<br><br>
@@ -405,29 +323,32 @@ function buildPreviewHTML(name, contact) {
     We strive for 5 stars and your review means the world to us!<br><br>
     Warm regards,<br>
     <strong style="color:var(--gold-light)">The Pi Cleaning Services Team</strong>
-    ${contactMode === 'email' ? `<div class="pfrom">Sent from ${FROM_EMAIL}</div>` : ''}
+    ${contactMode==='email' ? `<div class="pfrom">Sent from ${FROM_EMAIL}</div>` : ''}
   `;
 }
 
 function checkReady() {
   clearTimeout(debounceTimer);
-  document.getElementById('confirmPrompt').classList.remove('show');
-  document.getElementById('sendBtn').classList.remove('show');
-  amendMode = false;
-
+  if (amendMode) return;
+  resetPrompt();
   if (!isReady()) return;
-
-  debounceTimer = setTimeout(() => { showConfirm(); }, 600);
+  debounceTimer = setTimeout(showConfirm, 700);
 }
 
 function showConfirm() {
-  const { name, contact } = getValues();
+  const {name, contact} = getValues();
   if (!isReady()) return;
   document.getElementById('confirmPreview').innerHTML = buildPreviewHTML(name, contact);
   document.getElementById('confirmPrompt').classList.add('show');
   document.getElementById('sendBtn').classList.remove('show');
   amendMode = false;
-  document.getElementById('confirmPrompt').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('confirmPrompt').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function resetPrompt() {
+  document.getElementById('confirmPrompt').classList.remove('show');
+  document.getElementById('sendBtn').classList.remove('show');
+  document.getElementById('toast').classList.remove('show','success','error');
 }
 
 function doCancel() {
@@ -436,23 +357,65 @@ function doCancel() {
   document.getElementById('sendBtn').classList.add('show');
 }
 
-function doSend() {
-  const { name, contact } = getValues();
+async function doSend() {
+  const {name, contact} = getValues();
+  const btn = document.getElementById('btnSendNow');
+
+  if (contactMode === 'sms') {
+    // Native SMS — open Messages app pre-filled
+    const body = encodeURIComponent(buildSmsBody(name));
+    const phone = contact.replace(/\s/g,'');
+    window.location.href = `sms:${phone}?body=${body}`;
+    showToast('success', `📱 Opening Messages app for <strong>${name}</strong> — just hit Send!`);
+    resetAfterSend();
+    return;
+  }
+
+  // Email via EmailJS
+  if (!ejsCreds.publicKey || !ejsCreds.serviceId || !ejsCreds.templateId) {
+    showToast('error', '⚠️ Please fill in your EmailJS credentials in the setup section above first.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    await emailjs.send(ejsCreds.serviceId, ejsCreds.templateId, {
+      to_name:    name,
+      to_email:   contact,
+      from_name:  'Pi Cleaning Services',
+      from_email: FROM_EMAIL,
+      review_url: GOOGLE_URL,
+      message:    `Hi ${name.split(' ')[0]},\n\nThank you so much for choosing Pi Cleaning Services! We truly appreciate your trust in us.\n\nWe'd love to hear about your experience — click the link below to leave us a review:\n\nClick here to review us: ${GOOGLE_URL}\n\nWe strive for 5 stars and your review means the world to us!\n\nWarm regards,\nThe Pi Cleaning Services Team`
+    });
+    showToast('success', `✅ Email sent to <strong>${name}</strong> at ${contact}!`);
+    resetAfterSend();
+  } catch(err) {
+    showToast('error', `❌ Failed to send: ${err.text || err.message || 'Unknown error'}. Check your EmailJS credentials.`);
+    btn.disabled = false;
+    btn.textContent = '⭐ Send Now';
+  }
+}
+
+function resetAfterSend() {
   document.getElementById('confirmPrompt').classList.remove('show');
   document.getElementById('sendBtn').classList.remove('show');
   amendMode = false;
-
-  const toast = document.getElementById('successToast');
-  const medium = contactMode === 'email' ? `email to ${contact}` : `SMS to ${contact}`;
-  toast.innerHTML = `✅ Review request sent to <strong>${name}</strong> via ${medium}!`;
-  toast.classList.add('show');
-
   setTimeout(() => {
     document.getElementById('clientName').value = '';
     document.getElementById('clientEmail').value = '';
     document.getElementById('clientPhone').value = '';
-    toast.classList.remove('show');
-  }, 5000);
+    document.getElementById('btnSendNow').disabled = false;
+    document.getElementById('btnSendNow').textContent = '⭐ Send Now';
+  }, 1000);
+}
+
+function showToast(type, html) {
+  const t = document.getElementById('toast');
+  t.innerHTML = html;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 6000);
 }
 </script>
 </body>
