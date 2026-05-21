@@ -22,287 +22,221 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
-  .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.55); z-index: 80;
-  }
-  .overlay.open { display: block; }
+  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:80; }
+  .overlay.open { display:block; }
 
   .drawer {
-    position: fixed; top: 0; right: -380px;
-    width: 360px; height: 100vh;
-    background: var(--navy-mid);
-    border-left: 1px solid rgba(201,168,76,0.3);
-    z-index: 100;
-    transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
-    display: flex; flex-direction: column;
-    overflow-y: auto;
+    position:fixed; top:0; right:-380px;
+    width:360px; height:100vh;
+    background:var(--navy-mid);
+    border-left:1px solid rgba(201,168,76,0.3);
+    z-index:100;
+    transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
+    display:flex; flex-direction:column; overflow-y:auto;
   }
-  .drawer.open { right: 0; }
+  .drawer.open { right:0; }
 
   .drawer-header {
-    padding: 26px 24px 20px;
-    border-bottom: 1px solid rgba(201,168,76,0.2);
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0;
-    background: var(--navy-mid); z-index: 1;
+    padding:24px 22px 18px;
+    border-bottom:1px solid rgba(201,168,76,0.2);
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; background:var(--navy-mid); z-index:1;
   }
   .drawer-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 21px; font-weight: 600;
-    color: var(--gold-light); letter-spacing: 0.04em;
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px; font-weight:600;
+    color:var(--gold-light); letter-spacing:0.04em;
   }
   .close-btn {
-    width: 34px; height: 34px;
-    border: 1px solid rgba(201,168,76,0.35); border-radius: 50%;
-    background: transparent; color: var(--gold);
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    font-size: 16px; transition: background 0.2s, color 0.2s;
+    width:32px; height:32px;
+    border:1px solid rgba(201,168,76,0.35); border-radius:50%;
+    background:transparent; color:var(--gold);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:15px; transition:background 0.2s,color 0.2s;
   }
-  .close-btn:hover { background: var(--gold); color: var(--navy); }
+  .close-btn:hover { background:var(--gold); color:var(--navy); }
 
-  .drawer-body { padding: 28px 24px 32px; flex: 1; }
-
-  .section-tag {
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--gold); font-weight: 600; margin-bottom: 5px;
-  }
-  .section-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px; font-weight: 700;
-    color: var(--white); margin-bottom: 22px; line-height: 1.2;
-  }
+  .drawer-body { padding:24px 22px 32px; flex:1; }
 
   .review-link-box {
-    background: rgba(201,168,76,0.08);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-bottom: 26px;
-    display: flex; align-items: center; gap: 12px;
+    background:rgba(201,168,76,0.08);
+    border:1px solid rgba(201,168,76,0.28);
+    border-radius:11px; padding:14px 16px;
+    margin-bottom:22px;
+    display:flex; align-items:center; gap:11px;
   }
-  .review-link-icon {
-    font-size: 22px; flex-shrink: 0;
-  }
-  .review-link-text {
-    font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5;
-  }
+  .review-link-text { font-size:11px; color:rgba(255,255,255,0.55); line-height:1.5; }
   .review-hyperlink {
-    display: block;
-    color: var(--gold-light);
-    font-size: 13px; font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    margin-top: 4px;
-    cursor: pointer;
-    transition: color 0.2s;
+    display:block; color:var(--gold-light);
+    font-size:13px; font-weight:600;
+    text-decoration:underline; text-underline-offset:3px;
+    margin-top:4px; transition:color 0.2s;
   }
-  .review-hyperlink:hover { color: #fff; }
+  .review-hyperlink:hover { color:#fff; }
 
-  .divider {
-    height: 1px;
-    background: rgba(201,168,76,0.15);
-    margin: 0 0 24px;
-  }
+  .divider { height:1px; background:rgba(201,168,76,0.15); margin:0 0 22px; }
 
-  .field-group { margin-bottom: 15px; }
+  .field-group { margin-bottom:14px; }
   .field-label {
-    display: block; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 7px;
+    display:block; font-size:10px; font-weight:600;
+    letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px;
   }
   .field-input {
-    width: 100%; padding: 11px 14px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(201,168,76,0.22);
-    border-radius: 8px; color: var(--white);
-    font-family: 'Montserrat', sans-serif; font-size: 13px;
-    outline: none; transition: border-color 0.2s, background 0.2s;
+    width:100%; padding:11px 13px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(201,168,76,0.22);
+    border-radius:8px; color:var(--white);
+    font-family:'Montserrat',sans-serif; font-size:13px;
+    outline:none; transition:border-color 0.2s,background 0.2s;
   }
-  .field-input::placeholder { color: rgba(255,255,255,0.28); }
-  .field-input:focus { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .field-input::placeholder { color:rgba(255,255,255,0.28); }
+  .field-input:focus { border-color:var(--gold); background:rgba(201,168,76,0.06); }
 
-  .contact-toggle { display: flex; gap: 8px; margin-bottom: 15px; }
+  .contact-toggle { display:flex; gap:8px; margin-bottom:14px; }
   .toggle-btn {
-    flex: 1; padding: 9px;
-    border: 1px solid rgba(201,168,76,0.25); border-radius: 7px;
-    background: transparent; color: var(--white-muted);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s;
+    flex:1; padding:9px;
+    border:1px solid rgba(201,168,76,0.25); border-radius:7px;
+    background:transparent; color:var(--white-muted);
+    font-family:'Montserrat',sans-serif;
+    font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer; transition:all 0.2s;
   }
-  .toggle-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+  .toggle-btn.active { background:var(--gold); color:var(--navy); border-color:var(--gold); }
 
-  .preview-box {
-    background: rgba(201,168,76,0.06);
-    border: 1px solid rgba(201,168,76,0.18);
-    border-radius: 10px; padding: 14px 16px;
-    margin-bottom: 16px; display: none;
+  /* CONFIRM PROMPT */
+  .confirm-prompt {
+    display:none;
+    background:rgba(10,22,40,0.97);
+    border:1px solid rgba(201,168,76,0.45);
+    border-radius:14px;
+    padding:20px 18px;
+    margin-top:16px;
+    animation:slideUp 0.25s ease;
   }
-  .preview-box.show { display: block; }
-  .preview-label {
-    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--gold); font-weight: 600; margin-bottom: 8px;
-  }
-  .preview-content { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.8; }
-  .preview-link { color: var(--gold-light); text-decoration: underline; }
+  .confirm-prompt.show { display:block; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
+  .confirm-title {
+    font-family:'Cormorant Garamond',serif;
+    font-size:17px; font-weight:700; color:var(--gold-light);
+    margin-bottom:14px; text-align:center;
+  }
+  .confirm-preview {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(201,168,76,0.15);
+    border-radius:9px; padding:14px;
+    font-size:12px; color:rgba(255,255,255,0.72); line-height:1.9;
+    margin-bottom:16px;
+  }
+  .confirm-preview .to-line {
+    font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin-bottom:10px;
+  }
+  .confirm-preview .plink {
+    color:var(--gold-light); text-decoration:underline; text-underline-offset:2px;
+  }
+  .confirm-preview .pfrom {
+    font-size:10px; color:rgba(255,255,255,0.35); margin-top:10px;
+  }
+
+  .confirm-btns { display:flex; gap:10px; }
+  .btn-send {
+    flex:1; padding:12px;
+    background:var(--gold); border:none; border-radius:8px;
+    color:var(--navy); font-family:'Montserrat',sans-serif;
+    font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    cursor:pointer; transition:opacity 0.2s,transform 0.15s;
+  }
+  .btn-send:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-cancel {
+    flex:1; padding:12px;
+    background:transparent;
+    border:1px solid rgba(201,168,76,0.35); border-radius:8px;
+    color:rgba(255,255,255,0.6); font-family:'Montserrat',sans-serif;
+    font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer; transition:background 0.2s,color 0.2s;
+  }
+  .btn-cancel:hover { background:rgba(255,255,255,0.06); color:#fff; }
+
+  /* AMEND MODE */
   .send-btn {
-    width: 100%; padding: 14px;
-    background: var(--gold);
-    border: none; border-radius: 9px;
-    color: var(--navy);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+    width:100%; padding:13px;
+    background:var(--gold); border:none; border-radius:9px;
+    color:var(--navy); font-family:'Montserrat',sans-serif;
+    font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    cursor:pointer; transition:opacity 0.2s,transform 0.15s;
+    margin-top:14px; display:none;
   }
-  .send-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .send-btn:active { transform: translateY(0); }
+  .send-btn.show { display:block; }
+  .send-btn:hover { opacity:0.88; transform:translateY(-1px); }
 
-  .success-msg {
-    display: none;
-    border-radius: 9px; padding: 13px 15px;
-    margin-top: 12px; font-size: 12px; line-height: 1.6;
+  .success-toast {
+    display:none;
+    background:rgba(201,168,76,0.1);
+    border:1px solid rgba(201,168,76,0.3);
+    border-radius:9px; padding:13px 15px;
+    margin-top:12px; font-size:12px; line-height:1.6;
+    color:var(--gold-light);
   }
-  .success-msg.show { display: block; }
+  .success-toast.show { display:block; }
 
   /* TOPBAR */
   .topbar {
-    position: fixed; top: 0; left: 0; right: 0; height: 68px;
-    background: rgba(10,22,40,0.93);
-    border-bottom: 1px solid rgba(201,168,76,0.18);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 28px; z-index: 60;
+    position:fixed; top:0; left:0; right:0; height:68px;
+    background:rgba(10,22,40,0.93);
+    border-bottom:1px solid rgba(201,168,76,0.18);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 28px; z-index:60;
   }
-  .logo-area { display: flex; align-items: center; gap: 13px; }
-  .logo-img {
-    width: 44px; height: 44px; border-radius: 50%;
-    object-fit: cover; border: 1.5px solid rgba(201,168,76,0.5);
-  }
-  .logo-text-main {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 19px; font-weight: 700;
-    color: var(--gold-light); letter-spacing: 0.1em;
-  }
-  .logo-text-sub {
-    font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--white-muted); margin-top: 2px;
-  }
+  .logo-area { display:flex; align-items:center; gap:13px; }
+  .logo-img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(201,168,76,0.5); }
+  .logo-text-main { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:700; color:var(--gold-light); letter-spacing:0.1em; }
+  .logo-text-sub { font-size:9px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--white-muted); margin-top:2px; }
   .hamburger {
-    width: 42px; height: 42px;
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.3); border-radius: 10px;
-    cursor: pointer; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 5px; padding: 10px;
-    transition: border-color 0.2s, background 0.2s;
+    width:42px; height:42px; background:transparent;
+    border:1px solid rgba(201,168,76,0.3); border-radius:10px;
+    cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px; padding:10px;
+    transition:border-color 0.2s,background 0.2s;
   }
-  .hamburger:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
-  .hamburger span {
-    display: block; width: 20px; height: 1.5px;
-    background: var(--gold); border-radius: 2px;
-    transition: transform 0.25s, opacity 0.25s;
-  }
-  .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .hamburger.open span:nth-child(2) { opacity: 0; }
-  .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+  .hamburger:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+  .hamburger span { display:block; width:20px; height:1.5px; background:var(--gold); border-radius:2px; transition:transform 0.25s,opacity 0.25s; }
+  .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity:0; }
+  .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
 
   /* HERO */
-  .hero {
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; padding: 100px 32px 60px; position: relative; overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 70%);
-  }
-  .hero-ring {
-    position: absolute; border-radius: 50%;
-    border: 1px solid rgba(201,168,76,0.07);
-    top: 50%; left: 50%; transform: translate(-50%, -58%);
-  }
-  .hero-logo {
-    width: 126px; height: 126px; border-radius: 50%;
-    object-fit: cover; border: 2px solid rgba(201,168,76,0.45);
-    margin-bottom: 26px; position: relative; z-index: 1;
-    animation: floatLogo 4s ease-in-out infinite;
-  }
+  .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 32px 60px; position:relative; overflow:hidden; }
+  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(201,168,76,0.07) 0%,transparent 70%); }
+  .hero-ring { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,0.07); top:50%; left:50%; transform:translate(-50%,-58%); }
+  .hero-logo { width:126px; height:126px; border-radius:50%; object-fit:cover; border:2px solid rgba(201,168,76,0.45); margin-bottom:26px; position:relative; z-index:1; animation:floatLogo 4s ease-in-out infinite; }
   @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  .hero-eyebrow {
-    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--gold); font-weight: 600; margin-bottom: 13px; position: relative; z-index: 1;
-  }
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(44px,7vw,72px); font-weight: 700; line-height: 1.05;
-    color: var(--white); margin-bottom: 6px; position: relative; z-index: 1;
-  }
-  .hero-title span { color: var(--gold-light); }
-  .hero-sub {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(15px,2.5vw,20px); font-weight: 400; letter-spacing: 0.12em;
-    color: var(--gold); text-transform: uppercase; margin-bottom: 18px; position: relative; z-index: 1;
-  }
-  .hero-tagline {
-    font-size: 13px; color: var(--white-muted);
-    max-width: 380px; line-height: 1.8; position: relative; z-index: 1; margin-bottom: 38px;
-  }
-  .gold-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 38px; position: relative; z-index: 1;
-  }
-  .gold-divider::before,.gold-divider::after {
-    content:''; flex:1; height:1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    max-width:80px;
-  }
-  .stats-row {
-    display: flex; gap: 44px; justify-content: center;
-    position: relative; z-index: 1; flex-wrap: wrap;
-  }
-  .stat-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px; font-weight: 700; color: var(--gold-light); line-height: 1;
-  }
-  .stat-label {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--white-muted); margin-top: 4px;
-  }
-
-  .cards-section { padding: 56px 32px 72px; max-width: 940px; margin: 0 auto; }
-  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-  .card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(201,168,76,0.16); border-radius: 16px;
-    padding: 26px 22px; text-align: center;
-    transition: background 0.2s, border-color 0.2s, transform 0.2s;
-  }
-  .card:hover { background: rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.38); transform: translateY(-3px); }
-  .card-icon {
-    width: 46px; height: 46px; background: rgba(201,168,76,0.11);
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 14px; font-size: 20px;
-  }
-  .card-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px; font-weight: 600; color: var(--white); margin-bottom: 7px;
-  }
-  .card-desc { font-size: 12px; color: var(--white-muted); line-height: 1.7; }
-
-  .footer {
-    border-top: 1px solid rgba(201,168,76,0.12);
-    padding: 22px 32px; text-align: center;
-    font-size: 11px; color: rgba(255,255,255,0.28); letter-spacing: 0.06em;
-  }
-  .footer span { color: var(--gold); }
+  .hero-eyebrow { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:13px; position:relative; z-index:1; }
+  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(44px,7vw,72px); font-weight:700; line-height:1.05; color:var(--white); margin-bottom:6px; position:relative; z-index:1; }
+  .hero-title span { color:var(--gold-light); }
+  .hero-sub { font-family:'Cormorant Garamond',serif; font-size:clamp(15px,2.5vw,20px); font-weight:400; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase; margin-bottom:18px; position:relative; z-index:1; }
+  .hero-tagline { font-size:13px; color:var(--white-muted); max-width:380px; line-height:1.8; position:relative; z-index:1; margin-bottom:38px; }
+  .gold-divider { display:flex; align-items:center; gap:12px; margin-bottom:38px; position:relative; z-index:1; }
+  .gold-divider::before,.gold-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); max-width:80px; }
+  .stats-row { display:flex; gap:44px; justify-content:center; position:relative; z-index:1; flex-wrap:wrap; }
+  .stat-num { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:700; color:var(--gold-light); line-height:1; }
+  .stat-label { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--white-muted); margin-top:4px; }
+  .cards-section { padding:56px 32px 72px; max-width:940px; margin:0 auto; }
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.16); border-radius:16px; padding:26px 22px; text-align:center; transition:background 0.2s,border-color 0.2s,transform 0.2s; }
+  .card:hover { background:rgba(201,168,76,0.07); border-color:rgba(201,168,76,0.38); transform:translateY(-3px); }
+  .card-icon { width:46px; height:46px; background:rgba(201,168,76,0.11); border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:20px; }
+  .card-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; color:var(--white); margin-bottom:7px; }
+  .card-desc { font-size:12px; color:var(--white-muted); line-height:1.7; }
+  .footer { border-top:1px solid rgba(201,168,76,0.12); padding:22px 32px; text-align:center; font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.06em; }
+  .footer span { color:var(--gold); }
 </style>
 </head>
 <body>
 
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
-<!-- Simplified Drawer — Review Request only -->
 <div class="drawer" id="drawer">
   <div class="drawer-header">
     <div class="drawer-title">⭐ Request a Review</div>
@@ -310,17 +244,14 @@
   </div>
 
   <div class="drawer-body">
-    <div class="section-tag">After Every Job</div>
-    <div class="section-heading">Send your client<br>a Google review link</div>
+    <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;">After Every Job</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--white);margin-bottom:20px;line-height:1.2;">Send your client<br>a Google review link</div>
 
-    <!-- Click here to review us link -->
     <div class="review-link-box">
-      <div class="review-link-icon">🔗</div>
+      <div style="font-size:20px;flex-shrink:0;">🔗</div>
       <div>
-        <div class="review-link-text">Your Google Reviews page — share this with clients:</div>
-        <a class="review-hyperlink"
-           href="https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2"
-           target="_blank">
+        <div class="review-link-text">Your Google Reviews page:</div>
+        <a class="review-hyperlink" href="https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2" target="_blank">
           Click here to review us ⭐
         </a>
       </div>
@@ -330,7 +261,7 @@
 
     <div class="field-group">
       <label class="field-label">Client Name or Business</label>
-      <input class="field-input" type="text" id="clientName" placeholder="e.g. Sarah Mitchell" oninput="updatePreview()" />
+      <input class="field-input" type="text" id="clientName" placeholder="e.g. Sarah Mitchell" oninput="checkReady()" />
     </div>
 
     <div class="field-group">
@@ -341,24 +272,34 @@
       </div>
     </div>
 
-    <div class="field-group" id="emailGroup">
-      <label class="field-label">Email Address</label>
-      <input class="field-input" type="email" id="clientEmail" placeholder="client@example.com" oninput="updatePreview()" />
+    <div id="emailGroup">
+      <div class="field-group">
+        <label class="field-label">Email Address</label>
+        <input class="field-input" type="email" id="clientEmail" placeholder="client@example.com" oninput="checkReady()" />
+      </div>
     </div>
 
-    <div class="field-group" id="smsGroup" style="display:none">
-      <label class="field-label">Mobile Number</label>
-      <input class="field-input" type="tel" id="clientPhone" placeholder="+61 4xx xxx xxx" oninput="updatePreview()" />
+    <div id="smsGroup" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Mobile Number</label>
+        <input class="field-input" type="tel" id="clientPhone" placeholder="+61 4xx xxx xxx" oninput="checkReady()" />
+      </div>
     </div>
 
-    <div class="preview-box" id="previewBox">
-      <div class="preview-label">Message Preview</div>
-      <div class="preview-content" id="previewContent"></div>
+    <!-- Auto-triggered confirm prompt -->
+    <div class="confirm-prompt" id="confirmPrompt">
+      <div class="confirm-title">Review and send — or cancel?</div>
+      <div class="confirm-preview" id="confirmPreview"></div>
+      <div class="confirm-btns">
+        <button class="btn-send" onclick="doSend()">⭐ Send Now</button>
+        <button class="btn-cancel" onclick="doCancel()">✕ Cancel &amp; Amend</button>
+      </div>
     </div>
 
-    <button class="send-btn" onclick="sendReview()">⭐ Send Review Request</button>
+    <!-- Shown after cancel -->
+    <button class="send-btn" id="sendBtn" onclick="showConfirm()">⭐ Review &amp; Send</button>
 
-    <div class="success-msg" id="successMsg"></div>
+    <div class="success-toast" id="successToast"></div>
   </div>
 </div>
 
@@ -381,130 +322,138 @@
   <div class="hero-bg"></div>
   <div class="hero-ring" style="width:580px;height:580px;"></div>
   <div class="hero-ring" style="width:860px;height:860px;border-color:rgba(201,168,76,0.04)"></div>
-
-  <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png"
-       alt="Pi Cleaning Services" class="hero-logo"
-       onerror="this.style.display='none'" />
-
+  <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Cleaning Services" class="hero-logo" onerror="this.style.display='none'" />
   <div class="hero-eyebrow">Welcome to Your Command Centre</div>
   <h1 class="hero-title">Pi <span>Admin</span></h1>
   <div class="hero-sub">Control. Manage. Excel.</div>
   <p class="hero-tagline">Your all-in-one operations hub for Pi Cleaning Services. Manage jobs, clients, invoices, and reputation — all in one place.</p>
-
-  <div class="gold-divider">
-    <div style="color:var(--gold);font-size:13px;letter-spacing:6px;">✦ ✦ ✦</div>
-  </div>
-
+  <div class="gold-divider"><div style="color:var(--gold);font-size:13px;letter-spacing:6px;">✦ ✦ ✦</div></div>
   <div class="stats-row">
-    <div style="text-align:center">
-      <div class="stat-num">5★</div>
-      <div class="stat-label">Rating Goal</div>
-    </div>
-    <div style="text-align:center">
-      <div class="stat-num">100%</div>
-      <div class="stat-label">Dedication</div>
-    </div>
-    <div style="text-align:center">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">Excellence</div>
-    </div>
+    <div style="text-align:center"><div class="stat-num">5★</div><div class="stat-label">Rating Goal</div></div>
+    <div style="text-align:center"><div class="stat-num">100%</div><div class="stat-label">Dedication</div></div>
+    <div style="text-align:center"><div class="stat-num">∞</div><div class="stat-label">Excellence</div></div>
   </div>
 </section>
 
-<!-- Feature Cards -->
 <section class="cards-section">
   <div class="cards-grid">
-    <div class="card">
-      <div class="card-icon">📋</div>
-      <div class="card-title">Job Management</div>
-      <div class="card-desc">Track every booking, schedule, and completion status with ease.</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">⭐</div>
-      <div class="card-title">Review Requests</div>
-      <div class="card-desc">Send Google review links instantly after every job is done.</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">💰</div>
-      <div class="card-title">Invoicing</div>
-      <div class="card-desc">Generate and send professional invoices to your clients.</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">📊</div>
-      <div class="card-title">Reports</div>
-      <div class="card-desc">Insights on revenue, client retention, and business growth.</div>
-    </div>
+    <div class="card"><div class="card-icon">📋</div><div class="card-title">Job Management</div><div class="card-desc">Track every booking, schedule, and completion status with ease.</div></div>
+    <div class="card"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
+    <div class="card"><div class="card-icon">💰</div><div class="card-title">Invoicing</div><div class="card-desc">Generate and send professional invoices to your clients.</div></div>
+    <div class="card"><div class="card-icon">📊</div><div class="card-title">Reports</div><div class="card-desc">Insights on revenue, client retention, and business growth.</div></div>
   </div>
 </section>
 
-<footer class="footer">
-  © 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence
-</footer>
+<footer class="footer">© 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence</footer>
 
 <script>
-  const GOOGLE_URL = "https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2";
-  const LINK_LABEL = "We strive for 5 stars ⭐";
-  let contactMode = 'email';
+const GOOGLE_URL = "https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2";
+const FROM_EMAIL = "Admin@picleaningservices.com.au";
 
-  function toggleDrawer() {
-    const d = document.getElementById('drawer');
-    const o = document.getElementById('overlay');
-    const h = document.getElementById('hamburger');
-    d.classList.toggle('open');
-    o.classList.toggle('open');
-    h.classList.toggle('open');
-  }
-  function closeDrawer() {
-    document.getElementById('drawer').classList.remove('open');
-    document.getElementById('overlay').classList.remove('open');
-    document.getElementById('hamburger').classList.remove('open');
-  }
-  function setMode(mode) {
-    contactMode = mode;
-    document.getElementById('btnEmail').classList.toggle('active', mode === 'email');
-    document.getElementById('btnSms').classList.toggle('active', mode === 'sms');
-    document.getElementById('emailGroup').style.display = mode === 'email' ? 'block' : 'none';
-    document.getElementById('smsGroup').style.display = mode === 'sms' ? 'block' : 'none';
-    updatePreview();
-  }
-  function updatePreview() {
-    const name = document.getElementById('clientName').value.trim();
-    const contact = contactMode === 'email'
-      ? document.getElementById('clientEmail').value.trim()
-      : document.getElementById('clientPhone').value.trim();
-    const box = document.getElementById('previewBox');
-    if (!contact && !name) { box.classList.remove('show'); return; }
-    const greeting = name ? `Hi ${name.split(' ')[0]},` : 'Hi there,';
-    const dest = contact ? (contactMode === 'email' ? `To: ${contact}` : `SMS to: ${contact}`) : '';
-    document.getElementById('previewContent').innerHTML =
-      `${dest ? `<span style="color:rgba(255,255,255,0.35);font-size:10px">${dest}</span><br><br>` : ''}` +
-      `${greeting} Thank you for choosing Pi Cleaning Services! 🌟<br><br>` +
-      `We'd love to hear your feedback — it means the world to us.<br><br>` +
-      `<a class="preview-link" href="${GOOGLE_URL}" target="_blank">${LINK_LABEL}</a><br><br>` +
-      `Thank you for your support!<br><strong style="color:var(--gold-light)">— The Pi Cleaning Team</strong>`;
-    box.classList.add('show');
-  }
-  function sendReview() {
-    const name = document.getElementById('clientName').value.trim();
-    const contact = contactMode === 'email'
-      ? document.getElementById('clientEmail').value.trim()
-      : document.getElementById('clientPhone').value.trim();
-    const msg = document.getElementById('successMsg');
-    if (!contact) {
-      msg.style.cssText = 'display:block;background:rgba(180,30,30,0.15);border:1px solid rgba(220,50,50,0.3);border-radius:9px;color:#ff9999;padding:13px 15px;margin-top:12px;font-size:12px;line-height:1.6';
-      msg.innerHTML = '⚠️ Please enter a ' + (contactMode === 'email' ? 'email address.' : 'mobile number.');
-      return;
-    }
-    msg.style.cssText = 'display:block;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:9px;color:var(--gold-light);padding:13px 15px;margin-top:12px;font-size:12px;line-height:1.6';
-    msg.innerHTML = `✅ Review request sent to <strong>${name || contact}</strong>!<br><small style="opacity:0.7">Delivered as: "<em>${LINK_LABEL}</em>"</small>`;
-    setTimeout(() => {
-      document.getElementById('clientName').value = '';
-      document.getElementById('clientEmail').value = '';
-      document.getElementById('clientPhone').value = '';
-      msg.style.display = 'none';
-      document.getElementById('previewBox').classList.remove('show');
-    }, 4000);
-  }
+let contactMode = 'email';
+let debounceTimer = null;
+let amendMode = false;
+
+function toggleDrawer() {
+  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.toggle('open'));
+}
+function closeDrawer() {
+  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.remove('open'));
+}
+
+function setMode(mode) {
+  contactMode = mode;
+  document.getElementById('btnEmail').classList.toggle('active', mode === 'email');
+  document.getElementById('btnSms').classList.toggle('active', mode === 'sms');
+  document.getElementById('emailGroup').style.display = mode === 'email' ? 'block' : 'none';
+  document.getElementById('smsGroup').style.display = mode === 'sms' ? 'block' : 'none';
+  document.getElementById('confirmPrompt').classList.remove('show');
+  document.getElementById('sendBtn').classList.remove('show');
+  amendMode = false;
+  checkReady();
+}
+
+function getValues() {
+  const name = document.getElementById('clientName').value.trim();
+  const contact = contactMode === 'email'
+    ? document.getElementById('clientEmail').value.trim()
+    : document.getElementById('clientPhone').value.trim();
+  return { name, contact };
+}
+
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function isValidPhone(p) { return p.replace(/\s/g,'').length >= 8; }
+
+function isReady() {
+  const { name, contact } = getValues();
+  if (!name || !contact) return false;
+  if (contactMode === 'email') return isValidEmail(contact);
+  return isValidPhone(contact);
+}
+
+function buildPreviewHTML(name, contact) {
+  const first = name.split(' ')[0];
+  const toLine = contactMode === 'email'
+    ? `From: ${FROM_EMAIL} &rarr; To: ${contact}`
+    : `SMS to: ${contact}`;
+  return `
+    <div class="to-line">${toLine}</div>
+    Hi ${first},<br><br>
+    Thank you so much for choosing <strong style="color:var(--gold-light)">Pi Cleaning Services</strong>! We truly appreciate your trust in us and hope we exceeded your expectations.<br><br>
+    We'd love to hear about your experience — your feedback helps us grow and continue delivering exceptional results.<br><br>
+    <a class="plink" href="${GOOGLE_URL}" target="_blank">Click here to review us ⭐</a><br><br>
+    We strive for 5 stars and your review means the world to us!<br><br>
+    Warm regards,<br>
+    <strong style="color:var(--gold-light)">The Pi Cleaning Services Team</strong>
+    ${contactMode === 'email' ? `<div class="pfrom">Sent from ${FROM_EMAIL}</div>` : ''}
+  `;
+}
+
+function checkReady() {
+  clearTimeout(debounceTimer);
+  document.getElementById('confirmPrompt').classList.remove('show');
+  document.getElementById('sendBtn').classList.remove('show');
+  amendMode = false;
+
+  if (!isReady()) return;
+
+  debounceTimer = setTimeout(() => { showConfirm(); }, 600);
+}
+
+function showConfirm() {
+  const { name, contact } = getValues();
+  if (!isReady()) return;
+  document.getElementById('confirmPreview').innerHTML = buildPreviewHTML(name, contact);
+  document.getElementById('confirmPrompt').classList.add('show');
+  document.getElementById('sendBtn').classList.remove('show');
+  amendMode = false;
+  document.getElementById('confirmPrompt').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function doCancel() {
+  document.getElementById('confirmPrompt').classList.remove('show');
+  amendMode = true;
+  document.getElementById('sendBtn').classList.add('show');
+}
+
+function doSend() {
+  const { name, contact } = getValues();
+  document.getElementById('confirmPrompt').classList.remove('show');
+  document.getElementById('sendBtn').classList.remove('show');
+  amendMode = false;
+
+  const toast = document.getElementById('successToast');
+  const medium = contactMode === 'email' ? `email to ${contact}` : `SMS to ${contact}`;
+  toast.innerHTML = `✅ Review request sent to <strong>${name}</strong> via ${medium}!`;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    document.getElementById('clientName').value = '';
+    document.getElementById('clientEmail').value = '';
+    document.getElementById('clientPhone').value = '';
+    toast.classList.remove('show');
+  }, 5000);
+}
 </script>
 </body>
 </html>
