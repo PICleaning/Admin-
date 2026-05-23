@@ -3,43 +3,350 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pi Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Pi Admin — Command Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --navy:#0a1628; --navy-mid:#0f2040;
-    --gold:#c9a84c; --gold-light:#e8c97a;
-    --white:#ffffff; --white-muted:rgba(255,255,255,0.7);
+    --navy:#0a1628; --navy-mid:#0f2040; --navy-light:#162d54;
+    --gold:#c9a84c; --gold-light:#e8c97a; --gold-pale:rgba(201,168,76,0.12);
+    --white:#ffffff; --white-muted:rgba(255,255,255,0.65);
+    --success:#1db954; --danger:#e24b4a; --warn:#f0a500;
+    --sidebar-w: 300px;
   }
   body { font-family:'Montserrat',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; overflow-x:hidden; }
+
+  /* ── SPLASH SCREEN ── */
+  #splash {
+    position:fixed; inset:0; z-index:9999;
+    background:var(--navy);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:0;
+    transition:opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #splash.fade-out { opacity:0; visibility:hidden; }
+  .splash-emblem {
+    width:90px; height:90px; border-radius:50%;
+    border:2px solid rgba(201,168,76,0.6);
+    background:rgba(201,168,76,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:38px; font-weight:700; color:var(--gold);
+    animation:splashPop 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    opacity:0;
+    box-shadow:0 0 40px rgba(201,168,76,0.15);
+  }
+  @keyframes splashPop {
+    0%  { opacity:0; transform:scale(0.6); }
+    100%{ opacity:1; transform:scale(1); }
+  }
+  .splash-title {
+    font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:700;
+    color:var(--gold-light); letter-spacing:0.12em; margin-top:22px;
+    opacity:0; animation:splashFadeUp 0.6s ease 0.4s forwards;
+  }
+  .splash-sub {
+    font-size:10px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase;
+    color:var(--white-muted); margin-top:8px;
+    opacity:0; animation:splashFadeUp 0.6s ease 0.6s forwards;
+  }
+  .splash-ring {
+    position:absolute; border-radius:50%;
+    border:1px solid rgba(201,168,76,0.08);
+  }
+  .splash-bar {
+    width:120px; height:2px; background:rgba(201,168,76,0.12); border-radius:2px;
+    margin-top:40px; overflow:hidden;
+    opacity:0; animation:splashFadeUp 0.4s ease 0.8s forwards;
+  }
+  .splash-bar-fill {
+    height:100%; width:0%; background:linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius:2px; animation:splashLoad 2.2s ease 0.9s forwards;
+  }
+  @keyframes splashLoad {
+    0%  { width:0%; }
+    60% { width:70%; }
+    100%{ width:100%; }
+  }
+  @keyframes splashFadeUp {
+    from{ opacity:0; transform:translateY(10px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position:fixed; top:0; left:0; right:0; height:64px;
+    background:rgba(10,22,40,0.97); border-bottom:1px solid rgba(201,168,76,0.2);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; z-index:200;
+    backdrop-filter: blur(12px);
+  }
+  .logo-area { display:flex; align-items:center; gap:12px; }
+  .logo-emblem {
+    width:40px; height:40px; border-radius:50%;
+    border:1.5px solid rgba(201,168,76,0.5);
+    background:rgba(201,168,76,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:700; color:var(--gold);
+  }
+  .logo-text-main { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:var(--gold-light); letter-spacing:0.08em; }
+  .logo-text-sub { font-size:9px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--white-muted); margin-top:1px; }
+  .topbar-right { display:flex; align-items:center; gap:12px; }
+  .nav-tab {
+    padding:8px 16px; border-radius:8px; cursor:pointer;
+    font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    border:1px solid rgba(201,168,76,0.2); color:var(--white-muted);
+    background:transparent; transition:all 0.2s;
+  }
+  .nav-tab:hover, .nav-tab.active { background:var(--gold-pale); border-color:var(--gold); color:var(--gold); }
+  .hamburger { width:40px; height:40px; background:transparent; border:1px solid rgba(201,168,76,0.3); border-radius:9px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:10px; transition:all 0.2s; position:relative; }
+  .hamburger:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+  .hamburger span { display:block; width:18px; height:1.5px; background:var(--gold); border-radius:2px; transition:transform 0.25s,opacity 0.25s; }
+  .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity:0; }
+  .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+  /* Due-soon badge on hamburger */
+  .hbg-badge {
+    position:absolute; top:-4px; right:-4px;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--danger); border:2px solid var(--navy);
+    font-size:9px; font-weight:700; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    display:none;
+  }
+  .hbg-badge.show { display:flex; }
+
+  /* ── PAGE WRAPPER ── */
+  .page { padding-top:64px; min-height:100vh; }
+
+  /* ════════════════════════════════
+     DASHBOARD PAGE
+  ════════════════════════════════ */
+  .dashboard-layout {
+    display:flex; height:calc(100vh - 64px);
+  }
+
+  /* ── LEFT SIDEBAR ── */
+  .sidebar {
+    width:var(--sidebar-w); flex-shrink:0;
+    background:var(--navy-mid); border-right:1px solid rgba(201,168,76,0.18);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .sidebar-header {
+    padding:16px 18px 12px;
+    border-bottom:1px solid rgba(201,168,76,0.15);
+    flex-shrink:0;
+  }
+  .sidebar-title {
+    font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700;
+    color:var(--gold-light); letter-spacing:0.04em; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .live-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    background:rgba(29,185,84,0.12); border:1px solid rgba(29,185,84,0.3);
+    border-radius:20px; padding:3px 9px;
+    font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--success);
+  }
+  .live-dot { width:6px; height:6px; border-radius:50%; background:var(--success); animation:blink 1.2s ease infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .stats-strip {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:8px; margin-bottom:0;
+  }
+  .stat-chip {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.12);
+    border-radius:9px; padding:8px 6px; text-align:center;
+  }
+  .stat-chip-num {
+    font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700;
+    color:var(--gold); line-height:1;
+  }
+  .stat-chip-label { font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:var(--white-muted); margin-top:2px; }
+
+  .emp-list { flex:1; overflow-y:auto; padding:8px 12px 12px; }
+  .emp-list::-webkit-scrollbar { width:3px; }
+  .emp-list::-webkit-scrollbar-track { background:transparent; }
+  .emp-list::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.25); border-radius:2px; }
+
+  .emp-empty {
+    text-align:center; padding:40px 20px;
+    color:var(--white-muted); font-size:12px; line-height:1.8;
+  }
+  .emp-empty-icon { font-size:32px; margin-bottom:12px; }
+
+  .emp-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
+    border-radius:12px; padding:12px; margin-bottom:8px;
+    cursor:pointer; transition:all 0.2s;
+    position:relative; overflow:hidden;
+  }
+  .emp-card:hover { background:rgba(201,168,76,0.07); border-color:rgba(201,168,76,0.35); }
+  .emp-card.selected { background:rgba(201,168,76,0.1); border-color:var(--gold); }
+  .emp-card-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .emp-avatar {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700;
+    color:var(--navy); background:var(--gold);
+  }
+  .emp-avatar.on-break { background:var(--warn); }
+  .emp-avatar.clocked-out { background:rgba(255,255,255,0.2); color:var(--white-muted); }
+  .emp-info { flex:1; min-width:0; }
+  .emp-name { font-size:13px; font-weight:600; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .emp-id { font-size:10px; color:var(--white-muted); }
+  .status-pill-sm {
+    display:inline-flex; align-items:center; gap:4px;
+    border-radius:20px; padding:3px 8px;
+    font-size:9px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  }
+  .status-pill-sm.working { background:rgba(29,185,84,0.15); border:1px solid rgba(29,185,84,0.3); color:var(--success); }
+  .status-pill-sm.break { background:rgba(240,165,0,0.15); border:1px solid rgba(240,165,0,0.3); color:var(--warn); }
+  .status-pill-sm.clocked-out { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:var(--white-muted); }
+
+  .emp-details { font-size:11px; color:var(--white-muted); line-height:1.6; }
+  .emp-job { color:var(--gold); font-size:11px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .emp-meta { display:flex; justify-content:space-between; }
+  .emp-time { font-size:10px; color:var(--white-muted); }
+  .emp-jobs-count { font-size:10px; color:var(--gold); }
+  .locate-btn {
+    margin-top:8px; width:100%;
+    background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25);
+    border-radius:7px; padding:6px;
+    font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold); cursor:pointer; transition:all 0.2s;
+  }
+  .locate-btn:hover { background:rgba(201,168,76,0.18); }
+
+  .refresh-btn {
+    margin:8px 12px 0;
+    background:transparent; border:1px solid rgba(201,168,76,0.2);
+    border-radius:8px; padding:8px 12px;
+    font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    flex-shrink:0;
+  }
+  .refresh-btn:hover { background:var(--gold-pale); }
+
+  /* ── MAP AREA ── */
+  .map-area { flex:1; position:relative; }
+  #map { width:100%; height:100%; }
+
+  .map-info-bar {
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    background:rgba(10,22,40,0.9); border:1px solid rgba(201,168,76,0.3);
+    border-radius:12px; padding:8px 16px;
+    font-size:11px; color:var(--white-muted);
+    z-index:10; white-space:nowrap;
+    backdrop-filter:blur(8px);
+  }
+  .map-info-bar span { color:var(--gold); font-weight:600; }
+
+  .last-update {
+    position:absolute; bottom:12px; right:12px;
+    background:rgba(10,22,40,0.85); border:1px solid rgba(201,168,76,0.2);
+    border-radius:8px; padding:6px 10px;
+    font-size:10px; color:var(--white-muted); z-index:10;
+    backdrop-filter:blur(6px);
+  }
+
+  /* ════════════════════════════════
+     NON-DASHBOARD PAGES
+  ════════════════════════════════ */
+  .content-page {
+    display:none; padding:88px 32px 60px; max-width:960px; margin:0 auto;
+  }
+  .content-page.active { display:block; }
+
+  .hero-page {
+    display:none; min-height:calc(100vh - 64px);
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:60px 32px;
+    position:relative; overflow:hidden;
+  }
+  .hero-page.active { display:flex; }
+  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(201,168,76,0.07) 0%,transparent 70%); }
+  .hero-ring { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,0.07); top:50%; left:50%; transform:translate(-50%,-58%); }
+  .hero-eyebrow { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:13px; position:relative; z-index:1; }
+  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(44px,7vw,72px); font-weight:700; line-height:1.05; color:var(--white); margin-bottom:6px; position:relative; z-index:1; }
+  .hero-title span { color:var(--gold-light); }
+  .hero-sub { font-family:'Cormorant Garamond',serif; font-size:clamp(13px,2.5vw,18px); font-weight:400; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase; margin-bottom:16px; position:relative; z-index:1; }
+  .hero-tagline { font-size:13px; color:var(--white-muted); max-width:380px; line-height:1.8; position:relative; z-index:1; margin-bottom:36px; }
+  .gold-divider { display:flex; align-items:center; gap:12px; margin-bottom:36px; position:relative; z-index:1; }
+  .gold-divider::before,.gold-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); max-width:80px; }
+  .stats-row { display:flex; gap:44px; justify-content:center; position:relative; z-index:1; flex-wrap:wrap; }
+  .stat-num { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:700; color:var(--gold-light); line-height:1; }
+  .stat-label { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--white-muted); margin-top:4px; }
+
+  .cards-section { padding:40px 32px 60px; max-width:940px; margin:0 auto; }
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
+  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.16); border-radius:16px; padding:24px 20px; text-align:center; transition:all 0.2s; cursor:pointer; }
+  .card:hover { background:rgba(201,168,76,0.07); border-color:rgba(201,168,76,0.38); transform:translateY(-3px); }
+  .card-icon { width:44px; height:44px; background:rgba(201,168,76,0.11); border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:20px; }
+  .card-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; color:var(--white); margin-bottom:6px; }
+  .card-desc { font-size:11px; color:var(--white-muted); line-height:1.7; }
+
+  /* ════ DRAWER SYSTEM ════ */
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:80; }
   .overlay.open { display:block; }
-  .drawer { position:fixed; top:0; right:-380px; width:360px; height:100vh; background:var(--navy-mid); border-left:1px solid rgba(201,168,76,0.3); z-index:100; transition:right 0.35s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; overflow-y:auto; }
+
+  /* Main drawer shell */
+  .drawer {
+    position:fixed; top:0; right:-440px; width:420px; height:100vh;
+    background:var(--navy-mid); border-left:1px solid rgba(201,168,76,0.3);
+    z-index:300; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
   .drawer.open { right:0; }
-  .drawer-header { padding:24px 22px 18px; border-bottom:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--navy-mid); z-index:1; }
+
+  /* Drawer header with tabs */
+  .drawer-header {
+    padding:18px 22px 0; border-bottom:1px solid rgba(201,168,76,0.2);
+    position:sticky; top:0; background:var(--navy-mid); z-index:1; flex-shrink:0;
+  }
+  .drawer-header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .drawer-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--gold-light); letter-spacing:0.04em; }
-  .close-btn { width:32px; height:32px; border:1px solid rgba(201,168,76,0.35); border-radius:50%; background:transparent; color:var(--gold); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:background 0.2s,color 0.2s; }
+  .close-btn { width:32px; height:32px; border:1px solid rgba(201,168,76,0.35); border-radius:50%; background:transparent; color:var(--gold); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:all 0.2s; }
   .close-btn:hover { background:var(--gold); color:var(--navy); }
-  .drawer-body { padding:24px 22px 32px; flex:1; }
+
+  /* Drawer tab nav */
+  .drawer-tabs { display:flex; gap:4px; }
+  .drawer-tab {
+    flex:1; padding:9px 6px; background:transparent;
+    border:none; border-bottom:2px solid transparent;
+    font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--white-muted); cursor:pointer; transition:all 0.2s;
+  }
+  .drawer-tab:hover { color:var(--gold); }
+  .drawer-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+  /* Drawer panel content */
+  .drawer-panel { display:none; flex:1; overflow-y:auto; padding:20px 22px 32px; }
+  .drawer-panel.active { display:block; }
+  .drawer-panel::-webkit-scrollbar { width:3px; }
+  .drawer-panel::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.25); border-radius:2px; }
+
+  /* Shared field styles */
   .section-tag { font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:5px; }
   .section-heading { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:700; color:var(--white); margin-bottom:20px; line-height:1.2; }
-  .review-link-box { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.28); border-radius:11px; padding:14px 16px; margin-bottom:22px; display:flex; align-items:center; gap:11px; }
-  .review-link-text { font-size:11px; color:rgba(255,255,255,0.55); line-height:1.5; }
-  .review-hyperlink { display:block; color:var(--gold-light); font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; margin-top:4px; transition:color 0.2s; }
-  .review-hyperlink:hover { color:#fff; }
-  .divider { height:1px; background:rgba(201,168,76,0.15); margin:0 0 22px; }
+  .divider { height:1px; background:rgba(201,168,76,0.15); margin:0 0 18px; }
   .field-group { margin-bottom:14px; }
   .field-label { display:block; font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
-  .field-input { width:100%; padding:11px 13px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.22); border-radius:8px; color:var(--white); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s,background 0.2s; }
+  .field-input { width:100%; padding:11px 13px; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.22); border-radius:8px; color:var(--white); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; transition:all 0.2s; }
   .field-input::placeholder { color:rgba(255,255,255,0.28); }
   .field-input:focus { border-color:var(--gold); background:rgba(201,168,76,0.06); }
   .contact-toggle { display:flex; gap:8px; margin-bottom:14px; }
   .toggle-btn { flex:1; padding:9px; border:1px solid rgba(201,168,76,0.25); border-radius:7px; background:transparent; color:var(--white-muted); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
   .toggle-btn.active { background:var(--gold); color:var(--navy); border-color:var(--gold); }
-
-  /* EMAILJS SETUP BANNER */
+  .review-link-box { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.28); border-radius:11px; padding:14px 16px; margin-bottom:22px; display:flex; align-items:center; gap:11px; }
+  .review-link-text { font-size:11px; color:rgba(255,255,255,0.55); line-height:1.5; }
+  .review-hyperlink { display:block; color:var(--gold-light); font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; margin-top:4px; transition:color 0.2s; }
+  .review-hyperlink:hover { color:#fff; }
   .setup-banner { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.35); border-radius:11px; padding:14px 16px; margin-bottom:16px; }
   .setup-banner-title { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
   .setup-banner p { font-size:11px; color:rgba(255,255,255,0.6); line-height:1.7; }
@@ -51,8 +358,6 @@
   .setup-save-btn { width:100%; padding:9px; background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.4); border-radius:7px; color:var(--gold-light); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:background 0.2s; margin-top:4px; }
   .setup-save-btn:hover { background:rgba(201,168,76,0.25); }
   .setup-saved { font-size:10px; color:#7edb7e; margin-top:6px; display:none; }
-
-  /* CONFIRM PROMPT */
   .confirm-prompt { display:none; background:rgba(10,22,40,0.97); border:1px solid rgba(201,168,76,0.45); border-radius:14px; padding:20px 18px; margin-top:16px; animation:slideUp 0.25s ease; }
   .confirm-prompt.show { display:block; }
   @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
@@ -60,131 +365,316 @@
   .confirm-preview { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.15); border-radius:9px; padding:14px; font-size:12px; color:rgba(255,255,255,0.72); line-height:1.9; margin-bottom:16px; }
   .confirm-preview .to-line { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:10px; }
   .confirm-preview .plink { color:var(--gold-light); text-decoration:underline; text-underline-offset:2px; }
-  .confirm-preview .pfrom { font-size:10px; color:rgba(255,255,255,0.35); margin-top:10px; }
   .confirm-btns { display:flex; gap:10px; }
-  .btn-send { flex:1; padding:12px; background:var(--gold); border:none; border-radius:8px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:opacity 0.2s,transform 0.15s; }
-  .btn-send:hover { opacity:0.88; transform:translateY(-1px); }
-  .btn-send:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-  .btn-cancel { flex:1; padding:12px; background:transparent; border:1px solid rgba(201,168,76,0.35); border-radius:8px; color:rgba(255,255,255,0.6); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:background 0.2s,color 0.2s; }
+  .btn-send { flex:1; padding:12px; background:var(--gold); border:none; border-radius:8px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .btn-send:hover { opacity:0.88; }
+  .btn-send:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-cancel { flex:1; padding:12px; background:transparent; border:1px solid rgba(201,168,76,0.35); border-radius:8px; color:rgba(255,255,255,0.6); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
   .btn-cancel:hover { background:rgba(255,255,255,0.06); color:#fff; }
-  .send-btn { width:100%; padding:13px; background:var(--gold); border:none; border-radius:9px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:opacity 0.2s,transform 0.15s; margin-top:14px; display:none; }
+  .send-btn { width:100%; padding:13px; background:var(--gold); border:none; border-radius:9px; color:var(--navy); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; margin-top:14px; display:none; }
   .send-btn.show { display:block; }
-  .send-btn:hover { opacity:0.88; transform:translateY(-1px); }
+  .send-btn:hover { opacity:0.88; }
   .toast { display:none; border-radius:9px; padding:13px 15px; margin-top:12px; font-size:12px; line-height:1.6; }
   .toast.show { display:block; }
   .toast.success { background:rgba(50,180,80,0.1); border:1px solid rgba(50,180,80,0.3); color:#7edb7e; }
   .toast.error { background:rgba(180,50,50,0.12); border:1px solid rgba(220,60,60,0.3); color:#ff9999; }
+  .toast.warn { background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); color:var(--warn); }
 
-  /* TOPBAR */
-  .topbar { position:fixed; top:0; left:0; right:0; height:68px; background:rgba(10,22,40,0.93); border-bottom:1px solid rgba(201,168,76,0.18); display:flex; align-items:center; justify-content:space-between; padding:0 28px; z-index:60; }
-  .logo-area { display:flex; align-items:center; gap:13px; }
-  .logo-img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(201,168,76,0.5); }
-  .logo-text-main { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:700; color:var(--gold-light); letter-spacing:0.1em; }
-  .logo-text-sub { font-size:9px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--white-muted); margin-top:2px; }
-  .hamburger { width:42px; height:42px; background:transparent; border:1px solid rgba(201,168,76,0.3); border-radius:10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:10px; transition:border-color 0.2s,background 0.2s; }
-  .hamburger:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
-  .hamburger span { display:block; width:20px; height:1.5px; background:var(--gold); border-radius:2px; transition:transform 0.25s,opacity 0.25s; }
-  .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
-  .hamburger.open span:nth-child(2) { opacity:0; }
-  .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+  /* ════ CLIENTS PANEL ════ */
+  .gs-setup-box {
+    background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.3);
+    border-radius:12px; padding:16px; margin-bottom:18px;
+  }
+  .gs-setup-title { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .gs-setup-desc { font-size:11px; color:rgba(255,255,255,0.55); line-height:1.7; margin-bottom:12px; }
+  .gs-setup-desc a { color:var(--gold-light); }
+  .gs-url-row { display:flex; gap:8px; }
+  .gs-url-input { flex:1; padding:9px 11px; background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.2); border-radius:7px; color:var(--white); font-family:'Montserrat',sans-serif; font-size:11px; outline:none; }
+  .gs-url-input::placeholder { color:rgba(255,255,255,0.25); }
+  .gs-url-input:focus { border-color:var(--gold); }
+  .gs-save-btn { padding:9px 14px; background:rgba(201,168,76,0.2); border:1px solid rgba(201,168,76,0.4); border-radius:7px; color:var(--gold); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .gs-save-btn:hover { background:rgba(201,168,76,0.35); }
+  .gs-load-btn { width:100%; padding:10px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); border-radius:8px; color:var(--gold-light); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .gs-load-btn:hover { background:rgba(201,168,76,0.22); }
+  .gs-load-btn.loading { opacity:0.6; pointer-events:none; }
 
-  /* HERO */
-  .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 32px 60px; position:relative; overflow:hidden; }
-  .hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(201,168,76,0.07) 0%,transparent 70%); }
-  .hero-ring { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,0.07); top:50%; left:50%; transform:translate(-50%,-58%); }
-  .hero-logo { width:126px; height:126px; border-radius:50%; object-fit:cover; border:2px solid rgba(201,168,76,0.45); margin-bottom:26px; position:relative; z-index:1; animation:floatLogo 4s ease-in-out infinite; }
-  @keyframes floatLogo { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  .hero-eyebrow { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:13px; position:relative; z-index:1; }
-  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(44px,7vw,72px); font-weight:700; line-height:1.05; color:var(--white); margin-bottom:6px; position:relative; z-index:1; }
-  .hero-title span { color:var(--gold-light); }
-  .hero-sub { font-family:'Cormorant Garamond',serif; font-size:clamp(15px,2.5vw,20px); font-weight:400; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase; margin-bottom:18px; position:relative; z-index:1; }
-  .hero-tagline { font-size:13px; color:var(--white-muted); max-width:380px; line-height:1.8; position:relative; z-index:1; margin-bottom:38px; }
-  .gold-divider { display:flex; align-items:center; gap:12px; margin-bottom:38px; position:relative; z-index:1; }
-  .gold-divider::before,.gold-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); max-width:80px; }
-  .stats-row { display:flex; gap:44px; justify-content:center; position:relative; z-index:1; flex-wrap:wrap; }
-  .stat-num { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:700; color:var(--gold-light); line-height:1; }
-  .stat-label { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--white-muted); margin-top:4px; }
-  .cards-section { padding:56px 32px 72px; max-width:940px; margin:0 auto; }
-  .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
-  .card { background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.16); border-radius:16px; padding:26px 22px; text-align:center; transition:background 0.2s,border-color 0.2s,transform 0.2s; }
-  .card:hover { background:rgba(201,168,76,0.07); border-color:rgba(201,168,76,0.38); transform:translateY(-3px); }
-  .card-icon { width:46px; height:46px; background:rgba(201,168,76,0.11); border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:20px; }
-  .card-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; color:var(--white); margin-bottom:7px; }
-  .card-desc { font-size:12px; color:var(--white-muted); line-height:1.7; }
-  .footer { border-top:1px solid rgba(201,168,76,0.12); padding:22px 32px; text-align:center; font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.06em; }
+  /* Sheets connection indicator */
+  .gs-connected-indicator {
+    display:none; align-items:center; gap:8px;
+    background:rgba(0,255,100,0.07); border:1px solid rgba(0,255,100,0.3);
+    border-radius:10px; padding:10px 14px; margin-top:10px;
+    font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:#00ff64;
+  }
+  .gs-connected-indicator.show { display:flex; }
+  .gs-neon-dot {
+    width:10px; height:10px; border-radius:50%;
+    background:#00ff64;
+    box-shadow:0 0 6px 2px rgba(0,255,100,0.7);
+    animation:neonPulse 2s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes neonPulse {
+    0%,100% { opacity:1; box-shadow:0 0 6px 3px rgba(0,255,100,0.7); }
+    50%      { opacity:0.6; box-shadow:0 0 14px 6px rgba(0,255,100,0.35); }
+  }
+  .gs-url-entry { transition:all 0.3s ease; overflow:hidden; }
+  .gs-url-entry.hidden { display:none; }
+
+  /* Client list */
+  .clients-filter { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+  .filter-chip {
+    padding:5px 11px; border-radius:20px;
+    font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    border:1px solid rgba(201,168,76,0.25); color:var(--white-muted);
+    background:transparent; cursor:pointer; transition:all 0.2s;
+  }
+  .filter-chip.active { background:var(--gold-pale); border-color:var(--gold); color:var(--gold); }
+  .filter-chip.urgent { border-color:rgba(226,75,74,0.5); }
+  .filter-chip.urgent.active { background:rgba(226,75,74,0.12); border-color:var(--danger); color:var(--danger); }
+
+  .client-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
+    border-radius:11px; padding:13px; margin-bottom:8px;
+    cursor:pointer; transition:all 0.2s; position:relative;
+  }
+  .client-card:hover { background:rgba(201,168,76,0.06); border-color:rgba(201,168,76,0.3); }
+  .client-card.due-urgent {
+    border-color:rgba(226,75,74,0.5);
+    background:rgba(226,75,74,0.07);
+    animation:urgentPulse 2.5s ease infinite;
+  }
+  @keyframes urgentPulse {
+    0%,100%{border-color:rgba(226,75,74,0.5)}
+    50%{border-color:rgba(226,75,74,0.9)}
+  }
+  .client-card.due-soon {
+    border-color:rgba(240,165,0,0.5);
+    background:rgba(240,165,0,0.06);
+  }
+  .client-card-top { display:flex; align-items:flex-start; gap:10px; }
+  .client-avatar {
+    width:38px; height:38px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700;
+    color:var(--navy); background:var(--gold);
+  }
+  .client-avatar.urgent { background:var(--danger); color:#fff; }
+  .client-avatar.soon { background:var(--warn); color:var(--navy); }
+  .client-info { flex:1; min-width:0; }
+  .client-name { font-size:13px; font-weight:600; color:var(--white); margin-bottom:2px; display:flex; align-items:center; gap:6px; }
+  .client-name-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .due-badge {
+    flex-shrink:0; font-size:9px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    padding:2px 7px; border-radius:10px;
+  }
+  .due-badge.urgent { background:rgba(226,75,74,0.2); color:var(--danger); border:1px solid rgba(226,75,74,0.4); }
+  .due-badge.soon { background:rgba(240,165,0,0.15); color:var(--warn); border:1px solid rgba(240,165,0,0.4); }
+  .due-badge.ok { background:rgba(29,185,84,0.12); color:var(--success); border:1px solid rgba(29,185,84,0.3); }
+  .client-address { font-size:11px; color:var(--white-muted); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .client-meta { display:flex; gap:12px; font-size:10px; }
+  .client-meta-item { color:var(--white-muted); }
+  .client-meta-item span { color:var(--gold); }
+  .client-actions { display:flex; gap:6px; margin-top:10px; }
+  .client-action-btn {
+    flex:1; padding:7px 8px; background:rgba(201,168,76,0.08);
+    border:1px solid rgba(201,168,76,0.22); border-radius:7px;
+    font-family:'Montserrat',sans-serif; font-size:9px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold); cursor:pointer; transition:all 0.2s; text-align:center;
+  }
+  .client-action-btn:hover { background:rgba(201,168,76,0.2); }
+  .client-action-btn.danger { border-color:rgba(226,75,74,0.35); color:var(--danger); background:rgba(226,75,74,0.06); }
+  .client-action-btn.danger:hover { background:rgba(226,75,74,0.15); }
+  .client-expanded { display:none; margin-top:10px; border-top:1px solid rgba(201,168,76,0.12); padding-top:10px; }
+  .client-expanded.show { display:block; }
+  .client-detail-row { display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px; }
+  .client-detail-key { color:var(--white-muted); }
+  .client-detail-val { color:var(--white); font-weight:500; text-align:right; max-width:60%; word-break:break-word; }
+
+  /* No clients state */
+  .no-clients { text-align:center; padding:40px 20px; color:var(--white-muted); font-size:12px; line-height:2; }
+  .no-clients-icon { font-size:36px; margin-bottom:12px; }
+
+  /* ════ SERVICE REMINDERS PANEL ════ */
+  .reminder-summary {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px;
+  }
+  .reminder-stat {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
+    border-radius:10px; padding:12px; text-align:center;
+  }
+  .reminder-stat-num {
+    font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:700;
+    color:var(--gold); line-height:1; margin-bottom:4px;
+  }
+  .reminder-stat-num.red { color:var(--danger); }
+  .reminder-stat-num.warn { color:var(--warn); }
+  .reminder-stat-label { font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:var(--white-muted); }
+
+  .reminder-client-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
+    border-radius:11px; padding:13px; margin-bottom:8px;
+  }
+  .reminder-client-card.urgent { border-color:rgba(226,75,74,0.45); background:rgba(226,75,74,0.06); }
+  .reminder-client-card.soon { border-color:rgba(240,165,0,0.4); background:rgba(240,165,0,0.05); }
+  .reminder-client-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .reminder-client-name { font-size:13px; font-weight:600; color:var(--white); flex:1; }
+  .reminder-days {
+    font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    padding:3px 9px; border-radius:10px;
+  }
+  .reminder-days.overdue { background:rgba(226,75,74,0.18); color:var(--danger); border:1px solid rgba(226,75,74,0.4); }
+  .reminder-days.urgent { background:rgba(226,75,74,0.18); color:var(--danger); border:1px solid rgba(226,75,74,0.4); }
+  .reminder-days.soon { background:rgba(240,165,0,0.15); color:var(--warn); border:1px solid rgba(240,165,0,0.4); }
+  .reminder-detail { font-size:11px; color:var(--white-muted); margin-bottom:10px; line-height:1.6; }
+  .reminder-msg-area {
+    width:100%; padding:10px 12px; background:rgba(255,255,255,0.04);
+    border:1px solid rgba(201,168,76,0.2); border-radius:8px;
+    color:var(--white); font-family:'Montserrat',sans-serif; font-size:12px;
+    line-height:1.6; resize:vertical; min-height:80px; outline:none;
+    transition:border-color 0.2s;
+  }
+  .reminder-msg-area:focus { border-color:var(--gold); }
+  .reminder-send-row { display:flex; gap:8px; margin-top:8px; }
+  .reminder-sms-btn {
+    flex:1; padding:9px; background:var(--gold); border:none; border-radius:8px;
+    color:var(--navy); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s;
+  }
+  .reminder-sms-btn:hover { opacity:0.88; }
+  .reminder-sent-badge {
+    display:none; font-size:10px; color:var(--success); align-items:center; gap:4px;
+    padding:9px; background:rgba(29,185,84,0.1); border:1px solid rgba(29,185,84,0.3);
+    border-radius:8px;
+  }
+  .reminder-sent-badge.show { display:flex; }
+
+  .send-all-btn {
+    width:100%; padding:13px; background:var(--gold); border:none; border-radius:10px;
+    color:var(--navy); font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:all 0.2s;
+    margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .send-all-btn:hover { opacity:0.88; }
+  .send-all-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  .no-reminders { text-align:center; padding:40px 20px; color:var(--white-muted); font-size:12px; line-height:2; }
+  .no-reminders-icon { font-size:36px; margin-bottom:10px; }
+
+  /* Employee detail panel on map click */
+  .emp-detail-popup {
+    position:absolute; top:16px; right:16px;
+    width:260px;
+    background:rgba(10,22,40,0.95); border:1px solid rgba(201,168,76,0.35);
+    border-radius:14px; padding:16px;
+    z-index:20; backdrop-filter:blur(10px);
+    display:none; animation:fadeIn 0.2s ease;
+  }
+  .emp-detail-popup.visible { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  .popup-close { float:right; background:none; border:none; color:var(--white-muted); cursor:pointer; font-size:16px; line-height:1; }
+  .popup-name { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:var(--gold-light); margin-bottom:4px; }
+  .popup-status { margin-bottom:12px; }
+  .popup-row { display:flex; justify-content:space-between; margin-bottom:6px; font-size:11px; }
+  .popup-key { color:var(--white-muted); }
+  .popup-val { color:var(--white); font-weight:500; max-width:55%; text-align:right; }
+  .popup-jobs { margin-top:10px; border-top:1px solid rgba(201,168,76,0.15); padding-top:10px; }
+  .popup-jobs-title { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px; }
+  .popup-job-item { font-size:11px; color:var(--white-muted); padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; gap:6px; }
+  .popup-job-num { color:var(--gold); font-weight:600; flex-shrink:0; }
+  .popup-job-active { color:var(--success); font-size:10px; }
+
+  /* Leaflet custom marker overrides */
+  .emp-marker-pin {
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:700;
+    color:var(--navy); background:var(--gold);
+    border:2px solid rgba(255,255,255,0.9);
+    box-shadow:0 2px 8px rgba(0,0,0,0.4);
+  }
+  .emp-marker-pin.break { background:var(--warn); }
+  .emp-marker-pin.clocked-out { background:rgba(150,150,150,0.8); }
+
+  .footer { border-top:1px solid rgba(201,168,76,0.12); padding:20px 32px; text-align:center; font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.06em; }
+  .drawer-version-bar {
+    position:absolute; bottom:0; left:0; right:0;
+    padding:10px 22px; text-align:center;
+    font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+    color:rgba(201,168,76,0.4); border-top:1px solid rgba(201,168,76,0.1);
+    background:var(--navy-mid); z-index:1;
+    pointer-events:none;
+  }
   .footer span { color:var(--gold); }
+
+  @media (max-width: 680px) {
+    :root { --sidebar-w: 260px; }
+    .drawer { width:100%; right:-100%; }
+  }
+  @media (max-width: 520px) {
+    .sidebar { display:none; }
+    .sidebar.mobile-open { display:flex; position:fixed; top:64px; left:0; bottom:0; z-index:150; }
+    .mobile-sidebar-toggle { display:flex !important; }
+  }
+  .mobile-sidebar-toggle { display:none; }
 </style>
 </head>
 <body>
 
+<!-- ════ SPLASH SCREEN ════ -->
+<div id="splash">
+  <div class="splash-ring" style="width:300px;height:300px;"></div>
+  <div class="splash-ring" style="width:200px;height:200px;"></div>
+  <div class="splash-emblem">Pi</div>
+  <div class="splash-title">PI ADMIN</div>
+  <div class="splash-sub">Pi Cleaning Services</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- Overlay for drawer -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
+<!-- ════ MULTI-PANEL DRAWER ════ -->
 <div class="drawer" id="drawer">
   <div class="drawer-header">
-    <div class="drawer-title">⭐ Request a Review</div>
-    <button class="close-btn" onclick="closeDrawer()">✕</button>
+    <div class="drawer-header-top">
+      <div class="drawer-title" id="drawer-title">Menu</div>
+      <button class="close-btn" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-tabs">
+      <button class="drawer-tab active" id="tab-review" onclick="switchDrawerTab('review')">⭐ Reviews</button>
+      <button class="drawer-tab" id="tab-clients" onclick="switchDrawerTab('clients')">👥 Clients</button>
+      <button class="drawer-tab" id="tab-reminders" onclick="switchDrawerTab('reminders')">🔔 Reminders</button>
+    </div>
   </div>
+  <div class="drawer-version-bar">V 2.0.1</div>
 
-  <div class="drawer-body">
+  <!-- ── PANEL 1: REVIEW REQUESTS ── -->
+  <div class="drawer-panel active" id="panel-review">
     <div class="section-tag">After Every Job</div>
     <div class="section-heading">Send your client<br>a Google review link</div>
-
     <div class="review-link-box">
       <div style="font-size:20px;flex-shrink:0;">🔗</div>
       <div>
         <div class="review-link-text">Your Google Reviews page:</div>
-        <a class="review-hyperlink" href="https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2" target="_blank">
-          Click here to review us ⭐
-        </a>
+        <a class="review-hyperlink" href="https://www.google.com/search?q=Pi+Cleaning+Services+Reviews" target="_blank">Click here to review us ⭐</a>
       </div>
     </div>
-
     <div class="divider"></div>
-
-    <!-- EmailJS Setup (email mode only) -->
-    <div class="setup-banner" id="emailjsSetup" style="display:none">
-      <div class="setup-banner-title">📧 One-time Email Setup</div>
-      <p>To send real emails, create a free account at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> then enter your credentials below. Free plan = 200 emails/month.</p>
-      <div class="setup-fields">
-        <input class="setup-input" id="ejsPublicKey" placeholder="Public Key (from Account → API Keys)" />
-        <input class="setup-input" id="ejsServiceId" placeholder="Service ID (e.g. service_xxxxxx)" />
-        <input class="setup-input" id="ejsTemplateId" placeholder="Template ID (e.g. template_xxxxxx)" />
-        <button class="setup-save-btn" onclick="saveEmailJS()">💾 Save Credentials</button>
-        <div class="setup-saved" id="setupSaved">✅ Saved! Ready to send emails.</div>
-      </div>
-    </div>
-
     <div class="field-group">
       <label class="field-label">Client Name or Business</label>
       <input class="field-input" type="text" id="clientName" placeholder="e.g. Sarah Mitchell" oninput="checkReady()" />
     </div>
-
     <div class="field-group">
-      <label class="field-label">Send via</label>
-      <div class="contact-toggle">
-        <button class="toggle-btn active" id="btnEmail" onclick="setMode('email')">✉ Email</button>
-        <button class="toggle-btn" id="btnSms" onclick="setMode('sms')">📱 SMS</button>
-      </div>
+      <label class="field-label">Mobile Number</label>
+      <input class="field-input" type="tel" id="clientPhone" placeholder="+61 4xx xxx xxx" oninput="checkReady()" />
     </div>
-
-    <div id="emailGroup">
-      <div class="field-group">
-        <label class="field-label">Email Address</label>
-        <input class="field-input" type="email" id="clientEmail" placeholder="client@example.com" oninput="checkReady()" />
-      </div>
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:4px;">
+      📱 <strong style="color:var(--gold-light)">SMS:</strong> Tapping "Send Now" opens your Messages app pre-filled.
     </div>
-
-    <div id="smsGroup" style="display:none">
-      <div class="field-group">
-        <label class="field-label">Mobile Number</label>
-        <input class="field-input" type="tel" id="clientPhone" placeholder="+61 4xx xxx xxx" oninput="checkReady()" />
-      </div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:4px;">
-        📱 <strong style="color:var(--gold-light)">How SMS works:</strong> Tapping "Send Now" will open your phone's native Messages app with the message pre-filled. Just hit send — done!
-      </div>
-    </div>
-
-    <!-- Auto confirm prompt -->
+    <!-- hidden email input kept for JS compatibility -->
+    <input type="hidden" id="clientEmail" />
     <div class="confirm-prompt" id="confirmPrompt">
       <div class="confirm-title">Review &amp; Send — or Cancel?</div>
       <div class="confirm-preview" id="confirmPreview"></div>
@@ -193,140 +683,685 @@
         <button class="btn-cancel" onclick="doCancel()">✕ Cancel &amp; Amend</button>
       </div>
     </div>
-
-    <!-- Shown after cancel -->
     <button class="send-btn" id="sendBtn" onclick="showConfirm()">⭐ Review &amp; Send</button>
-
     <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- ── PANEL 2: CLIENTS ── -->
+  <div class="drawer-panel" id="panel-clients">
+    <!-- Google Sheets Connection -->
+    <div class="gs-setup-box">
+      <div class="gs-setup-title">🔗 Google Sheets Connection</div>
+      <div class="gs-setup-desc" id="gsSetupDesc">
+        Paste your Google Apps Script Web App URL below to connect your client database. 
+        <a href="#" onclick="showScriptHelp(); return false;">How to set this up ↗</a>
+      </div>
+      <div class="gs-url-entry" id="gsUrlEntry">
+        <div class="gs-url-row">
+          <input class="gs-url-input" id="gsWebAppUrl" placeholder="https://script.google.com/macros/s/..." />
+          <button class="gs-save-btn" onclick="saveGsUrl()">Save</button>
+        </div>
+      </div>
+      <div class="gs-connected-indicator" id="gsConnectedIndicator">
+        <span class="gs-neon-dot"></span> Sheets Connected &amp; Stable
+      </div>
+
+    </div>
+
+    <!-- Refresh button -->
+    <button class="gs-load-btn" id="gsRefreshBtn" onclick="refreshClients()" style="margin-bottom:14px;">
+      <span id="gsRefreshIcon">↻</span> <span>Refresh</span>
+    </button>
+
+    <!-- Filter chips -->
+    <div class="clients-filter">
+      <button class="filter-chip active" onclick="filterClients('all', this)">All</button>
+      <button class="filter-chip urgent" onclick="filterClients('urgent', this)">🔴 Due Now</button>
+      <button class="filter-chip" onclick="filterClients('soon', this)">🟡 Due Soon</button>
+      <button class="filter-chip" onclick="filterClients('ok', this)">🟢 Up to Date</button>
+    </div>
+
+    <!-- Client list -->
+    <div id="clientsList">
+      <div class="no-clients">
+        <div class="no-clients-icon">👥</div>
+        <div>No clients loaded yet.</div>
+        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Connect your Google Sheet above and tap "Load Clients".</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 3: SERVICE REMINDERS ── -->
+  <div class="drawer-panel" id="panel-reminders">
+    <div class="section-tag">6-Month Service Cycle</div>
+    <div class="section-heading">Send service<br>reminder messages</div>
+
+    <!-- Summary stats -->
+    <div class="reminder-summary" id="reminderSummary" style="display:none">
+      <div class="reminder-stat">
+        <div class="reminder-stat-num red" id="stat-overdue">0</div>
+        <div class="reminder-stat-label">Overdue</div>
+      </div>
+      <div class="reminder-stat">
+        <div class="reminder-stat-num warn" id="stat-due-soon">0</div>
+        <div class="reminder-stat-label">Due in 14 Days</div>
+      </div>
+    </div>
+
+    <div id="remindersConnect" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:11px;padding:16px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+      💡 Connect your Google Sheet in the <strong style="color:var(--gold-light)">Clients</strong> tab first, then come back here to send service reminders to clients whose next service is due.
+    </div>
+
+    <div id="remindersList"></div>
   </div>
 </div>
 
-<!-- Topbar -->
+<!-- TOPBAR -->
 <header class="topbar">
   <div class="logo-area">
-    <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Admin Logo" class="logo-img" onerror="this.style.display='none'" />
+    <div class="logo-emblem">Pi</div>
     <div>
       <div class="logo-text-main">PI ADMIN</div>
       <div class="logo-text-sub">Pi Cleaning Services</div>
     </div>
   </div>
-  <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
-    <span></span><span></span><span></span>
-  </button>
+  <div class="topbar-right">
+    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">🗺 Live Map</button>
+    <button class="nav-tab" id="tab-home" onclick="showPage('home')">⚙ Tools</button>
+    <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
+      <span></span><span></span><span></span>
+      <div class="hbg-badge" id="hbgBadge"></div>
+    </button>
+  </div>
 </header>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-ring" style="width:580px;height:580px;"></div>
-  <div class="hero-ring" style="width:860px;height:860px;border-color:rgba(201,168,76,0.04)"></div>
-  <img src="/mnt/user-data/uploads/ChatGPT_Image_May_20__2026__11_31_48_PM.png" alt="Pi Cleaning" class="hero-logo" onerror="this.style.display='none'" />
-  <div class="hero-eyebrow">Welcome to Your Command Centre</div>
-  <h1 class="hero-title">Pi <span>Admin</span></h1>
-  <div class="hero-sub">Control. Manage. Excel.</div>
-  <p class="hero-tagline">Your all-in-one operations hub for Pi Cleaning Services. Manage jobs, clients, invoices, and reputation — all in one place.</p>
-  <div class="gold-divider"><div style="color:var(--gold);font-size:13px;letter-spacing:6px;">✦ ✦ ✦</div></div>
-  <div class="stats-row">
-    <div style="text-align:center"><div class="stat-num">5★</div><div class="stat-label">Rating Goal</div></div>
-    <div style="text-align:center"><div class="stat-num">100%</div><div class="stat-label">Dedication</div></div>
-    <div style="text-align:center"><div class="stat-num">∞</div><div class="stat-label">Excellence</div></div>
+<!-- ════════ DASHBOARD PAGE ════════ -->
+<div class="page" id="page-dashboard" style="display:flex;flex-direction:column;">
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          Active Team
+          <span class="live-badge"><span class="live-dot"></span> Live</span>
+        </div>
+        <div class="stats-strip">
+          <div class="stat-chip"><div class="stat-chip-num" id="stat-active">0</div><div class="stat-chip-label">Active</div></div>
+          <div class="stat-chip"><div class="stat-chip-num" id="stat-break">0</div><div class="stat-chip-label">On Break</div></div>
+          <div class="stat-chip"><div class="stat-chip-num" id="stat-jobs">0</div><div class="stat-chip-label">Jobs</div></div>
+        </div>
+      </div>
+      <div class="emp-list" id="emp-list">
+        <div class="emp-empty">
+          <div class="emp-empty-icon">📡</div>
+          <div>No employees clocked in yet.</div>
+          <div style="margin-top:6px;font-size:10px;opacity:0.6;">When an employee starts their shift in the employee app, they'll appear here in real time.</div>
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="refreshDashboard()">↻ Refresh</button>
+    </aside>
+    <div class="map-area">
+      <div id="map"></div>
+      <div class="map-info-bar" id="map-info-bar">
+        <span id="map-active-count">0</span> employees on the map · updates every 30s
+      </div>
+      <div class="emp-detail-popup" id="emp-detail-popup">
+        <button class="popup-close" onclick="closeDetailPopup()">✕</button>
+        <div class="popup-name" id="popup-name">—</div>
+        <div class="popup-status" id="popup-status-badge"></div>
+        <div class="popup-row"><span class="popup-key">Employee ID</span><span class="popup-val" id="popup-id">—</span></div>
+        <div class="popup-row"><span class="popup-key">Shift Type</span><span class="popup-val" id="popup-shift">—</span></div>
+        <div class="popup-row"><span class="popup-key">Clocked In</span><span class="popup-val" id="popup-clockin">—</span></div>
+        <div class="popup-row"><span class="popup-key">Time on Shift</span><span class="popup-val" id="popup-elapsed">—</span></div>
+        <div class="popup-row"><span class="popup-key">Break Time</span><span class="popup-val" id="popup-break">—</span></div>
+        <div class="popup-row"><span class="popup-key">GPS Updated</span><span class="popup-val" id="popup-gps-update">—</span></div>
+        <div class="popup-jobs">
+          <div class="popup-jobs-title">Jobs This Shift</div>
+          <div id="popup-jobs-list"></div>
+        </div>
+      </div>
+      <div class="last-update" id="last-update">Last refresh: —</div>
+    </div>
   </div>
-</section>
+</div>
 
-<section class="cards-section">
-  <div class="cards-grid">
-    <div class="card"><div class="card-icon">📋</div><div class="card-title">Job Management</div><div class="card-desc">Track every booking, schedule and completion status with ease.</div></div>
-    <div class="card"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
-    <div class="card"><div class="card-icon">💰</div><div class="card-title">Invoicing</div><div class="card-desc">Generate and send professional invoices to your clients.</div></div>
-    <div class="card"><div class="card-icon">📊</div><div class="card-title">Reports</div><div class="card-desc">Insights on revenue, client retention and business growth.</div></div>
-  </div>
-</section>
-
-<footer class="footer">© 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence</footer>
+<!-- ════════ HOME / TOOLS PAGE ════════ -->
+<div class="page" id="page-home" style="display:none;">
+  <section class="hero-page active" style="min-height:auto;padding-top:80px;">
+    <div class="hero-bg"></div>
+    <div class="hero-ring" style="width:480px;height:480px;"></div>
+    <div class="hero-eyebrow">Welcome to Your Command Centre</div>
+    <h1 class="hero-title">Pi <span>Admin</span></h1>
+    <div class="hero-sub">Control. Manage. Excel.</div>
+    <p class="hero-tagline">Your all-in-one operations hub for Pi Cleaning Services.</p>
+    <div class="gold-divider"><div style="color:var(--gold);font-size:13px;letter-spacing:6px;">✦ ✦ ✦</div></div>
+    <div class="stats-row">
+      <div style="text-align:center"><div class="stat-num">5★</div><div class="stat-label">Rating Goal</div></div>
+      <div style="text-align:center"><div class="stat-num">100%</div><div class="stat-label">Dedication</div></div>
+      <div style="text-align:center"><div class="stat-num">∞</div><div class="stat-label">Excellence</div></div>
+    </div>
+  </section>
+  <section class="cards-section">
+    <div class="cards-grid">
+      <div class="card" onclick="showPage('dashboard')"><div class="card-icon">🗺</div><div class="card-title">Live Map</div><div class="card-desc">Track active employees, their locations, and current jobs in real time.</div></div>
+      <div class="card" onclick="openDrawerTab('review')"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
+      <div class="card" onclick="openDrawerTab('clients')"><div class="card-icon">👥</div><div class="card-title">Clients</div><div class="card-desc">View your full client database, due dates and service history.</div></div>
+      <div class="card" onclick="openDrawerTab('reminders')"><div class="card-icon">🔔</div><div class="card-title">Service Reminders</div><div class="card-desc">Send SMS reminders to clients whose 6-month service is coming up.</div></div>
+    </div>
+  </section>
+  <footer class="footer">© 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence</footer>
+</div>
 
 <script>
-const GOOGLE_URL = "https://www.google.com/search?sca_esv=3f0cb7c755f254fa&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n5uS_1isOzTKP5vA_7t648azVg9rw:1779328403755&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwjtucbrosmUAxVPSWwGHTGgBRsQ0bkNegQIOBAH&biw=1440&bih=778&dpr=2";
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const ADMIN_KEY = 'pi_active_employees';
+const GOOGLE_URL = "https://www.google.com/search?q=Pi+Cleaning+Services+Reviews";
 const FROM_EMAIL = "Admin@picleaningservices.com.au";
+const GS_URL_KEY = 'pi_gs_webapp_url';
+const CLIENTS_CACHE_KEY = 'pi_clients_cache';
 
-let contactMode = 'email';
-let debounceTimer = null;
-let amendMode = false;
-
-// Load saved EmailJS creds from memory
-let ejsCreds = { publicKey:'', serviceId:'', templateId:'' };
-
-function saveEmailJS() {
-  ejsCreds.publicKey   = document.getElementById('ejsPublicKey').value.trim();
-  ejsCreds.serviceId   = document.getElementById('ejsServiceId').value.trim();
-  ejsCreds.templateId  = document.getElementById('ejsTemplateId').value.trim();
-  if (ejsCreds.publicKey) {
-    emailjs.init({ publicKey: ejsCreds.publicKey });
-    document.getElementById('setupSaved').style.display = 'block';
-  }
+// ══════════════════════════════════════════
+//  PAGE SWITCHING
+// ══════════════════════════════════════════
+function showPage(page) {
+  document.getElementById('page-dashboard').style.display = page === 'dashboard' ? 'flex' : 'none';
+  document.getElementById('page-home').style.display = page === 'home' ? 'block' : 'none';
+  document.getElementById('tab-dashboard').classList.toggle('active', page === 'dashboard');
+  document.getElementById('tab-home').classList.toggle('active', page === 'home');
+  if (page === 'dashboard') setTimeout(() => { if (map) map.invalidateSize(); }, 100);
 }
 
+// ══════════════════════════════════════════
+//  DRAWER SYSTEM
+// ══════════════════════════════════════════
+let currentDrawerTab = 'review';
+
 function toggleDrawer() {
-  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.toggle('open'));
+  // Always open the drawer when hamburger is clicked
+  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.add('open'));
 }
 function closeDrawer() {
   ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.remove('open'));
 }
-
-function setMode(mode) {
-  contactMode = mode;
-  document.getElementById('btnEmail').classList.toggle('active', mode==='email');
-  document.getElementById('btnSms').classList.toggle('active', mode==='sms');
-  document.getElementById('emailGroup').style.display = mode==='email' ? 'block' : 'none';
-  document.getElementById('smsGroup').style.display   = mode==='sms'   ? 'block' : 'none';
-  document.getElementById('emailjsSetup').style.display = mode==='email' ? 'block' : 'none';
-  resetPrompt();
-  checkReady();
+function openDrawerTab(tab) {
+  switchDrawerTab(tab);
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('hamburger').classList.add('open');
+}
+function switchDrawerTab(tab) {
+  currentDrawerTab = tab;
+  // Update tab buttons
+  ['review','clients','reminders'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+  // Update drawer title
+  const titles = { review: '⭐ Request a Review', clients: '👥 Client Database', reminders: '🔔 Service Reminders' };
+  document.getElementById('drawer-title').textContent = titles[tab];
+  // Load data for reminders tab
+  if (tab === 'reminders') renderReminders();
 }
 
-// Show EmailJS setup for email mode on load
-document.getElementById('emailjsSetup').style.display = 'block';
+// ══════════════════════════════════════════
+//  GOOGLE SHEETS INTEGRATION
+// ══════════════════════════════════════════
+let allClients = [];
+let clientFilter = 'all';
+
+function saveGsUrl() {
+  const url = document.getElementById('gsWebAppUrl').value.trim();
+  if (!url) return;
+  localStorage.setItem(GS_URL_KEY, url);
+  showGsConnected();
+  showGsToast('✅ Connected to Google Sheets!', 'success');
+}
+
+function showGsConnected() {
+  document.getElementById('gsUrlEntry').classList.add('hidden');
+  document.getElementById('gsSetupDesc').style.display = 'none';
+  document.getElementById('gsConnectedIndicator').classList.add('show');
+}
+
+function getGsUrl() {
+  return localStorage.getItem(GS_URL_KEY) || '';
+}
+
+// loadClients removed — use refreshClients() instead
+
+async function refreshClients() {
+  const btn = document.getElementById('gsRefreshBtn');
+  const icon = document.getElementById('gsRefreshIcon');
+  const url = getGsUrl();
+  if (!url) { showGsToast('⚠️ No Google Sheets URL saved yet.', 'warn'); return; }
+  btn.classList.add('loading');
+  icon.textContent = '⏳';
+  try {
+    const resp = await fetch(url + '?action=getClients');
+    const data = await resp.json();
+    if (data.clients) {
+      allClients = data.clients;
+      localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify(allClients));
+      renderClients();
+      updateDueBadge();
+      showGsToast(`✅ Refreshed — ${allClients.length} clients loaded.`, 'success');
+    } else {
+      showGsToast('❌ Unexpected response. Check your Apps Script.', 'error');
+    }
+  } catch(e) {
+    showGsToast('❌ Could not reach Google Sheets: ' + e.message, 'error');
+  } finally {
+    btn.classList.remove('loading');
+    icon.textContent = '↻';
+  }
+}
+
+function showGsToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg; t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const target = new Date(dateStr);
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  target.setHours(0,0,0,0);
+  return Math.ceil((target - now) / 86400000);
+}
+
+function clientStatus(client) {
+  const days = daysUntil(client.nextService);
+  if (days === null) return 'ok';
+  if (days <= 0) return 'urgent';     // overdue or today
+  if (days <= 14) return 'soon';      // due within 14 days
+  return 'ok';
+}
+
+function renderClients() {
+  const list = document.getElementById('clientsList');
+  let filtered = allClients;
+  if (clientFilter !== 'all') {
+    filtered = allClients.filter(c => clientStatus(c) === clientFilter);
+  }
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">${clientFilter === 'urgent' ? '🟢' : '👥'}</div><div>${clientFilter === 'urgent' ? 'No overdue clients — great!' : clientFilter === 'soon' ? 'No clients due in the next 14 days.' : 'No clients found.'}</div></div>`;
+    return;
+  }
+  // Sort: urgent first, soon next, ok last
+  filtered.sort((a,b) => {
+    const order = { urgent:0, soon:1, ok:2 };
+    return (order[clientStatus(a)]||2) - (order[clientStatus(b)]||2);
+  });
+  list.innerHTML = filtered.map((c, i) => {
+    const status = clientStatus(c);
+    const days = daysUntil(c.nextService);
+    const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const avatarCls = status === 'urgent' ? 'urgent' : status === 'soon' ? 'soon' : '';
+    const cardCls = status === 'urgent' ? 'due-urgent' : status === 'soon' ? 'due-soon' : '';
+    let dayLabel = '';
+    if (days !== null) {
+      if (days < 0) dayLabel = `<span class="due-badge urgent">Overdue ${Math.abs(days)}d</span>`;
+      else if (days === 0) dayLabel = `<span class="due-badge urgent">Due Today</span>`;
+      else if (days <= 14) dayLabel = `<span class="due-badge soon">Due in ${days}d</span>`;
+      else dayLabel = `<span class="due-badge ok">Due in ${days}d</span>`;
+    }
+    return `
+    <div class="client-card ${cardCls}" id="cc-${i}">
+      <div class="client-card-top">
+        <div class="client-avatar ${avatarCls}">${initials}</div>
+        <div class="client-info">
+          <div class="client-name"><span class="client-name-text">${c.name||'Unknown'}</span>${dayLabel}</div>
+          <div class="client-address">📍 ${c.address||'No address'}</div>
+          <div class="client-meta">
+            <div class="client-meta-item">📞 <span>${c.phone||'—'}</span></div>
+            <div class="client-meta-item">🗓 Next: <span>${c.nextService||'—'}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="client-expanded" id="cex-${i}">
+        <div class="client-detail-row"><span class="client-detail-key">Email</span><span class="client-detail-val">${c.email||'—'}</span></div>
+        <div class="client-detail-row"><span class="client-detail-key">Last Service</span><span class="client-detail-val">${c.lastService||'—'}</span></div>
+        <div class="client-detail-row"><span class="client-detail-key">Service Done</span><span class="client-detail-val">${c.serviceDone||'—'}</span></div>
+        <div class="client-detail-row"><span class="client-detail-key">Notes</span><span class="client-detail-val">${c.notes||'—'}</span></div>
+      </div>
+      <div class="client-actions">
+        <button class="client-action-btn" onclick="toggleClientExpand(${i})">ℹ Details</button>
+        ${c.phone ? `<button class="client-action-btn" onclick="smsClient('${c.name}','${c.phone}')">📱 SMS</button>` : ''}
+        ${(status==='urgent'||status==='soon') ? `<button class="client-action-btn danger" onclick="quickReminder(${i})">🔔 Remind</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleClientExpand(i) {
+  const el = document.getElementById('cex-' + i);
+  el.classList.toggle('show');
+}
+
+function filterClients(filter, btn) {
+  clientFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderClients();
+}
+
+function smsClient(name, phone) {
+  const body = encodeURIComponent(`Hi ${name.split(' ')[0]},\n\nThis is Pi Cleaning Services. We wanted to reach out to you.`);
+  const p = phone.replace(/\s/g,'');
+  window.location.href = `sms:${p}?body=${body}`;
+}
+
+function quickReminder(i) {
+  switchDrawerTab('reminders');
+  // Scroll to client in reminders after tab switch
+  setTimeout(() => {
+    const el = document.getElementById('rm-' + i);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 200);
+}
+
+function updateDueBadge() {
+  const urgent = allClients.filter(c => clientStatus(c) !== 'ok').length;
+  const badge = document.getElementById('hbgBadge');
+  if (urgent > 0) {
+    badge.textContent = urgent > 9 ? '9+' : urgent;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════
+//  SERVICE REMINDERS
+// ══════════════════════════════════════════
+function renderReminders() {
+  const due = allClients.filter(c => clientStatus(c) !== 'ok');
+  const overdue = due.filter(c => {
+    const d = daysUntil(c.nextService);
+    return d !== null && d <= 0;
+  });
+  const soon = due.filter(c => {
+    const d = daysUntil(c.nextService);
+    return d !== null && d > 0;
+  });
+
+  // Update summary
+  if (due.length > 0) {
+    document.getElementById('reminderSummary').style.display = 'grid';
+    document.getElementById('stat-overdue').textContent = overdue.length;
+    document.getElementById('stat-due-soon').textContent = soon.length;
+    document.getElementById('remindersConnect').style.display = 'none';
+  } else if (allClients.length === 0) {
+    document.getElementById('reminderSummary').style.display = 'none';
+    document.getElementById('remindersConnect').style.display = 'block';
+    document.getElementById('remindersList').innerHTML = '';
+    return;
+  } else {
+    document.getElementById('reminderSummary').style.display = 'grid';
+    document.getElementById('stat-overdue').textContent = 0;
+    document.getElementById('stat-due-soon').textContent = 0;
+    document.getElementById('remindersConnect').style.display = 'none';
+    document.getElementById('remindersList').innerHTML = `<div class="no-reminders"><div class="no-reminders-icon">🎉</div><div>All clients are up to date!</div><div style="font-size:10px;opacity:0.6;margin-top:6px;">No service reminders needed right now.</div></div>`;
+    return;
+  }
+
+  const list = document.getElementById('remindersList');
+
+  // Sort overdue first
+  due.sort((a,b) => {
+    const da = daysUntil(a.nextService) || 0;
+    const db = daysUntil(b.nextService) || 0;
+    return da - db;
+  });
+
+  list.innerHTML = due.map((c, i) => {
+    const days = daysUntil(c.nextService);
+    const isOverdue = days !== null && days <= 0;
+    const cardCls = isOverdue ? 'urgent' : 'soon';
+    let dayText = '';
+    if (days < 0) dayText = `Overdue by ${Math.abs(days)} days`;
+    else if (days === 0) dayText = 'Due today';
+    else dayText = `Due in ${days} days`;
+    const dayBadgeCls = isOverdue ? 'overdue' : 'soon';
+    const defaultMsg = buildReminderMsg(c, days);
+    return `
+    <div class="reminder-client-card ${cardCls}" id="rm-${i}">
+      <div class="reminder-client-top">
+        <div class="reminder-client-name">${c.name||'Client'}</div>
+        <span class="reminder-days ${dayBadgeCls}">${dayText}</span>
+      </div>
+      <div class="reminder-detail">
+        📍 ${c.address||'No address'}<br>
+        🗓 Next service: ${c.nextService||'—'} · 📞 ${c.phone||'No phone'}
+      </div>
+      <textarea class="reminder-msg-area" id="rmsg-${i}">${defaultMsg}</textarea>
+      <div class="reminder-send-row">
+        ${c.phone ? `<button class="reminder-sms-btn" onclick="sendReminderSms(${i},'${c.phone}')">📱 Send SMS</button>` : '<div style="font-size:11px;color:var(--danger)">No phone number saved</div>'}
+        <div class="reminder-sent-badge" id="rsent-${i}">✅ Sent</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDateDDMMYY(dateStr) {
+  if (!dateStr) return '';
+  // Try to parse common date formats and output DD/MM/YY
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr; // fallback to raw if unparseable
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const year = String(d.getFullYear()).slice(-2);
+  return `${day}/${month}/${year}`;
+}
+
+function buildReminderMsg(client, days) {
+  const first = (client.name||'').split(' ')[0] || 'there';
+  let timeStr = '';
+  if (days < 0) timeStr = 'is now overdue';
+  else if (days === 0) timeStr = 'is due today';
+  else timeStr = `is coming up in ${days} days`;
+  return `Hi ${first},\n\nThis is Pi Cleaning Services. Your scheduled service ${timeStr}.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
+}
+
+function sendReminderSms(i, phone) {
+  const msg = document.getElementById('rmsg-' + i).value;
+  const body = encodeURIComponent(msg);
+  const p = phone.replace(/\s/g,'');
+  window.location.href = `sms:${p}?body=${body}`;
+  // Mark as sent
+  const badge = document.getElementById('rsent-' + i);
+  badge.classList.add('show');
+}
+
+function showScriptHelp() {
+  alert('HOW TO SET UP GOOGLE SHEETS:\n\n1. Create a new Google Sheet with these columns:\n   Name | Address | Phone | Email | Last Service | Service Done | Next Service | Notes\n\n2. Go to Extensions > Apps Script\n\n3. Paste the code from the "Pi_Cleaning_AppsScript.gs" file provided\n\n4. Click Deploy > New Deployment > Web App\n   - Execute as: Me\n   - Who has access: Anyone\n\n5. Copy the Web App URL and paste it here.\n\nYour client data from MYOB can be exported as CSV and imported into the Google Sheet via File > Import.');
+}
+
+// ══════════════════════════════════════════
+//  LEAFLET MAP
+// ══════════════════════════════════════════
+let map, markers = {};
+let selectedEmpId = null;
+
+function initMap() {
+  map = L.map('map', { center: [-37.8136, 144.9631], zoom: 11, zoomControl: true });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO',
+    subdomains: 'abcd', maxZoom: 20
+  }).addTo(map);
+}
+
+function createMarkerIcon(emp) {
+  const initials = emp.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+  const cls = emp.status === 'On Break' ? 'break' : emp.status === 'Clocked Out' ? 'clocked-out' : '';
+  return L.divIcon({ className: '', html: `<div class="emp-marker-pin ${cls}" title="${emp.name}">${initials}</div>`, iconSize: [32,32], iconAnchor: [16,16], popupAnchor: [0,-20] });
+}
+
+function updateMapMarkers(employees) {
+  const activeIds = new Set();
+  Object.values(employees).forEach(emp => {
+    const lat = parseFloat(emp.lat), lng = parseFloat(emp.lng);
+    if (isNaN(lat) || isNaN(lng)) return;
+    activeIds.add(emp.id);
+    if (markers[emp.id]) { markers[emp.id].setLatLng([lat,lng]); markers[emp.id].setIcon(createMarkerIcon(emp)); }
+    else { const m = L.marker([lat,lng], { icon: createMarkerIcon(emp) }).addTo(map); m.on('click', () => showEmpDetail(emp.id)); markers[emp.id] = m; }
+  });
+  Object.keys(markers).forEach(id => { if (!activeIds.has(id)) { map.removeLayer(markers[id]); delete markers[id]; } });
+  if (activeIds.size > 0) {
+    const latlngs = Object.values(employees).filter(e => !isNaN(parseFloat(e.lat)) && !isNaN(parseFloat(e.lng))).map(e => [parseFloat(e.lat), parseFloat(e.lng)]);
+    if (latlngs.length === 1) map.setView(latlngs[0], 15);
+    else if (latlngs.length > 1) map.fitBounds(latlngs, { padding: [60,60], maxZoom: 16 });
+  }
+}
+
+// ══════════════════════════════════════════
+//  EMPLOYEE SIDEBAR
+// ══════════════════════════════════════════
+function renderSidebar(employees) {
+  const list = document.getElementById('emp-list');
+  const empArray = Object.values(employees);
+  let active = 0, onBreak = 0, totalJobs = 0;
+  empArray.forEach(e => {
+    if (e.status === 'Working') active++;
+    if (e.status === 'On Break') { active++; onBreak++; }
+    totalJobs += (e.jobCount || 0);
+  });
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-break').textContent = onBreak;
+  document.getElementById('stat-jobs').textContent = totalJobs;
+  document.getElementById('map-active-count').textContent = active;
+  if (empArray.length === 0) {
+    list.innerHTML = `<div class="emp-empty"><div class="emp-empty-icon">📡</div><div>No employees clocked in yet.</div><div style="margin-top:6px;font-size:10px;opacity:0.6;">When an employee starts their shift in the employee app, they'll appear here automatically.</div></div>`;
+    return;
+  }
+  empArray.sort((a,b) => { const order = { 'Working':0, 'On Break':1, 'Clocked Out':2 }; return (order[a.status]||0) - (order[b.status]||0); });
+  list.innerHTML = empArray.map(emp => {
+    const initial = emp.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const statusCls = emp.status === 'On Break' ? 'break' : emp.status === 'Clocked Out' ? 'clocked-out' : 'working';
+    const avatarCls = emp.status === 'On Break' ? 'on-break' : emp.status === 'Clocked Out' ? 'clocked-out' : '';
+    const elapsed = emp.clockInTime ? formatElapsed(emp.clockInTime) : '—';
+    return `
+    <div class="emp-card ${selectedEmpId === emp.id ? 'selected' : ''}" onclick="selectEmployee('${emp.id}')" id="card-${emp.id}">
+      <div class="emp-card-top">
+        <div class="emp-avatar ${avatarCls}">${initial}</div>
+        <div class="emp-info"><div class="emp-name">${emp.name}</div><div class="emp-id">ID: ${emp.id}</div></div>
+        <span class="status-pill-sm ${statusCls}">${emp.status}</span>
+      </div>
+      ${emp.currentJob ? `<div class="emp-job">📍 ${emp.currentJob}</div>` : ''}
+      <div class="emp-meta"><span class="emp-time">⏱ ${elapsed}</span><span class="emp-jobs-count">🧹 ${emp.jobCount||0} job${(emp.jobCount||0)!==1?'s':''}</span></div>
+      ${(emp.lat && emp.lng) ? `<button class="locate-btn" onclick="locateEmp(event,'${emp.id}')">📡 Locate on Map</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectEmployee(empId) {
+  selectedEmpId = empId;
+  showEmpDetail(empId);
+  const employees = loadEmployees();
+  renderSidebar(employees);
+  if (markers[empId]) map.flyTo(markers[empId].getLatLng(), 16, { duration: 1.2 });
+}
+
+function locateEmp(e, empId) {
+  e.stopPropagation();
+  if (markers[empId]) { map.flyTo(markers[empId].getLatLng(), 17, { duration: 1.2 }); showEmpDetail(empId); }
+}
+
+function showEmpDetail(empId) {
+  const employees = loadEmployees();
+  const emp = employees[empId];
+  if (!emp) return;
+  document.getElementById('popup-name').textContent = emp.name;
+  document.getElementById('popup-id').textContent = emp.id;
+  document.getElementById('popup-shift').textContent = emp.shift || '—';
+  document.getElementById('popup-clockin').textContent = emp.clockInTime ? fmtTime(emp.clockInTime) : '—';
+  document.getElementById('popup-elapsed').textContent = emp.clockInTime ? formatElapsed(emp.clockInTime) : '—';
+  document.getElementById('popup-break').textContent = formatBreak(emp.totalBreakSecs || 0);
+  document.getElementById('popup-gps-update').textContent = emp.lastLocationUpdate ? timeAgo(emp.lastLocationUpdate) : '—';
+  const statusCls = emp.status === 'On Break' ? 'break' : emp.status === 'Clocked Out' ? 'clocked-out' : 'working';
+  document.getElementById('popup-status-badge').innerHTML = `<span class="status-pill-sm ${statusCls}">${emp.status}</span>`;
+  const jobsList = document.getElementById('popup-jobs-list');
+  if (emp.jobs && emp.jobs.length) {
+    jobsList.innerHTML = emp.jobs.map((j,i) => `<div class="popup-job-item"><span class="popup-job-num">${i+1}</span><span style="flex:1">${j.address}</span>${j.active?'<span class="popup-job-active">● Now</span>':''}</div>`).join('');
+  } else {
+    jobsList.innerHTML = '<div style="font-size:11px;color:var(--white-muted)">No jobs recorded yet.</div>';
+  }
+  document.getElementById('emp-detail-popup').classList.add('visible');
+}
+
+function closeDetailPopup() {
+  document.getElementById('emp-detail-popup').classList.remove('visible');
+  selectedEmpId = null;
+}
+
+// ══════════════════════════════════════════
+//  DATA LOADING
+// ══════════════════════════════════════════
+function loadEmployees() {
+  try { const raw = localStorage.getItem(ADMIN_KEY); if (!raw) return {}; return JSON.parse(raw) || {}; } catch(e) { return {}; }
+}
+
+function refreshDashboard() {
+  const employees = loadEmployees();
+  renderSidebar(employees);
+  updateMapMarkers(employees);
+  const now = new Date();
+  document.getElementById('last-update').textContent = `Last refresh: ${now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  if (selectedEmpId && employees[selectedEmpId]) showEmpDetail(selectedEmpId);
+}
+
+setInterval(refreshDashboard, 30000);
+window.addEventListener('storage', e => { if (e.key === ADMIN_KEY) refreshDashboard(); });
+
+// ══════════════════════════════════════════
+//  TIME UTILS
+// ══════════════════════════════════════════
+function formatElapsed(clockInISO) {
+  const diff = Date.now() - new Date(clockInISO).getTime();
+  if (diff < 0) return '—';
+  const h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+function formatBreak(secs) {
+  if (!secs) return '0:00';
+  const m = Math.floor(secs/60), s = secs%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function fmtTime(iso) {
+  try { return new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:true}); } catch(e) { return '—'; }
+}
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff/60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const h = Math.floor(mins/60);
+  return `${h}h ${mins%60}m ago`;
+}
+
+// ══════════════════════════════════════════
+//  REVIEW DRAWER (original functionality)
+// ══════════════════════════════════════════
+let contactMode = 'sms', debounceTimer = null, amendMode = false;
+let ejsCreds = { publicKey:'', serviceId:'', templateId:'' };
+
+// SMS-only mode — email removed
+function saveEmailJS() {}
+function setMode(mode) {}
 
 function getValues() {
-  return {
-    name: document.getElementById('clientName').value.trim(),
-    contact: contactMode==='email'
-      ? document.getElementById('clientEmail').value.trim()
-      : document.getElementById('clientPhone').value.trim()
-  };
+  return { name: document.getElementById('clientName').value.trim(), contact: document.getElementById('clientPhone').value.trim() };
 }
-
 function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 function isValidPhone(p) { return p.replace(/[\s\-\+\(\)]/g,'').length >= 8; }
-
 function isReady() {
   const {name, contact} = getValues();
   if (!name || !contact) return false;
-  return contactMode==='email' ? isValidEmail(contact) : isValidPhone(contact);
+  return isValidPhone(contact);
 }
-
-function buildSmsBody(name) {
-  const first = name.split(' ')[0];
-  return `Hi ${first},\n\nThank you so much for choosing Pi Cleaning Services! We truly appreciate your trust in us.\n\nWe'd love to hear about your experience — tap the link below to leave us a quick review:\n\n${GOOGLE_URL}\n\nClick here to review us ⭐ — we strive for 5 stars!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
-}
-
-function buildPreviewHTML(name, contact) {
-  const first = name.split(' ')[0];
-  const toLine = contactMode==='email'
-    ? `From: ${FROM_EMAIL} &rarr; To: ${contact}`
-    : `SMS to: ${contact} (opens native Messages app)`;
-  return `
-    <div class="to-line">${toLine}</div>
-    Hi ${first},<br><br>
-    Thank you so much for choosing <strong style="color:var(--gold-light)">Pi Cleaning Services</strong>! We truly appreciate your trust in us and hope we exceeded your expectations.<br><br>
-    We'd love to hear about your experience — your feedback helps us grow and continue delivering exceptional results.<br><br>
-    <a class="plink" href="${GOOGLE_URL}" target="_blank">Click here to review us ⭐</a><br><br>
-    We strive for 5 stars and your review means the world to us!<br><br>
-    Warm regards,<br>
-    <strong style="color:var(--gold-light)">The Pi Cleaning Services Team</strong>
-    ${contactMode==='email' ? `<div class="pfrom">Sent from ${FROM_EMAIL}</div>` : ''}
-  `;
-}
-
 function checkReady() {
   clearTimeout(debounceTimer);
   if (amendMode) return;
@@ -334,70 +1369,43 @@ function checkReady() {
   if (!isReady()) return;
   debounceTimer = setTimeout(showConfirm, 700);
 }
-
 function showConfirm() {
   const {name, contact} = getValues();
   if (!isReady()) return;
-  document.getElementById('confirmPreview').innerHTML = buildPreviewHTML(name, contact);
+  const first = name.split(' ')[0];
+  const toLine = `SMS to: ${contact}`;
+  document.getElementById('confirmPreview').innerHTML = `<div class="to-line">${toLine}</div>Hi ${first},<br><br>Thank you for choosing <strong style="color:var(--gold-light)">Pi Cleaning Services</strong>! We'd love to hear about your experience.<br><br><a class="plink" href="${GOOGLE_URL}" target="_blank">Click here to review us ⭐</a>`;
   document.getElementById('confirmPrompt').classList.add('show');
   document.getElementById('sendBtn').classList.remove('show');
   amendMode = false;
-  document.getElementById('confirmPrompt').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
-
 function resetPrompt() {
   document.getElementById('confirmPrompt').classList.remove('show');
   document.getElementById('sendBtn').classList.remove('show');
   document.getElementById('toast').classList.remove('show','success','error');
 }
-
-function doCancel() {
-  document.getElementById('confirmPrompt').classList.remove('show');
-  amendMode = true;
-  document.getElementById('sendBtn').classList.add('show');
-}
-
+function doCancel() { document.getElementById('confirmPrompt').classList.remove('show'); amendMode = true; document.getElementById('sendBtn').classList.add('show'); }
 async function doSend() {
   const {name, contact} = getValues();
   const btn = document.getElementById('btnSendNow');
-
   if (contactMode === 'sms') {
-    // Native SMS — open Messages app pre-filled
-    const body = encodeURIComponent(buildSmsBody(name));
+    const body = encodeURIComponent(`Hi ${name.split(' ')[0]},\n\nThank you for choosing Pi Cleaning Services! We'd love to hear about your experience:\n\n${GOOGLE_URL}\n\nWarm regards,\nThe Pi Cleaning Services Team`);
     const phone = contact.replace(/\s/g,'');
     window.location.href = `sms:${phone}?body=${body}`;
-    showToast('success', `📱 Opening Messages app for <strong>${name}</strong> — just hit Send!`);
-    resetAfterSend();
-    return;
+    showToast('success', `📱 Opening Messages app for <strong>${name}</strong>!`);
+    resetAfterSend(); return;
   }
-
-  // Email via EmailJS
-  if (!ejsCreds.publicKey || !ejsCreds.serviceId || !ejsCreds.templateId) {
-    showToast('error', '⚠️ Please fill in your EmailJS credentials in the setup section above first.');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-
+  if (!ejsCreds.publicKey || !ejsCreds.serviceId || !ejsCreds.templateId) { showToast('error', '⚠️ Please fill in your EmailJS credentials first.'); return; }
+  btn.disabled = true; btn.textContent = 'Sending…';
   try {
-    await emailjs.send(ejsCreds.serviceId, ejsCreds.templateId, {
-      to_name:    name,
-      to_email:   contact,
-      from_name:  'Pi Cleaning Services',
-      from_email: FROM_EMAIL,
-      review_url: GOOGLE_URL,
-      message:    `Hi ${name.split(' ')[0]},\n\nThank you so much for choosing Pi Cleaning Services! We truly appreciate your trust in us.\n\nWe'd love to hear about your experience — click the link below to leave us a review:\n\nClick here to review us: ${GOOGLE_URL}\n\nWe strive for 5 stars and your review means the world to us!\n\nWarm regards,\nThe Pi Cleaning Services Team`
-    });
-    showToast('success', `✅ Email sent to <strong>${name}</strong> at ${contact}!`);
+    await emailjs.send(ejsCreds.serviceId, ejsCreds.templateId, { to_name: name, to_email: contact, from_name: 'Pi Cleaning Services', from_email: FROM_EMAIL, review_url: GOOGLE_URL, message: `Hi ${name.split(' ')[0]}, thank you for choosing Pi Cleaning Services! Leave us a review: ${GOOGLE_URL}` });
+    showToast('success', `✅ Email sent to <strong>${name}</strong>!`);
     resetAfterSend();
   } catch(err) {
-    showToast('error', `❌ Failed to send: ${err.text || err.message || 'Unknown error'}. Check your EmailJS credentials.`);
-    btn.disabled = false;
-    btn.textContent = '⭐ Send Now';
+    showToast('error', `❌ Failed: ${err.text || err.message}`);
+    btn.disabled = false; btn.textContent = '⭐ Send Now';
   }
 }
-
 function resetAfterSend() {
   document.getElementById('confirmPrompt').classList.remove('show');
   document.getElementById('sendBtn').classList.remove('show');
@@ -410,13 +1418,40 @@ function resetAfterSend() {
     document.getElementById('btnSendNow').textContent = '⭐ Send Now';
   }, 1000);
 }
-
 function showToast(type, html) {
   const t = document.getElementById('toast');
-  t.innerHTML = html;
-  t.className = `toast show ${type}`;
+  t.innerHTML = html; t.className = `toast show ${type}`;
   setTimeout(() => t.classList.remove('show'), 6000);
 }
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  SPLASH SCREEN
+// ══════════════════════════════════════════
+function dismissSplash() {
+  const splash = document.getElementById('splash');
+  splash.classList.add('fade-out');
+  setTimeout(() => splash.remove(), 700);
+}
+setTimeout(dismissSplash, 3000);
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  refreshDashboard();
+  // Restore GS URL — if already saved, show indicator and hide URL box
+  const savedUrl = localStorage.getItem(GS_URL_KEY);
+  if (savedUrl) {
+    document.getElementById('gsWebAppUrl').value = savedUrl;
+    showGsConnected();
+  }
+  // Load cached clients
+  const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
+  if (cached) {
+    try { allClients = JSON.parse(cached); renderClients(); updateDueBadge(); } catch(e) {}
+  }
+});
 </script>
 </body>
 </html>
