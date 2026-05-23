@@ -306,7 +306,7 @@
   /* Drawer header with tabs */
   .drawer-header {
     padding:18px 22px 0; border-bottom:1px solid rgba(201,168,76,0.2);
-    position:sticky; top:0; background:var(--navy-mid); z-index:1; flex-shrink:0;
+    background:var(--navy-mid); flex-shrink:0;
   }
   .drawer-header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .drawer-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--gold-light); letter-spacing:0.04em; }
@@ -326,7 +326,7 @@
   .drawer-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
 
   /* Drawer panel content */
-  .drawer-panel { display:none; flex:1; overflow-y:auto; padding:20px 22px 32px; }
+  .drawer-panel { display:none; flex:1; overflow-y:auto; padding:20px 22px 60px; min-height:0; }
   .drawer-panel.active { display:block; }
   .drawer-panel::-webkit-scrollbar { width:3px; }
   .drawer-panel::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.25); border-radius:2px; }
@@ -599,12 +599,11 @@
 
   .footer { border-top:1px solid rgba(201,168,76,0.12); padding:20px 32px; text-align:center; font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.06em; }
   .drawer-version-bar {
-    position:absolute; bottom:0; left:0; right:0;
+    flex-shrink:0; margin-top:auto;
     padding:10px 22px; text-align:center;
     font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
     color:rgba(201,168,76,0.4); border-top:1px solid rgba(201,168,76,0.1);
-    background:var(--navy-mid); z-index:1;
-    pointer-events:none;
+    background:var(--navy-mid);
   }
   .footer span { color:var(--gold); }
 
@@ -648,8 +647,6 @@
       <button class="drawer-tab" id="tab-reminders" onclick="switchDrawerTab('reminders')">🔔 Reminders</button>
     </div>
   </div>
-  <div class="drawer-version-bar">V 2.0.1</div>
-
   <!-- ── PANEL 1: REVIEW REQUESTS ── -->
   <div class="drawer-panel active" id="panel-review">
     <div class="section-tag">After Every Job</div>
@@ -754,6 +751,8 @@
 
     <div id="remindersList"></div>
   </div>
+
+  <div class="drawer-version-bar">V 2.0.1</div>
 </div>
 
 <!-- TOPBAR -->
@@ -859,6 +858,7 @@ const ADMIN_KEY = 'pi_active_employees';
 const GOOGLE_URL = "https://www.google.com/search?q=Pi+Cleaning+Services+Reviews";
 const FROM_EMAIL = "Admin@picleaningservices.com.au";
 const GS_URL_KEY = 'pi_gs_webapp_url';
+const GS_HARDCODED_URL = 'https://script.google.com/macros/s/AKfycbyHN01kkbbxKJFyPzTlKPlG2iNO5bp9m9NvZ000n2_-cHttqmKG_rYDJsK824A3skEE/exec';
 const CLIENTS_CACHE_KEY = 'pi_clients_cache';
 
 // ══════════════════════════════════════════
@@ -925,7 +925,7 @@ function showGsConnected() {
 }
 
 function getGsUrl() {
-  return localStorage.getItem(GS_URL_KEY) || '';
+  return GS_HARDCODED_URL;
 }
 
 // loadClients removed — use refreshClients() instead
@@ -1440,12 +1440,10 @@ setTimeout(dismissSplash, 3000);
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
   refreshDashboard();
-  // Restore GS URL — if already saved, show indicator and hide URL box
-  const savedUrl = localStorage.getItem(GS_URL_KEY);
-  if (savedUrl) {
-    document.getElementById('gsWebAppUrl').value = savedUrl;
-    showGsConnected();
-  }
+  // Hardcoded URL — always connected, show indicator immediately
+  localStorage.setItem(GS_URL_KEY, GS_HARDCODED_URL);
+  document.getElementById('gsWebAppUrl').value = GS_HARDCODED_URL;
+  showGsConnected();
   // Load cached clients
   const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
   if (cached) {
