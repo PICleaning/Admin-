@@ -101,12 +101,18 @@
     background:transparent; transition:all 0.2s;
   }
   .nav-tab:hover, .nav-tab.active { background:var(--gold-pale); border-color:var(--gold); color:var(--gold); }
-  .hamburger { width:40px; height:40px; background:transparent; border:1px solid rgba(201,168,76,0.3); border-radius:9px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:10px; transition:all 0.2s; position:relative; }
-  .hamburger:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
-  .hamburger span { display:block; width:18px; height:1.5px; background:var(--gold); border-radius:2px; transition:transform 0.25s,opacity 0.25s; }
-  .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
-  .hamburger.open span:nth-child(2) { opacity:0; }
-  .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+  .hamburger {
+    background:var(--gold-pale); border:1px solid rgba(201,168,76,0.45);
+    border-radius:9px; cursor:pointer;
+    display:flex; align-items:center; gap:7px;
+    padding:9px 15px; transition:all 0.2s; position:relative;
+    font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--gold);
+  }
+  .hamburger:hover { background:rgba(201,168,76,0.18); border-color:var(--gold); }
+  .hamburger.open { background:rgba(201,168,76,0.18); border-color:var(--gold); }
+  .hamburger .menu-icon { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
+  .hamburger .menu-icon span { display:block; width:16px; height:1.5px; background:var(--gold); border-radius:2px; transition:all 0.25s; }
   /* Due-soon badge on hamburger */
   .hbg-badge {
     position:absolute; top:-4px; right:-4px;
@@ -452,6 +458,34 @@
     border-color:rgba(240,165,0,0.5);
     background:rgba(240,165,0,0.06);
   }
+  /* Due within 30 days — tiffany blue glow */
+  .client-card.due-30 {
+    border-color:rgba(0,213,210,0.6);
+    background:rgba(0,213,210,0.05);
+    box-shadow:0 0 12px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25);
+    animation:tiffanyPulse 2.8s ease infinite;
+  }
+  @keyframes tiffanyPulse {
+    0%,100% { box-shadow:0 0 10px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25); border-color:rgba(0,213,210,0.55); }
+    50%      { box-shadow:0 0 22px 6px rgba(0,213,210,0.32), 0 0 0 1px rgba(0,213,210,0.5);  border-color:rgba(0,213,210,0.9); }
+  }
+  /* Service done within 7 days — neon green */
+  .client-card.service-done {
+    border-color:rgba(0,255,100,0.6);
+    background:rgba(0,255,100,0.05);
+    box-shadow:0 0 12px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25);
+    animation:donePulse 2.8s ease infinite;
+  }
+  @keyframes donePulse {
+    0%,100% { box-shadow:0 0 10px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25); border-color:rgba(0,255,100,0.55); }
+    50%      { box-shadow:0 0 22px 6px rgba(0,255,100,0.32), 0 0 0 1px rgba(0,255,100,0.5);  border-color:rgba(0,255,100,0.9); }
+  }
+  /* Badge styles for new statuses */
+  .due-badge.due30 { background:rgba(0,213,210,0.15); color:#00d5d2; border:1px solid rgba(0,213,210,0.45); }
+  .due-badge.done  { background:rgba(0,255,100,0.12); color:#00ff64; border:1px solid rgba(0,255,100,0.4); }
+  /* Avatar colours for new statuses */
+  .client-avatar.due30 { background:#00d5d2; color:var(--navy); }
+  .client-avatar.done  { background:#00ff64; color:var(--navy); }
   .client-card-top { display:flex; align-items:flex-start; gap:10px; }
   .client-avatar {
     width:38px; height:38px; border-radius:50%; flex-shrink:0;
@@ -597,6 +631,35 @@
   .emp-marker-pin.break { background:var(--warn); }
   .emp-marker-pin.clocked-out { background:rgba(150,150,150,0.8); }
 
+  /* ════ JOBS FOR THE DAY ════ */
+  .job-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.2);
+    border-radius:13px; padding:15px; margin-bottom:10px;
+    transition:all 0.2s;
+  }
+  .job-card:hover { background:rgba(201,168,76,0.06); border-color:rgba(201,168,76,0.35); }
+  .job-card-top { display:flex; align-items:flex-start; gap:11px; margin-bottom:10px; }
+  .job-time-badge {
+    flex-shrink:0; background:var(--gold); color:var(--navy);
+    border-radius:8px; padding:6px 10px; text-align:center;
+    font-size:11px; font-weight:700; line-height:1.2; min-width:52px;
+  }
+  .job-time-badge .time-label { font-size:8px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; opacity:0.75; }
+  .job-info { flex:1; min-width:0; }
+  .job-name { font-size:14px; font-weight:700; color:var(--white); margin-bottom:3px; }
+  .job-address { font-size:11px; color:var(--white-muted); line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .job-maps-btn {
+    width:100%; padding:10px; margin-top:2px;
+    background:rgba(66,133,244,0.12); border:1px solid rgba(66,133,244,0.35);
+    border-radius:8px; color:#7cb3ff;
+    font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+  }
+  .job-maps-btn:hover { background:rgba(66,133,244,0.22); border-color:rgba(66,133,244,0.6); }
+  .job-maps-btn svg { flex-shrink:0; }
+
   .footer { border-top:1px solid rgba(201,168,76,0.12); padding:20px 32px; text-align:center; font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.06em; }
   .drawer-version-bar {
     flex-shrink:0; margin-top:auto;
@@ -645,6 +708,7 @@
       <button class="drawer-tab active" id="tab-review" onclick="switchDrawerTab('review')">⭐ Reviews</button>
       <button class="drawer-tab" id="tab-clients" onclick="switchDrawerTab('clients')">👥 Clients</button>
       <button class="drawer-tab" id="tab-reminders" onclick="switchDrawerTab('reminders')">🔔 Reminders</button>
+      <button class="drawer-tab" id="tab-jobs" onclick="switchDrawerTab('jobs')">📋 Jobs</button>
     </div>
   </div>
   <!-- ── PANEL 1: REVIEW REQUESTS ── -->
@@ -752,7 +816,32 @@
     <div id="remindersList"></div>
   </div>
 
-  <div class="drawer-version-bar">V 2.0.1</div>
+  <!-- ── PANEL 4: JOBS FOR THE DAY ── -->
+  <div class="drawer-panel" id="panel-jobs">
+    <div class="section-tag">Today's Schedule</div>
+    <div class="section-heading">Jobs for<br>the day</div>
+
+    <!-- Jobs connected indicator -->
+    <div class="gs-connected-indicator show" style="margin-bottom:14px;">
+      <span class="gs-neon-dot"></span> Connected to Assigned Jobs Sheet
+    </div>
+
+    <!-- Refresh jobs -->
+    <button class="gs-load-btn" id="jobsRefreshBtn" onclick="refreshJobs()" style="margin-bottom:16px;">
+      <span id="jobsRefreshIcon">↻</span> <span>Refresh Jobs</span>
+    </button>
+
+    <!-- Jobs list -->
+    <div id="jobsList">
+      <div class="no-clients">
+        <div class="no-clients-icon">📋</div>
+        <div>No jobs loaded yet.</div>
+        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Tap Refresh Jobs to load today's schedule.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-version-bar">V 2.0.2</div>
 </div>
 
 <!-- TOPBAR -->
@@ -768,7 +857,8 @@
     <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">🗺 Live Map</button>
     <button class="nav-tab" id="tab-home" onclick="showPage('home')">⚙ Tools</button>
     <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
-      <span></span><span></span><span></span>
+      <div class="menu-icon"><span></span><span></span><span></span></div>
+      Main Menu
       <div class="hbg-badge" id="hbgBadge"></div>
     </button>
   </div>
@@ -893,15 +983,16 @@ function openDrawerTab(tab) {
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
   // Update tab buttons
-  ['review','clients','reminders'].forEach(t => {
+  ['review','clients','reminders','jobs'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
     document.getElementById('panel-' + t).classList.toggle('active', t === tab);
   });
   // Update drawer title
-  const titles = { review: '⭐ Request a Review', clients: '👥 Client Database', reminders: '🔔 Service Reminders' };
-  document.getElementById('drawer-title').textContent = titles[tab];
-  // Load data for reminders tab
+  const titles = { review: '⭐ Request a Review', clients: '👥 Client Database', reminders: '🔔 Service Reminders', jobs: '📋 Jobs for the Day' };
+  document.getElementById('drawer-title').textContent = titles[tab] || 'Menu';
+  // Load data for reminders and jobs tabs
   if (tab === 'reminders') renderReminders();
+  if (tab === 'jobs') refreshJobs();
 }
 
 // ══════════════════════════════════════════
@@ -941,7 +1032,7 @@ async function refreshClients() {
     const resp = await fetch(url + '?action=getClients');
     const data = await resp.json();
     if (data.clients) {
-      allClients = data.clients;
+      allClients = data.clients.map(normaliseDates);
       localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify(allClients));
       renderClients();
       updateDueBadge();
@@ -957,6 +1048,74 @@ async function refreshClients() {
   }
 }
 
+// ══════════════════════════════════════════
+//  JOBS FOR THE DAY
+// ══════════════════════════════════════════
+let allJobs = [];
+
+async function refreshJobs() {
+  const btn = document.getElementById('jobsRefreshBtn');
+  const icon = document.getElementById('jobsRefreshIcon');
+  const url = getGsUrl();
+  if (!url) { renderJobsList([]); return; }
+  if (btn) { btn.classList.add('loading'); icon.textContent = '⏳'; }
+  try {
+    const resp = await fetch(url + '?action=getJobs');
+    const data = await resp.json();
+    if (data.jobs) {
+      allJobs = data.jobs;
+      renderJobsList(allJobs);
+    } else {
+      renderJobsList([]);
+    }
+  } catch(e) {
+    renderJobsList([]);
+  } finally {
+    if (btn) { btn.classList.remove('loading'); icon.textContent = '↻'; }
+  }
+}
+
+function renderJobsList(jobs) {
+  const list = document.getElementById('jobsList');
+  if (!list) return;
+  if (!jobs || jobs.length === 0) {
+    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">📋</div><div>No jobs scheduled today.</div><div style="font-size:10px;opacity:0.6;margin-top:6px;">Add jobs in the "Assigned Jobs" tab of your Google Sheet.</div></div>`;
+    return;
+  }
+  // Sort by start time
+  jobs.sort((a,b) => (a.startTime||'').localeCompare(b.startTime||''));
+  list.innerHTML = jobs.map((job, i) => {
+    const addr = (job.address||'').trim();
+    const mapsUrl = addr ? 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(addr) : '#';
+    const timeStr = job.startTime || '—';
+    const timeParts = timeStr !== '—' ? timeStr.split(':') : null;
+    const timeDisplay = timeParts ? `${timeParts[0]}:${timeParts[1]}` : '—';
+    const ampm = timeParts ? (parseInt(timeParts[0]) >= 12 ? 'PM' : 'AM') : '';
+    return `
+    <div class="job-card">
+      <div class="job-card-top">
+        <div class="job-time-badge">
+          <div>${timeDisplay}</div>
+          <div class="time-label">${ampm}</div>
+        </div>
+        <div class="job-info">
+          <div class="job-name">${job.jobName || 'Unnamed Job'}</div>
+          <div class="job-address">📍 ${addr || 'No address provided'}</div>
+        </div>
+      </div>
+      ${addr ? `<button class="job-maps-btn" onclick="openMaps('${addr.replace(/'/g,"\\'")}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Get Directions in Google Maps
+      </button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function openMaps(address) {
+  const url = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(address);
+  window.open(url, '_blank');
+}
+
 function showGsToast(msg, type) {
   const t = document.getElementById('toast');
   t.innerHTML = msg; t.className = `toast show ${type}`;
@@ -965,18 +1124,37 @@ function showGsToast(msg, type) {
 
 function daysUntil(dateStr) {
   if (!dateStr) return null;
-  const target = new Date(dateStr);
+  const target = parseDateAU(dateStr);
+  if (!target || isNaN(target.getTime())) return null;
+  // Use local midnight so Melbourne's UTC+10/11 never shifts the day
   const now = new Date();
-  now.setHours(0,0,0,0);
-  target.setHours(0,0,0,0);
-  return Math.ceil((target - now) / 86400000);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  target.setHours(0, 0, 0, 0);
+  return Math.ceil((target - todayMidnight) / 86400000);
 }
 
 function clientStatus(client) {
   const days = daysUntil(client.nextService);
-  if (days === null) return 'ok';
-  if (days <= 0) return 'urgent';     // overdue or today
-  if (days <= 14) return 'soon';      // due within 14 days
+
+  // Overdue / due very soon take highest priority
+  if (days !== null && days <= 0)  return 'urgent';   // overdue or today
+  if (days !== null && days <= 14) return 'soon';     // due within 14 days
+
+  // Service done within the last 7 days → green glow
+  if (client.serviceDone) {
+    const doneDate = parseDateAU(String(client.serviceDone).trim());
+    if (doneDate) {
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      doneDate.setHours(0, 0, 0, 0);
+      const daysSince = Math.floor((todayMidnight - doneDate) / 86400000);
+      if (daysSince >= 0 && daysSince <= 7) return 'done';
+    }
+  }
+
+  // Due within 30 days → tiffany blue glow
+  if (days !== null && days <= 30) return 'due30';
+
   return 'ok';
 }
 
@@ -999,14 +1177,31 @@ function renderClients() {
     const status = clientStatus(c);
     const days = daysUntil(c.nextService);
     const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const avatarCls = status === 'urgent' ? 'urgent' : status === 'soon' ? 'soon' : '';
-    const cardCls = status === 'urgent' ? 'due-urgent' : status === 'soon' ? 'due-soon' : '';
+
+    // Avatar colour class
+    const avatarCls = status === 'urgent' ? 'urgent'
+                    : status === 'soon'   ? 'soon'
+                    : status === 'due30'  ? 'due30'
+                    : status === 'done'   ? 'done'
+                    : '';
+
+    // Card border/glow class
+    const cardCls = status === 'urgent' ? 'due-urgent'
+                  : status === 'soon'   ? 'due-soon'
+                  : status === 'due30'  ? 'due-30'
+                  : status === 'done'   ? 'service-done'
+                  : '';
+
+    // Day label badge
     let dayLabel = '';
-    if (days !== null) {
-      if (days < 0) dayLabel = `<span class="due-badge urgent">Overdue ${Math.abs(days)}d</span>`;
+    if (status === 'done') {
+      dayLabel = `<span class="due-badge done">✔ Done</span>`;
+    } else if (days !== null) {
+      if (days < 0)       dayLabel = `<span class="due-badge urgent">Overdue ${Math.abs(days)}d</span>`;
       else if (days === 0) dayLabel = `<span class="due-badge urgent">Due Today</span>`;
       else if (days <= 14) dayLabel = `<span class="due-badge soon">Due in ${days}d</span>`;
-      else dayLabel = `<span class="due-badge ok">Due in ${days}d</span>`;
+      else if (days <= 30) dayLabel = `<span class="due-badge due30">Due in ${days}d</span>`;
+      else                dayLabel = `<span class="due-badge ok">Due in ${days}d</span>`;
     }
     return `
     <div class="client-card ${cardCls}" id="cc-${i}">
@@ -1017,13 +1212,13 @@ function renderClients() {
           <div class="client-address">📍 ${c.address||'No address'}</div>
           <div class="client-meta">
             <div class="client-meta-item">📞 <span>${c.phone||'—'}</span></div>
-            <div class="client-meta-item">🗓 Next: <span>${c.nextService||'—'}</span></div>
+            <div class="client-meta-item">🗓 Next: <span>${formatDateDDMMYY(c.nextService)||'—'}</span></div>
           </div>
         </div>
       </div>
       <div class="client-expanded" id="cex-${i}">
         <div class="client-detail-row"><span class="client-detail-key">Email</span><span class="client-detail-val">${c.email||'—'}</span></div>
-        <div class="client-detail-row"><span class="client-detail-key">Last Service</span><span class="client-detail-val">${c.lastService||'—'}</span></div>
+        <div class="client-detail-row"><span class="client-detail-key">Last Service</span><span class="client-detail-val">${formatDateDDMMYY(c.lastService)||'—'}</span></div>
         <div class="client-detail-row"><span class="client-detail-key">Service Done</span><span class="client-detail-val">${c.serviceDone||'—'}</span></div>
         <div class="client-detail-row"><span class="client-detail-key">Notes</span><span class="client-detail-val">${c.notes||'—'}</span></div>
       </div>
@@ -1064,7 +1259,10 @@ function quickReminder(i) {
 }
 
 function updateDueBadge() {
-  const urgent = allClients.filter(c => clientStatus(c) !== 'ok').length;
+  const urgent = allClients.filter(c => {
+    const s = clientStatus(c);
+    return s === 'urgent' || s === 'soon' || s === 'due30';
+  }).length;
   const badge = document.getElementById('hbgBadge');
   if (urgent > 0) {
     badge.textContent = urgent > 9 ? '9+' : urgent;
@@ -1135,7 +1333,7 @@ function renderReminders() {
       </div>
       <div class="reminder-detail">
         📍 ${c.address||'No address'}<br>
-        🗓 Next service: ${c.nextService||'—'} · 📞 ${c.phone||'No phone'}
+        🗓 Next service: ${formatDateDDMMYY(c.nextService)||'—'} · 📞 ${c.phone||'No phone'}
       </div>
       <textarea class="reminder-msg-area" id="rmsg-${i}">${defaultMsg}</textarea>
       <div class="reminder-send-row">
@@ -1146,15 +1344,102 @@ function renderReminders() {
   }).join('');
 }
 
-function formatDateDDMMYY(dateStr) {
-  if (!dateStr) return '';
-  // Try to parse common date formats and output DD/MM/YY
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr; // fallback to raw if unparseable
-  const day = String(d.getDate()).padStart(2,'0');
-  const month = String(d.getMonth()+1).padStart(2,'0');
-  const year = String(d.getFullYear()).slice(-2);
-  return `${day}/${month}/${year}`;
+// ══════════════════════════════════════════════════════════════
+//  AUSTRALIAN DATE HANDLING — DD/MM/YYYY strictly throughout
+//  ▸ Apps Script sends dates as "DD/MM/YYYY" strings
+//  ▸ Internal storage: "DD/MM/YYYY" (4-digit year, no ambiguity)
+//  ▸ Display format:   "DD/MM/YY"  (2-digit year for compact UI)
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Parse any date value → Date object, always treating first number as DAY.
+ * Handles:
+ *   DD/MM/YYYY · DD/MM/YY   ← Australian (primary)
+ *   DD-MM-YYYY · DD-MM-YY   ← Australian with dashes
+ *   YYYY-MM-DD              ← ISO date (fallback for old cached data)
+ *   YYYY-MM-DDTHH:mm:ss...  ← ISO datetime (in case JSON ever sends Date objects)
+ */
+function parseDateAU(str) {
+  if (!str) return null;
+  str = String(str).trim();
+  if (!str || str === '—') return null;
+
+  let m;
+
+  // PRIMARY — DD/MM/YYYY or DD/MM/YY  (what Apps Script now always sends)
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) {
+    let dd = parseInt(m[1], 10);
+    let mm = parseInt(m[2], 10);
+    let yyyy = parseInt(m[3], 10);
+    if (yyyy < 100) yyyy += 2000;
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) {
+      const d = new Date(yyyy, mm - 1, dd);
+      // Reject if JS auto-rolled the date (e.g. 31/02 → 03/03)
+      if (d.getMonth() === mm - 1) return d;
+    }
+    return null;
+  }
+
+  // DD-MM-YYYY or DD-MM-YY
+  m = str.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+  if (m) {
+    let dd = parseInt(m[1], 10);
+    let mm = parseInt(m[2], 10);
+    let yyyy = parseInt(m[3], 10);
+    if (yyyy < 100) yyyy += 2000;
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) {
+      const d = new Date(yyyy, mm - 1, dd);
+      if (d.getMonth() === mm - 1) return d;
+    }
+    return null;
+  }
+
+  // ISO datetime string — e.g. "2026-05-06T00:00:00.000Z"
+  // Extract the date portion only, interpret in LOCAL time (not UTC)
+  // so Melbourne never gets shifted to the wrong day
+  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    const d = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
+/**
+ * Format a date string → "DD/MM/YY" for compact UI display.
+ */
+function formatDateDDMMYY(str) {
+  if (!str || str === '—') return '—';
+  const d = parseDateAU(str);
+  if (!d || isNaN(d.getTime())) return String(str).trim();
+  return String(d.getDate()).padStart(2, '0') + '/' +
+         String(d.getMonth() + 1).padStart(2, '0') + '/' +
+         String(d.getFullYear()).slice(-2);
+}
+
+// Alias kept for backward compat
+function parseDDMMYY(str) { return parseDateAU(str); }
+
+/**
+ * Normalise all date fields on a client record to "DD/MM/YYYY" (4-digit year).
+ * Called immediately when data arrives from the API — so every downstream
+ * function always works with one consistent unambiguous format.
+ */
+function normaliseDates(client) {
+  ['nextService', 'lastService', 'serviceDone'].forEach(field => {
+    if (client[field]) {
+      const d = parseDateAU(String(client[field]).trim());
+      if (d && !isNaN(d.getTime())) {
+        // Store as DD/MM/YYYY — 4-digit year = zero ambiguity
+        client[field] = String(d.getDate()).padStart(2, '0') + '/' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                        d.getFullYear();
+      }
+    }
+  });
+  return client;
 }
 
 function buildReminderMsg(client, days) {
@@ -1423,9 +1708,8 @@ function showToast(type, html) {
   t.innerHTML = html; t.className = `toast show ${type}`;
   setTimeout(() => t.classList.remove('show'), 6000);
 }
-
 // ══════════════════════════════════════════
-//  INIT
+//  INIT 
 // ══════════════════════════════════════════
 // ══════════════════════════════════════════
 //  SPLASH SCREEN
@@ -1447,7 +1731,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load cached clients
   const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
   if (cached) {
-    try { allClients = JSON.parse(cached); renderClients(); updateDueBadge(); } catch(e) {}
+    try { allClients = JSON.parse(cached).map(normaliseDates); renderClients(); updateDueBadge(); } catch(e) {}
   }
 });
 </script>
