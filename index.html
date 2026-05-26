@@ -302,7 +302,7 @@
 
   /* Main drawer shell */
   .drawer {
-    position:fixed; top:0; right:-440px; width:420px; height:100vh;
+    position:fixed; top:0; right:-460px; width:440px; height:100vh;
     background:var(--navy-mid); border-left:1px solid rgba(201,168,76,0.3);
     z-index:300; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
     display:flex; flex-direction:column; overflow:hidden;
@@ -680,6 +680,136 @@
     .mobile-sidebar-toggle { display:flex !important; }
   }
   .mobile-sidebar-toggle { display:none; }
+
+  /* ════ DRAWER NAV MENU (hamburger vertical menu) ════ */
+  .drawer-nav-menu {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 16px 14px;
+    max-height: calc(100vh - 80px); overflow-y: auto;
+  }
+  .drawer-nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px;
+    background: transparent; border: 1px solid transparent;
+    cursor: pointer; transition: all 0.2s; text-align: left;
+    width: 100%;
+  }
+  .drawer-nav-item:hover {
+    background: var(--gold-pale); border-color: rgba(201,168,76,0.3);
+  }
+  .drawer-nav-item.active {
+    background: rgba(201,168,76,0.12); border-color: var(--gold);
+  }
+  .nav-item-icon {
+    font-size: 20px; flex-shrink: 0; width: 28px; text-align: center;
+  }
+  .nav-item-text { flex: 1; min-width: 0; }
+  .nav-item-label {
+    font-size: 13px; font-weight: 600; color: var(--white);
+    margin-bottom: 2px; letter-spacing: 0.02em;
+  }
+  .drawer-nav-item.active .nav-item-label { color: var(--gold-light); }
+  .nav-item-sub { font-size: 10px; color: var(--white-muted); }
+  .nav-item-arrow {
+    font-size: 18px; color: var(--gold); opacity: 0.5; flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .drawer-nav-item.active .nav-item-arrow { opacity: 1; transform: translateX(2px); }
+  .new-feature-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+    padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(29,185,84,0.18); color: var(--success);
+    border: 1px solid rgba(29,185,84,0.4);
+  }
+  .drawer-back-btn {
+    display: none; align-items: center; gap: 4px;
+    background: transparent; border: none;
+    color: var(--gold); font-family: 'Montserrat', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    padding: 4px 8px 4px 0; letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+  }
+  .drawer-back-btn:hover { opacity: 0.75; }
+  .drawer-version-bar-inline {
+    margin: 20px 16px 0;
+    font-size: 10px; color: var(--white-muted); letter-spacing: 0.08em;
+    text-align: center; padding: 12px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+  }
+
+  /* ════ CLIENTS & REMINDERS COMBINED PANEL ════ */
+  .cr-subtab-row {
+    display: flex; gap: 6px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.03); border-radius: 10px; padding: 4px;
+  }
+  .cr-subtab {
+    flex: 1; padding: 9px 8px; border-radius: 7px; border: none;
+    font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--white-muted); background: transparent; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cr-subtab.active {
+    background: var(--gold); color: var(--navy);
+  }
+  .cr-subpanel { display: none; }
+  .cr-subpanel.active { display: block; }
+
+  /* ════ SETTINGS PANEL ════ */
+  .settings-section { margin-bottom: 8px; }
+  .settings-section-title {
+    font-size: 13px; font-weight: 700; color: var(--gold-light);
+    letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .settings-section-desc {
+    font-size: 11px; color: var(--white-muted); line-height: 1.7; margin-bottom: 14px;
+  }
+  .settings-option-group { display: flex; flex-direction: column; gap: 6px; }
+  .settings-option {
+    width: 100%; padding: 12px 14px; text-align: left;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 9px; cursor: pointer; transition: all 0.2s;
+  }
+  .settings-option:hover { background: var(--gold-pale); border-color: rgba(201,168,76,0.35); }
+  .settings-option.active { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+  .settings-option-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 3px;
+  }
+  .settings-option-label {
+    font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--white);
+  }
+  .settings-option.active .settings-option-label { color: var(--gold-light); }
+  .settings-option-check { font-size: 13px; color: var(--gold); font-weight: 700; }
+  .settings-option-sub { font-size: 10px; color: var(--white-muted); }
+  .settings-saved-msg {
+    font-size: 11px; color: var(--success); margin-top: 8px;
+    display: none; background: rgba(29,185,84,0.1);
+    border: 1px solid rgba(29,185,84,0.3); border-radius: 7px; padding: 8px 12px;
+  }
+  .settings-saved-msg.show { display: block; }
+
+  /* ════ NEW FEATURES PANEL ════ */
+  .new-feature-card {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px; padding: 16px; margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .new-feature-card:hover { background: var(--gold-pale); border-color: rgba(201,168,76,0.3); }
+  .nf-icon { font-size: 24px; flex-shrink: 0; width: 36px; text-align: center; margin-top: 2px; }
+  .nf-title {
+    font-size: 13px; font-weight: 700; color: var(--gold-light);
+    margin-bottom: 6px; letter-spacing: 0.02em;
+  }
+  .nf-desc { font-size: 11px; color: var(--white-muted); line-height: 1.7; }
+
+
+  @media (max-width: 600px) {
+    .drawer { width: 100vw !important; right: -100vw !important; }
+    .drawer.open { right: 0 !important; }
+  }
 </style>
 </head>
 <body>
@@ -698,18 +828,70 @@
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
 <!-- ════ MULTI-PANEL DRAWER ════ -->
+<div id="drawer-backdrop" style="display:none;position:fixed;inset:0;z-index:150;background:var(--navy);" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
     <div class="drawer-header-top">
-      <div class="drawer-title" id="drawer-title">Menu</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="drawer-back-btn" id="drawerBackBtn" onclick="showDrawerMenu()">‹ Back</button>
+        <div class="drawer-title" id="drawer-title">Main Menu</div>
+      </div>
       <button class="close-btn" onclick="closeDrawer()">✕</button>
     </div>
-    <div class="drawer-tabs">
-      <button class="drawer-tab active" id="tab-review" onclick="switchDrawerTab('review')">⭐ Reviews</button>
-      <button class="drawer-tab" id="tab-clients" onclick="switchDrawerTab('clients')">👥 Clients</button>
-      <button class="drawer-tab" id="tab-reminders" onclick="switchDrawerTab('reminders')">🔔 Reminders</button>
-      <button class="drawer-tab" id="tab-jobs" onclick="switchDrawerTab('jobs')">📋 Jobs</button>
+  </div>
+  <!-- ── PANEL 0: MAIN MENU ── -->
+  <div class="drawer-panel active" id="panel-menu" style="padding-top:8px;">
+    <div class="drawer-nav-menu">
+      <button class="drawer-nav-item" id="tab-livemap" onclick="openLiveMap()">
+        <span class="nav-item-icon">🗺</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Live Map</div>
+          <div class="nav-item-sub">Track active employees in real time</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-review" onclick="switchDrawerTab('review')">
+        <span class="nav-item-icon">⭐</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Request Reviews</div>
+          <div class="nav-item-sub">Send Google review links after jobs</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-clients-reminders" onclick="switchDrawerTab('clients-reminders')">
+        <span class="nav-item-icon">👥</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Clients &amp; Reminders</div>
+          <div class="nav-item-sub">Client database &amp; service reminders</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-jobs" onclick="switchDrawerTab('jobs')">
+        <span class="nav-item-icon">📋</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Jobs for the Day</div>
+          <div class="nav-item-sub">Today's schedule &amp; directions</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-settings" onclick="switchDrawerTab('settings')">
+        <span class="nav-item-icon">⚙️</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Settings</div>
+          <div class="nav-item-sub">Customise your app experience</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-newfeatures" onclick="switchDrawerTab('newfeatures')">
+        <span class="nav-item-icon">🚀</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">New Features</div>
+          <div class="nav-item-sub">What's new in v2.0.2</div>
+        </div>
+        <span class="new-feature-badge">NEW</span>
+      </button>
     </div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.2 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL 1: REVIEW REQUESTS ── -->
   <div class="drawer-panel active" id="panel-review">
@@ -748,72 +930,75 @@
     <div class="toast" id="toast"></div>
   </div>
 
-  <!-- ── PANEL 2: CLIENTS ── -->
-  <div class="drawer-panel" id="panel-clients">
-    <!-- Google Sheets Connection -->
-    <div class="gs-setup-box">
-      <div class="gs-setup-title">🔗 Google Sheets Connection</div>
-      <div class="gs-setup-desc" id="gsSetupDesc">
-        Paste your Google Apps Script Web App URL below to connect your client database. 
-        <a href="#" onclick="showScriptHelp(); return false;">How to set this up ↗</a>
-      </div>
-      <div class="gs-url-entry" id="gsUrlEntry">
-        <div class="gs-url-row">
-          <input class="gs-url-input" id="gsWebAppUrl" placeholder="https://script.google.com/macros/s/..." />
-          <button class="gs-save-btn" onclick="saveGsUrl()">Save</button>
+  <!-- ── PANEL 2: CLIENTS & REMINDERS (combined) ── -->
+  <div class="drawer-panel" id="panel-clients-reminders">
+    <!-- Sub-tab switcher inside the panel -->
+    <div class="cr-subtab-row">
+      <button class="cr-subtab active" id="cr-tab-clients" onclick="switchCRTab('clients')">👥 Clients</button>
+      <button class="cr-subtab" id="cr-tab-reminders" onclick="switchCRTab('reminders')">🔔 Reminders</button>
+    </div>
+
+    <!-- ── CLIENTS SUB-PANEL ── -->
+    <div class="cr-subpanel active" id="cr-panel-clients">
+      <!-- Google Sheets Connection -->
+      <div class="gs-setup-box">
+        <div class="gs-setup-title">🔗 Google Sheets Connection</div>
+        <div class="gs-setup-desc" id="gsSetupDesc">
+          Paste your Google Apps Script Web App URL below to connect your client database.
+          <a href="#" onclick="showScriptHelp(); return false;">How to set this up ↗</a>
+        </div>
+        <div class="gs-url-entry" id="gsUrlEntry">
+          <div class="gs-url-row">
+            <input class="gs-url-input" id="gsWebAppUrl" placeholder="https://script.google.com/macros/s/..." />
+            <button class="gs-save-btn" onclick="saveGsUrl()">Save</button>
+          </div>
+        </div>
+        <div class="gs-connected-indicator" id="gsConnectedIndicator">
+          <span class="gs-neon-dot"></span> Sheets Connected &amp; Stable
         </div>
       </div>
-      <div class="gs-connected-indicator" id="gsConnectedIndicator">
-        <span class="gs-neon-dot"></span> Sheets Connected &amp; Stable
+      <!-- Refresh button -->
+      <button class="gs-load-btn" id="gsRefreshBtn" onclick="refreshClients()" style="margin-bottom:14px;">
+        <span id="gsRefreshIcon">↻</span> <span>Refresh</span>
+      </button>
+      <!-- Filter chips -->
+      <div class="clients-filter">
+        <button class="filter-chip active" onclick="filterClients('all', this)">All</button>
+        <button class="filter-chip urgent" onclick="filterClients('urgent', this)">🔴 Due Now</button>
+        <button class="filter-chip" onclick="filterClients('soon', this)">🟡 Due Soon</button>
+        <button class="filter-chip" onclick="filterClients('ok', this)">🟢 Up to Date</button>
       </div>
-
-    </div>
-
-    <!-- Refresh button -->
-    <button class="gs-load-btn" id="gsRefreshBtn" onclick="refreshClients()" style="margin-bottom:14px;">
-      <span id="gsRefreshIcon">↻</span> <span>Refresh</span>
-    </button>
-
-    <!-- Filter chips -->
-    <div class="clients-filter">
-      <button class="filter-chip active" onclick="filterClients('all', this)">All</button>
-      <button class="filter-chip urgent" onclick="filterClients('urgent', this)">🔴 Due Now</button>
-      <button class="filter-chip" onclick="filterClients('soon', this)">🟡 Due Soon</button>
-      <button class="filter-chip" onclick="filterClients('ok', this)">🟢 Up to Date</button>
-    </div>
-
-    <!-- Client list -->
-    <div id="clientsList">
-      <div class="no-clients">
-        <div class="no-clients-icon">👥</div>
-        <div>No clients loaded yet.</div>
-        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Connect your Google Sheet above and tap "Load Clients".</div>
+      <!-- Client list -->
+      <div id="clientsList">
+        <div class="no-clients">
+          <div class="no-clients-icon">👥</div>
+          <div>No clients loaded yet.</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:6px;">Connect your Google Sheet above and tap "Refresh".</div>
+        </div>
       </div>
+      <div class="toast" id="gsToast" style="margin-top:10px;"></div>
     </div>
-  </div>
 
-  <!-- ── PANEL 3: SERVICE REMINDERS ── -->
-  <div class="drawer-panel" id="panel-reminders">
-    <div class="section-tag">6-Month Service Cycle</div>
-    <div class="section-heading">Send service<br>reminder messages</div>
-
-    <!-- Summary stats -->
-    <div class="reminder-summary" id="reminderSummary" style="display:none">
-      <div class="reminder-stat">
-        <div class="reminder-stat-num red" id="stat-overdue">0</div>
-        <div class="reminder-stat-label">Overdue</div>
+    <!-- ── REMINDERS SUB-PANEL ── -->
+    <div class="cr-subpanel" id="cr-panel-reminders">
+      <div class="section-tag">6-Month Service Cycle</div>
+      <div class="section-heading">Send service<br>reminder messages</div>
+      <!-- Summary stats -->
+      <div class="reminder-summary" id="reminderSummary" style="display:none">
+        <div class="reminder-stat">
+          <div class="reminder-stat-num red" id="stat-overdue">0</div>
+          <div class="reminder-stat-label">Overdue</div>
+        </div>
+        <div class="reminder-stat">
+          <div class="reminder-stat-num warn" id="stat-due-soon">0</div>
+          <div class="reminder-stat-label">Due in 14 Days</div>
+        </div>
       </div>
-      <div class="reminder-stat">
-        <div class="reminder-stat-num warn" id="stat-due-soon">0</div>
-        <div class="reminder-stat-label">Due in 14 Days</div>
+      <div id="remindersConnect" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:11px;padding:16px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        💡 Connect your Google Sheet in the <strong style="color:var(--gold-light)">Clients</strong> tab first, then come back here to send service reminders.
       </div>
+      <div id="remindersList"></div>
     </div>
-
-    <div id="remindersConnect" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:11px;padding:16px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
-      💡 Connect your Google Sheet in the <strong style="color:var(--gold-light)">Clients</strong> tab first, then come back here to send service reminders to clients whose next service is due.
-    </div>
-
-    <div id="remindersList"></div>
   </div>
 
   <!-- ── PANEL 4: JOBS FOR THE DAY ── -->
@@ -841,7 +1026,102 @@
     </div>
   </div>
 
-  <div class="drawer-version-bar">V 2.0.2</div>
+  <!-- ── PANEL: SETTINGS ── -->
+  <div class="drawer-panel" id="panel-settings">
+    <div class="section-tag">App Preferences</div>
+    <div class="section-heading">Settings</div>
+
+    <!-- Date Format -->
+    <div class="settings-section">
+      <div class="settings-section-title">📅 Date Format</div>
+      <div class="settings-section-desc">Choose how dates are displayed throughout the app. Dates from Google Sheets are automatically converted to your chosen format.</div>
+      <div class="settings-option-group" id="dateFormatGroup">
+        <button class="settings-option active" onclick="setDateFormat('DD/MM/YY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">DD/MM/YY</span><span class="settings-option-check" id="dfcheck-DDMMYY">✓</span></div>
+          <div class="settings-option-sub">e.g. 26/05/26 — Australian standard</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('DD/MM/YYYY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">DD/MM/YYYY</span><span class="settings-option-check" id="dfcheck-DDMMYYYY"></span></div>
+          <div class="settings-option-sub">e.g. 26/05/2026 — Full year</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('MM/DD/YY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">MM/DD/YY</span><span class="settings-option-check" id="dfcheck-MMDDYY"></span></div>
+          <div class="settings-option-sub">e.g. 05/26/26 — US format</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('YYYY-MM-DD', this)">
+          <div class="settings-option-top"><span class="settings-option-label">YYYY-MM-DD</span><span class="settings-option-check" id="dfcheck-YYYYMMDD"></span></div>
+          <div class="settings-option-sub">e.g. 2026-05-26 — ISO standard</div>
+        </button>
+      </div>
+      <div class="settings-saved-msg" id="dateFormatSaved">✅ Date format saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Amend Reminder Text -->
+    <div class="settings-section">
+      <div class="settings-section-title">✉️ Amend Reminder Text</div>
+      <div class="settings-section-desc">Customise the SMS reminder message sent to clients when their service is due. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
+      <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
+      </div>
+      <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: NEW FEATURES ── -->
+  <div class="drawer-panel" id="panel-newfeatures">
+    <div class="section-tag">Latest Update</div>
+    <div class="section-heading">What's New<br>in v2.0.2</div>
+    <div class="new-feature-card">
+      <div class="nf-icon">👥</div>
+      <div class="nf-content">
+        <div class="nf-title">Clients &amp; Reminders — One Tab</div>
+        <div class="nf-desc">Clients and Service Reminders are now combined under a single tab in the menu, with a smooth sub-tab switcher. Quicker to navigate, easier to use.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">📱</div>
+      <div class="nf-content">
+        <div class="nf-title">Remind Directly from Clients</div>
+        <div class="nf-desc">Tap the "Remind" button on any client card and your phone's native Messages app opens instantly with a pre-filled reminder — no copying, no hassle.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">⚙️</div>
+      <div class="nf-content">
+        <div class="nf-title">Settings Panel</div>
+        <div class="nf-desc">A new Settings section lets you customise the app to your preferences — including choosing your preferred date format across the entire app.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">📅</div>
+      <div class="nf-content">
+        <div class="nf-title">Date Format Preference</div>
+        <div class="nf-desc">Set your preferred date format (DD/MM/YY, DD/MM/YYYY, MM/DD/YY or YYYY-MM-DD) and the whole app respects it — regardless of how dates come in from Google Sheets.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">✉️</div>
+      <div class="nf-content">
+        <div class="nf-title">Custom Reminder Text</div>
+        <div class="nf-desc">Under Settings → Amend Reminder Text, you can write your own personalised service reminder SMS template. It's pre-loaded every time you send a reminder.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">🍔</div>
+      <div class="nf-content">
+        <div class="nf-title">Redesigned Hamburger Menu</div>
+        <div class="nf-desc">The main menu has been redesigned with a clean vertical layout showing all sections at a glance — Reviews, Clients &amp; Reminders, Jobs, Settings, and New Features.</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- TOPBAR -->
@@ -854,8 +1134,6 @@
     </div>
   </div>
   <div class="topbar-right">
-    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">🗺 Live Map</button>
-    <button class="nav-tab" id="tab-home" onclick="showPage('home')">⚙ Tools</button>
     <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
       <div class="menu-icon"><span></span><span></span><span></span></div>
       Main Menu
@@ -865,7 +1143,7 @@
 </header>
 
 <!-- ════════ DASHBOARD PAGE ════════ -->
-<div class="page" id="page-dashboard" style="display:flex;flex-direction:column;">
+<div class="page" id="page-dashboard" style="display:none;flex-direction:column;">
   <div class="dashboard-layout">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -914,7 +1192,7 @@
 </div>
 
 <!-- ════════ HOME / TOOLS PAGE ════════ -->
-<div class="page" id="page-home" style="display:none;">
+<div class="page" id="page-home" style="display:block;">
   <section class="hero-page active" style="min-height:auto;padding-top:80px;">
     <div class="hero-bg"></div>
     <div class="hero-ring" style="width:480px;height:480px;"></div>
@@ -933,8 +1211,8 @@
     <div class="cards-grid">
       <div class="card" onclick="showPage('dashboard')"><div class="card-icon">🗺</div><div class="card-title">Live Map</div><div class="card-desc">Track active employees, their locations, and current jobs in real time.</div></div>
       <div class="card" onclick="openDrawerTab('review')"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
-      <div class="card" onclick="openDrawerTab('clients')"><div class="card-icon">👥</div><div class="card-title">Clients</div><div class="card-desc">View your full client database, due dates and service history.</div></div>
-      <div class="card" onclick="openDrawerTab('reminders')"><div class="card-icon">🔔</div><div class="card-title">Service Reminders</div><div class="card-desc">Send SMS reminders to clients whose 6-month service is coming up.</div></div>
+      <div class="card" onclick="openDrawerTab('clients-reminders')"><div class="card-icon">👥</div><div class="card-title">Clients</div><div class="card-desc">View your full client database, due dates and service history.</div></div>
+      <div class="card" onclick="openDrawerTab('clients-reminders')"><div class="card-icon">🔔</div><div class="card-title">Service Reminders</div><div class="card-desc">Send SMS reminders to clients whose 6-month service is coming up.</div></div>
     </div>
   </section>
   <footer class="footer">© 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence</footer>
@@ -956,9 +1234,8 @@ const CLIENTS_CACHE_KEY = 'pi_clients_cache';
 // ══════════════════════════════════════════
 function showPage(page) {
   document.getElementById('page-dashboard').style.display = page === 'dashboard' ? 'flex' : 'none';
-  document.getElementById('page-home').style.display = page === 'home' ? 'block' : 'none';
-  document.getElementById('tab-dashboard').classList.toggle('active', page === 'dashboard');
-  document.getElementById('tab-home').classList.toggle('active', page === 'home');
+  const homeEl = document.getElementById('page-home');
+  if (homeEl) homeEl.style.display = page === 'home' ? 'block' : 'none';
   if (page === 'dashboard') setTimeout(() => { if (map) map.invalidateSize(); }, 100);
 }
 
@@ -967,32 +1244,134 @@ function showPage(page) {
 // ══════════════════════════════════════════
 let currentDrawerTab = 'review';
 
+function openLiveMap() {
+  closeDrawer();
+  showPage('dashboard');
+  if (!mapInitialised) { initMap(); mapInitialised = true; refreshDashboard(); }
+  setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+}
+
 function toggleDrawer() {
-  // Always open the drawer when hamburger is clicked
-  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.add('open'));
+  showDrawerMenu();
+  ['drawer','hamburger'].forEach(id => document.getElementById(id).classList.add('open'));
+  document.getElementById('drawer-backdrop').style.display = 'block';
 }
 function closeDrawer() {
   ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.remove('open'));
+  document.getElementById('drawer-backdrop').style.display = 'none';
+  setTimeout(() => { if (map) map.invalidateSize(); }, 100);
 }
 function openDrawerTab(tab) {
   switchDrawerTab(tab);
   document.getElementById('drawer').classList.add('open');
-  document.getElementById('overlay').classList.add('open');
   document.getElementById('hamburger').classList.add('open');
+  document.getElementById('drawer-backdrop').style.display = 'block';
+}
+
+// Settings: Date Format
+const DATE_FORMAT_KEY = 'pi_date_format';
+const REMINDER_TEXT_KEY = 'pi_reminder_text';
+
+function getDateFormat() {
+  return localStorage.getItem(DATE_FORMAT_KEY) || 'DD/MM/YY';
+}
+
+function setDateFormat(fmt, btn) {
+  localStorage.setItem(DATE_FORMAT_KEY, fmt);
+  // Uncheck all, check selected
+  ['DDMMYY','DDMMYYYY','MMDDYY','YYYYMMDD'].forEach(k => {
+    const el = document.getElementById('dfcheck-' + k);
+    if (el) el.textContent = '';
+  });
+  const keyMap = {'DD/MM/YY':'DDMMYY','DD/MM/YYYY':'DDMMYYYY','MM/DD/YY':'MMDDYY','YYYY-MM-DD':'YYYYMMDD'};
+  const checkEl = document.getElementById('dfcheck-' + (keyMap[fmt]||'DDMMYY'));
+  if (checkEl) checkEl.textContent = '✓';
+  // Toggle active class on option buttons
+  document.querySelectorAll('.settings-option').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const saved = document.getElementById('dateFormatSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+  // Re-render clients if loaded
+  if (allClients.length > 0) renderClients();
+}
+
+function loadSettingsUI() {
+  const fmt = getDateFormat();
+  const keyMap = {'DD/MM/YY':'DDMMYY','DD/MM/YYYY':'DDMMYYYY','MM/DD/YY':'MMDDYY','YYYY-MM-DD':'YYYYMMDD'};
+  ['DDMMYY','DDMMYYYY','MMDDYY','YYYYMMDD'].forEach(k => {
+    const el = document.getElementById('dfcheck-' + k);
+    if (el) el.textContent = '';
+  });
+  const checkKey = keyMap[fmt] || 'DDMMYY';
+  const el = document.getElementById('dfcheck-' + checkKey);
+  if (el) el.textContent = '✓';
+  // Load saved reminder text
+  const savedTxt = localStorage.getItem(REMINDER_TEXT_KEY);
+  const ta = document.getElementById('customReminderText');
+  if (ta) ta.value = savedTxt || getDefaultReminderTemplate();
+}
+
+function getDefaultReminderTemplate() {
+  return 'Hi {name},\n\nThis is Pi Cleaning Services. Your scheduled service is coming up soon.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team';
+}
+
+function saveReminderText() {
+  const ta = document.getElementById('customReminderText');
+  if (ta) localStorage.setItem(REMINDER_TEXT_KEY, ta.value);
+  const saved = document.getElementById('reminderTextSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+
+function resetReminderText() {
+  const ta = document.getElementById('customReminderText');
+  if (ta) ta.value = getDefaultReminderTemplate();
+  localStorage.removeItem(REMINDER_TEXT_KEY);
+  const saved = document.getElementById('reminderTextSaved');
+  if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Reminder text saved!'; }, 2500); }
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  // Update tab buttons
-  ['review','clients','reminders','jobs'].forEach(t => {
-    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures'];
+  allPanelIds.forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.classList.toggle('active', t === tab);
   });
-  // Update drawer title
-  const titles = { review: '⭐ Request a Review', clients: '👥 Client Database', reminders: '🔔 Service Reminders', jobs: '📋 Jobs for the Day' };
-  document.getElementById('drawer-title').textContent = titles[tab] || 'Menu';
-  // Load data for reminders and jobs tabs
-  if (tab === 'reminders') renderReminders();
+  const titles = {
+    review: '⭐ Request a Review',
+    'clients-reminders': '👥 Clients & Reminders',
+    jobs: '📋 Jobs for the Day',
+    settings: '⚙️ Settings',
+    newfeatures: '🚀 New Features'
+  };
+  document.getElementById('drawer-title').textContent = titles[tab] || 'Main Menu';
+  // Show back button when in a section
+  const backBtn = document.getElementById('drawerBackBtn');
+  if (backBtn) backBtn.style.display = tab === 'menu' ? 'none' : 'inline-flex';
+  if (tab === 'clients-reminders') { renderClients(); renderReminders(); }
   if (tab === 'jobs') refreshJobs();
+  if (tab === 'settings') loadSettingsUI();
+}
+
+function showDrawerMenu() {
+  currentDrawerTab = 'menu';
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures'];
+  allPanelIds.forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.classList.toggle('active', t === 'menu');
+  });
+  document.getElementById('drawer-title').textContent = 'Main Menu';
+  const backBtn = document.getElementById('drawerBackBtn');
+  if (backBtn) backBtn.style.display = 'none';
+}
+
+function switchCRTab(sub) {
+  ['clients','reminders'].forEach(t => {
+    const tab = document.getElementById('cr-tab-' + t);
+    const panel = document.getElementById('cr-panel-' + t);
+    if (tab) tab.classList.toggle('active', t === sub);
+    if (panel) panel.classList.toggle('active', t === sub);
+  });
+  if (sub === 'reminders') renderReminders();
 }
 
 // ══════════════════════════════════════════
@@ -1117,7 +1496,9 @@ function openMaps(address) {
 }
 
 function showGsToast(msg, type) {
-  const t = document.getElementById('toast');
+  // Use gsToast if available, otherwise fall back to toast
+  const t = document.getElementById('gsToast') || document.getElementById('toast');
+  if (!t) return;
   t.innerHTML = msg; t.className = `toast show ${type}`;
   setTimeout(() => t.classList.remove('show'), 5000);
 }
@@ -1250,12 +1631,18 @@ function smsClient(name, phone) {
 }
 
 function quickReminder(i) {
-  switchDrawerTab('reminders');
-  // Scroll to client in reminders after tab switch
-  setTimeout(() => {
-    const el = document.getElementById('rm-' + i);
-    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-  }, 200);
+  const client = allClients[i];
+  if (!client || !client.phone) {
+    // Fallback: open reminders tab
+    switchDrawerTab('clients-reminders');
+    switchCRTab('reminders');
+    return;
+  }
+  const days = daysUntil(client.nextService);
+  const msg = buildReminderMsg(client, days !== null ? days : 0);
+  const body = encodeURIComponent(msg);
+  const phone = client.phone.replace(/\s/g,'');
+  window.location.href = `sms:${phone}?body=${body}`;
 }
 
 function updateDueBadge() {
@@ -1414,9 +1801,15 @@ function formatDateDDMMYY(str) {
   if (!str || str === '—') return '—';
   const d = parseDateAU(str);
   if (!d || isNaN(d.getTime())) return String(str).trim();
-  return String(d.getDate()).padStart(2, '0') + '/' +
-         String(d.getMonth() + 1).padStart(2, '0') + '/' +
-         String(d.getFullYear()).slice(-2);
+  const fmt = (typeof getDateFormat === 'function') ? getDateFormat() : 'DD/MM/YY';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(d.getFullYear());
+  const yy = yyyy.slice(-2);
+  if (fmt === 'DD/MM/YYYY') return `${dd}/${mm}/${yyyy}`;
+  if (fmt === 'MM/DD/YY')   return `${mm}/${dd}/${yy}`;
+  if (fmt === 'YYYY-MM-DD') return `${yyyy}-${mm}-${dd}`;
+  return `${dd}/${mm}/${yy}`; // default DD/MM/YY
 }
 
 // Alias kept for backward compat
@@ -1448,6 +1841,11 @@ function buildReminderMsg(client, days) {
   if (days < 0) timeStr = 'is now overdue';
   else if (days === 0) timeStr = 'is due today';
   else timeStr = `is coming up in ${days} days`;
+  // Use custom reminder template if saved
+  const customTpl = localStorage.getItem('pi_reminder_text');
+  if (customTpl) {
+    return customTpl.replace(/{name}/g, first).replace(/{days}/g, Math.abs(days));
+  }
   return `Hi ${first},\n\nThis is Pi Cleaning Services. Your scheduled service ${timeStr}.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
 }
 
@@ -1470,6 +1868,7 @@ function showScriptHelp() {
 // ══════════════════════════════════════════
 let map, markers = {};
 let selectedEmpId = null;
+let mapInitialised = false;
 
 function initMap() {
   map = L.map('map', { center: [-37.8136, 144.9631], zoom: 11, zoomControl: true });
@@ -1592,7 +1991,7 @@ function loadEmployees() {
 function refreshDashboard() {
   const employees = loadEmployees();
   renderSidebar(employees);
-  updateMapMarkers(employees);
+  if (mapInitialised) updateMapMarkers(employees);
   const now = new Date();
   document.getElementById('last-update').textContent = `Last refresh: ${now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
   if (selectedEmpId && employees[selectedEmpId]) showEmpDetail(selectedEmpId);
@@ -1722,17 +2121,20 @@ function dismissSplash() {
 setTimeout(dismissSplash, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
-  initMap();
+  // Map is only initialised when the user opens the Live Map from the menu
   refreshDashboard();
   // Hardcoded URL — always connected, show indicator immediately
   localStorage.setItem(GS_URL_KEY, GS_HARDCODED_URL);
-  document.getElementById('gsWebAppUrl').value = GS_HARDCODED_URL;
+  const gsInput = document.getElementById('gsWebAppUrl');
+  if (gsInput) gsInput.value = GS_HARDCODED_URL;
   showGsConnected();
   // Load cached clients
   const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
   if (cached) {
     try { allClients = JSON.parse(cached).map(normaliseDates); renderClients(); updateDueBadge(); } catch(e) {}
   }
+  // Init settings UI date format check marks
+  loadSettingsUI();
 });
 </script>
 </body>
