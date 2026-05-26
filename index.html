@@ -1325,10 +1325,9 @@ function loadSettingsUI() {
   const checkKey = keyMap[fmt] || 'DDMMYY';
   const el = document.getElementById('dfcheck-' + checkKey);
   if (el) el.textContent = '✓';
-  // Load saved reminder text
-  const savedTxt = localStorage.getItem(REMINDER_TEXT_KEY);
+  // Always load from getSavedReminderTemplate so the textarea shows exactly what will be sent
   const ta = document.getElementById('customReminderText');
-  if (ta) ta.value = savedTxt || getDefaultReminderTemplate();
+  if (ta) ta.value = getSavedReminderTemplate();
 }
 
 function getDefaultReminderTemplate() {
@@ -1337,7 +1336,14 @@ function getDefaultReminderTemplate() {
 
 function saveReminderText() {
   const ta = document.getElementById('customReminderText');
-  if (ta) localStorage.setItem(REMINDER_TEXT_KEY, ta.value);
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (text) {
+    localStorage.setItem(REMINDER_TEXT_KEY, text);
+  } else {
+    // If blank, remove so the default kicks in
+    localStorage.removeItem(REMINDER_TEXT_KEY);
+  }
   const saved = document.getElementById('reminderTextSaved');
   if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
 }
@@ -1653,15 +1659,15 @@ function smsClient(name, phone) {
 function quickReminder(i) {
   const client = allClients[i];
   if (!client || !client.phone) {
-    // Fallback: open reminders tab
     switchDrawerTab('clients-reminders');
     switchCRTab('reminders');
     return;
   }
   const days = daysUntil(client.nextService);
+  // Always read the saved template fresh — getSavedReminderTemplate() goes straight to localStorage
   const msg = buildReminderMsg(client, days !== null ? days : 0);
   const body = encodeURIComponent(msg);
-  const phone = client.phone.replace(/\s/g,'');
+  const phone = client.phone.replace(/\s/g, '');
   window.location.href = `sms:${phone}?body=${body}`;
 }
 
@@ -1855,28 +1861,41 @@ function normaliseDates(client) {
   return client;
 }
 
+function getSavedReminderTemplate() {
+  // Always read fresh from localStorage — never cache in memory
+  const saved = localStorage.getItem('pi_reminder_text');
+  return (saved && saved.trim()) ? saved.trim() : getDefaultReminderTemplate();
+}
+
 function buildReminderMsg(client, days) {
-  const first = (client.name||'').split(' ')[0] || 'there';
-  let timeStr = '';
-  if (days < 0) timeStr = 'is now overdue';
-  else if (days === 0) timeStr = 'is due today';
-  else timeStr = `is coming up in ${days} days`;
-  // Use custom reminder template if saved
-  const customTpl = localStorage.getItem('pi_reminder_text');
-  if (customTpl) {
-    return customTpl.replace(/{name}/g, first).replace(/{days}/g, Math.abs(days));
-  }
-  return `Hi ${first},\n\nThis is Pi Cleaning Services. Your scheduled service ${timeStr}.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
+  const first = (client.name || '').split(' ')[0] || 'there';
+  const absDays = Math.abs(days !== null ? days : 0);
+  const tpl = getSavedReminderTemplate();
+  // Replace {name} and {days} placeholders
+  return tpl.replace(/{name}/g, first).replace(/{days}/g, absDays);
 }
 
 function sendReminderSms(i, phone) {
-  const msg = document.getElementById('rmsg-' + i).value;
+  // Always re-build from the saved template at send time so edits in Settings are reflected immediately
+  const client = allClients[i];
+  let msg;
+  if (client) {
+    const days = daysUntil(client.nextService);
+    msg = buildReminderMsg(client, days !== null ? days : 0);
+    // Also refresh the textarea so the user sees what was actually sent
+    const ta = document.getElementById('rmsg-' + i);
+    if (ta) ta.value = msg;
+  } else {
+    // Fallback: use whatever is in the textarea
+    const ta = document.getElementById('rmsg-' + i);
+    msg = ta ? ta.value : '';
+  }
+  if (!msg) return;
   const body = encodeURIComponent(msg);
-  const p = phone.replace(/\s/g,'');
+  const p = phone.replace(/\s/g, '');
   window.location.href = `sms:${p}?body=${body}`;
-  // Mark as sent
   const badge = document.getElementById('rsent-' + i);
-  badge.classList.add('show');
+  if (badge) badge.classList.add('show');
 }
 
 function showScriptHelp() {
