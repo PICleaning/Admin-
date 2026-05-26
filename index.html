@@ -1331,7 +1331,7 @@ function loadSettingsUI() {
 }
 
 function getDefaultReminderTemplate() {
-  return 'Hi {name},\n\nThis is Pi Cleaning Services. Your scheduled service is coming up soon.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team';
+  return 'Hi {name},\nThis is Pi Cleaning Services. Your scheduled service is coming up soon.\nPlease give us a call or reply to book in your next clean!\nWarm regards,\nThe Pi Cleaning Services Team';
 }
 
 function saveReminderText() {
@@ -2167,6 +2167,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const gsInput = document.getElementById('gsWebAppUrl');
   if (gsInput) gsInput.value = GS_HARDCODED_URL;
   showGsConnected();
+  // Seed the default reminder template if the user hasn't saved a custom one yet
+  if (!localStorage.getItem(REMINDER_TEXT_KEY)) {
+    localStorage.setItem(REMINDER_TEXT_KEY, getDefaultReminderTemplate());
+  }
   // Load cached clients
   const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
   if (cached) {
