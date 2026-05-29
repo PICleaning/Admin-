@@ -922,7 +922,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.0.3</div>
+  <div class="splash-version">v2.0.4</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -995,12 +995,20 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.0.3</div>
+          <div class="nav-item-sub">What's new in v2.0.4</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
+      <button class="drawer-nav-item" id="tab-documents" onclick="switchDrawerTab('documents')">
+        <span class="nav-item-icon">📄</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Documents</div>
+          <div class="nav-item-sub">Client service agreements &amp; forms</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.3 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.4 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL 1: REVIEW REQUESTS ── -->
   <div class="drawer-panel active" id="panel-review">
@@ -1336,7 +1344,14 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.0.3</div>
+    <div class="section-heading">What's New<br>in v2.0.4</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">📄</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Documents Centre</div>
+        <div class="nf-desc">A brand-new Documents section is now available in the Main Menu. Open, fill in, download, or share the Client Service Agreement via WhatsApp — all from within the app.</div>
+      </div>
+    </div>
     <div class="new-feature-card">
       <div class="nf-icon">🔍</div>
       <div class="nf-content">
@@ -1385,6 +1400,147 @@
         <div class="nf-title">Bulk Prospect SMS</div>
         <div class="nf-desc">Load your prospects from Google Sheets and send a personalised marketing SMS to every one of them — step by step, with a preview list and progress tracker.</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: DOCUMENTS ── -->
+  <div class="drawer-panel" id="panel-documents">
+    <div class="section-tag">Pi Cleaning Services</div>
+    <div class="section-heading">Client Service<br>Agreement</div>
+
+    <!-- Action buttons row -->
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button onclick="downloadAgreementPDF()" style="flex:1;padding:10px 8px;background:var(--gold);border:none;border-radius:9px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        ⬇ Download PDF
+      </button>
+      <button onclick="shareViaWhatsApp()" style="flex:1;padding:10px 8px;background:#25D366;border:none;border-radius:9px;color:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.557 4.123 1.528 5.855L.057 23.428a.5.5 0 0 0 .611.611l5.57-1.47C7.878 23.443 9.875 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.95 0-3.8-.538-5.386-1.47l-.385-.228-3.987 1.052 1.052-3.987-.228-.385A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Share via WA
+      </button>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:10px 13px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7;">
+      ✏️ Fill in the fields below, then <strong style="color:var(--gold-light)">Download PDF</strong> or <strong style="color:#25D366;">Share via WhatsApp</strong> to send to your client.
+    </div>
+
+    <!-- ══ AGREEMENT FORM ══ -->
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:14px;padding:18px 16px;">
+
+      <!-- Client Details -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Client Details</div>
+
+      <div class="field-group">
+        <label class="field-label">Business Name</label>
+        <input class="field-input" id="agr_business" type="text" placeholder="e.g. ABC Pty Ltd" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">ABN</label>
+        <input class="field-input" id="agr_abn" type="text" placeholder="e.g. 12 345 678 901" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contact Name</label>
+        <input class="field-input" id="agr_contact" type="text" placeholder="Full name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Phone</label>
+        <input class="field-input" id="agr_phone" type="tel" placeholder="+61 4xx xxx xxx" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="agr_email" type="email" placeholder="client@example.com" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Billing Address</label>
+        <input class="field-input" id="agr_billing" type="text" placeholder="Street, Suburb, State, Postcode" />
+      </div>
+
+      <!-- Scope of Work -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Scope of Work</div>
+
+      <div class="field-group">
+        <label class="field-label">Service Type</label>
+        <input class="field-input" id="agr_service_type" type="text" placeholder="e.g. Commercial Office Clean" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Frequency</label>
+        <input class="field-input" id="agr_frequency" type="text" placeholder="e.g. Weekly / Fortnightly / Monthly" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Estimated Duration</label>
+        <input class="field-input" id="agr_duration" type="text" placeholder="e.g. 3 hours per visit" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Special Instructions</label>
+        <textarea class="field-input" id="agr_special" rows="3" placeholder="Any special requirements or notes…" style="resize:vertical;min-height:70px;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Extra Services</label>
+        <input class="field-input" id="agr_extra" type="text" placeholder="e.g. Window cleaning, carpet steam" />
+      </div>
+
+      <!-- Pricing -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Pricing &amp; Quote</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Agreed Rate (excl. GST)</label>
+          <input class="field-input" id="agr_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST Amount</label>
+          <input class="field-input" id="agr_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:10px;">
+        <label class="field-label">Total Agreed Amount</label>
+        <input class="field-input" id="agr_total" type="text" placeholder="$ 0.00" />
+      </div>
+
+      <!-- Additional Services -->
+      <div class="field-group">
+        <label class="field-label">Additional Service 1 — Type</label>
+        <input class="field-input" id="agr_add1_type" type="text" placeholder="Service type" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Rate</label>
+          <input class="field-input" id="agr_add1_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST</label>
+          <input class="field-input" id="agr_add1_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:10px;">
+        <label class="field-label">Additional Service 2 — Type</label>
+        <input class="field-input" id="agr_add2_type" type="text" placeholder="Service type" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Rate</label>
+          <input class="field-input" id="agr_add2_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST</label>
+          <input class="field-input" id="agr_add2_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+
+      <!-- Signatures -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Signatures &amp; Date</div>
+
+      <div class="field-group">
+        <label class="field-label">Client Name (Print)</label>
+        <input class="field-input" id="agr_client_name_sig" type="text" placeholder="Full legal name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input class="field-input" id="agr_date" type="date" />
+      </div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:10px 13px;margin-top:14px;font-size:10px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      ℹ️ Physical signatures are obtained on the printed copy. This form generates a pre-filled PDF ready for signing.
     </div>
   </div>
 
@@ -1670,7 +1826,7 @@ function resetReminderText() {
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === tab);
@@ -1681,7 +1837,8 @@ function switchDrawerTab(tab) {
     jobs: '📋 Jobs for the Day',
     settings: '⚙️ Settings',
     newfeatures: '🚀 New Features',
-    prospects: '📣 Prospects'
+    prospects: '📣 Prospects',
+    documents: '📄 Documents'
   };
   document.getElementById('drawer-title').textContent = titles[tab] || 'Main Menu';
   // Show back button when in a section
@@ -1695,7 +1852,7 @@ function switchDrawerTab(tab) {
 
 function showDrawerMenu() {
   currentDrawerTab = 'menu';
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === 'menu');
@@ -2790,6 +2947,240 @@ function resetBulkCampaign() {
   bulkActive = false;
   renderProspectsList();
   resetBulkUI();
+}
+
+// ══════════════════════════════════════════
+//  DOCUMENTS — CLIENT SERVICE AGREEMENT
+// ══════════════════════════════════════════
+function getAgreementData() {
+  return {
+    business:       (document.getElementById('agr_business')?.value   || '').trim(),
+    abn:            (document.getElementById('agr_abn')?.value        || '').trim(),
+    contact:        (document.getElementById('agr_contact')?.value    || '').trim(),
+    phone:          (document.getElementById('agr_phone')?.value      || '').trim(),
+    email:          (document.getElementById('agr_email')?.value      || '').trim(),
+    billing:        (document.getElementById('agr_billing')?.value    || '').trim(),
+    service_type:   (document.getElementById('agr_service_type')?.value || '').trim(),
+    frequency:      (document.getElementById('agr_frequency')?.value  || '').trim(),
+    duration:       (document.getElementById('agr_duration')?.value   || '').trim(),
+    special:        (document.getElementById('agr_special')?.value    || '').trim(),
+    extra:          (document.getElementById('agr_extra')?.value      || '').trim(),
+    rate:           (document.getElementById('agr_rate')?.value       || '').trim(),
+    gst:            (document.getElementById('agr_gst')?.value        || '').trim(),
+    total:          (document.getElementById('agr_total')?.value      || '').trim(),
+    add1_type:      (document.getElementById('agr_add1_type')?.value  || '').trim(),
+    add1_rate:      (document.getElementById('agr_add1_rate')?.value  || '').trim(),
+    add1_gst:       (document.getElementById('agr_add1_gst')?.value   || '').trim(),
+    add2_type:      (document.getElementById('agr_add2_type')?.value  || '').trim(),
+    add2_rate:      (document.getElementById('agr_add2_rate')?.value  || '').trim(),
+    add2_gst:       (document.getElementById('agr_add2_gst')?.value   || '').trim(),
+    client_name:    (document.getElementById('agr_client_name_sig')?.value || '').trim(),
+    date:           (document.getElementById('agr_date')?.value       || '').trim(),
+  };
+}
+
+function buildAgreementHTML(d) {
+  const fmtDate = (iso) => {
+    if (!iso) return '_______________';
+    const [y,m,dd] = iso.split('-');
+    return `${dd}/${m}/${y}`;
+  };
+  const val = (v, fallback) => v || fallback || '_______________';
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#222;background:#fff;}
+    .page{width:210mm;min-height:297mm;padding:12mm 14mm;margin:0 auto;}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .company-name{font-size:22pt;font-weight:700;color:#1a2a4a;letter-spacing:1px;}
+    .company-detail{font-size:8.5pt;color:#444;line-height:1.7;margin-top:4px;}
+    .logo-circle{width:64px;height:64px;border-radius:50%;border:2px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-size:22pt;font-weight:700;color:#c9a84c;flex-shrink:0;}
+    .doc-title{font-size:16pt;font-weight:600;text-align:center;margin:12px 0;letter-spacing:0.5px;}
+    .section-bar{background:#1a2a4a;color:#fff;padding:6px 12px;font-size:11pt;font-weight:600;margin:12px 0 8px;border-radius:3px;}
+    table.fields{width:100%;border-collapse:collapse;margin-bottom:8px;}
+    table.fields td{border:1px solid #c9a84c;padding:6px 9px;font-size:9.5pt;vertical-align:top;}
+    table.fields td.label{background:rgba(201,168,76,0.18);font-weight:600;width:38%;color:#1a2a4a;}
+    table.fields td.value{min-height:20px;}
+    .terms-list{font-size:8.5pt;color:#333;line-height:1.8;padding-left:16px;}
+    .terms-list li{margin-bottom:2px;}
+    .sig-row{display:flex;gap:24px;margin-top:16px;}
+    .sig-block{flex:1;border-top:1px solid #1a2a4a;padding-top:6px;font-size:9pt;color:#555;}
+    .sig-label{font-size:8pt;letter-spacing:0.5px;text-transform:uppercase;color:#888;}
+    .sig-value{font-size:11pt;font-weight:600;color:#1a2a4a;min-height:20px;margin-top:4px;}
+    .footer-note{font-size:7.5pt;color:#999;text-align:center;margin-top:16px;border-top:1px solid #eee;padding-top:8px;}
+  </style></head><body><div class="page">
+  <div class="header">
+    <div>
+      <div class="company-name">PI CLEANING SERVICES PTY LTD</div>
+      <div class="company-detail">
+        ABN — 53 654 625 831<br>
+        Address — 2/4 Weddel Ct, Laverton North, Vic 3028<br>
+        Phone — 0450 585 874<br>
+        Email — admin@picleaningservices.com.au
+      </div>
+    </div>
+    <div class="logo-circle">π</div>
+  </div>
+
+  <div class="doc-title">Client Service Agreement</div>
+
+  <div class="section-bar">Client Details</div>
+  <table class="fields">
+    <tr><td class="label">Business Name</td><td class="value">${val(d.business)}</td></tr>
+    <tr><td class="label">ABN</td><td class="value">${val(d.abn)}</td></tr>
+    <tr><td class="label">Contact Name</td><td class="value">${val(d.contact)}</td></tr>
+    <tr><td class="label">Phone</td><td class="value">${val(d.phone)}</td></tr>
+    <tr><td class="label">Email</td><td class="value">${val(d.email)}</td></tr>
+    <tr><td class="label">Billing Address</td><td class="value">${val(d.billing)}</td></tr>
+  </table>
+
+  <div class="section-bar">Scope of Work</div>
+  <p style="font-size:9pt;margin-bottom:8px;color:#444;">The service provider agrees to perform the following cleaning services at the above property.</p>
+  <table class="fields">
+    <tr><td class="label">Service Type</td><td class="value">${val(d.service_type)}</td></tr>
+    <tr><td class="label">Frequency</td><td class="value">${val(d.frequency)}</td></tr>
+    <tr><td class="label">Estimated Duration</td><td class="value">${val(d.duration)}</td></tr>
+    <tr><td class="label">Special Instructions</td><td class="value" style="white-space:pre-wrap;">${val(d.special)}</td></tr>
+    <tr><td class="label">Extra Services</td><td class="value">${val(d.extra)}</td></tr>
+  </table>
+  <p style="font-size:8.5pt;color:#555;margin-bottom:6px;font-style:italic;">Any additional services requested outside of the agreed scope will be quoted separately and must be approved in writing by both parties prior to commencement.</p>
+
+  <div class="section-bar">Pricing &amp; Quote Acceptance</div>
+  <table class="fields" style="margin-bottom:6px;">
+    <tr>
+      <td class="label">Agreed Service Rate (excl. GST)</td>
+      <td class="value">$ ${val(d.rate,'___________')}</td>
+      <td class="label" style="width:22%;">GST</td>
+      <td class="value">$ ${val(d.gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label">Additional Service 1 — Type</td>
+      <td class="value">${val(d.add1_type,'___________')}</td>
+      <td class="label">GST</td>
+      <td class="value">$ ${val(d.add1_gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label">Additional Service 2 — Type</td>
+      <td class="value">${val(d.add2_type,'___________')}</td>
+      <td class="label">GST</td>
+      <td class="value">$ ${val(d.add2_gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label" style="font-size:10.5pt;">Total Agreed Amount</td>
+      <td class="value" colspan="3" style="font-size:12pt;font-weight:700;color:#1a2a4a;">$ ${val(d.total,'_______________')}</td>
+    </tr>
+  </table>
+  <p style="font-size:8pt;color:#555;font-style:italic;margin-bottom:8px;">By signing this agreement the client confirms they have read, understood and accepted the pricing above. The quoted amount constitutes the client's financial obligation to PI Cleaning Services upon completion of the services.</p>
+
+  <div class="section-bar">Payment Terms</div>
+  <ol class="terms-list">
+    <li>All invoices are issued in the same week as service completion.</li>
+    <li>Payment is due within 7 days of the invoice date, unless an alternative agreement has been made in writing.</li>
+    <li>Accepted payment methods are Bank Transfer, Credit/Debit Card, Cash — unless otherwise agreed in writing.</li>
+    <li>Bank details or payment instructions are provided in the invoice.</li>
+    <li>Invoices will be sent to the client's nominated email address or mobile number in PDF format.</li>
+    <li>The client is responsible for ensuring payments are made by the due date.</li>
+    <li>An additional processing fee of 1.9% may apply if the invoice is overdue past the agreed payment timeframe.</li>
+    <li>PI Cleaning Services may collect credit/debit card or payment details to process payments for services rendered.</li>
+    <li>All sensitive information is stored securely within an encrypted payment processing platform and will never be shared with unauthorised third parties.</li>
+    <li>All service prices are subject to change and PI Cleaning Services will provide notice of any change.</li>
+  </ol>
+
+  <div class="section-bar" style="margin-top:10px;">Debt Recovery</div>
+  <ol class="terms-list" start="11">
+    <li>PI Cleaning Services will follow standard follow-ups for payment recovery for up to 21 days of invoice date.</li>
+    <li>If the client fails to make full invoice payment within 21 days they may be referred to a debt collector or solicitor.</li>
+    <li>PI Cleaning Services may file a claim through the relevant Civil Administrative Tribunal (e.g. VCAT) for recovery of the unpaid amount.</li>
+    <li>All reasonable costs associated with debt recovery — including legal fees, tribunal filing fees, and collection agency charges — shall be borne by the client.</li>
+    <li>This agreement, together with any signed invoice or quote, constitutes sufficient evidence of the client's obligation to pay for services rendered.</li>
+  </ol>
+
+  <div class="section-bar" style="margin-top:10px;">General Terms &amp; Conditions</div>
+  <ol class="terms-list" start="16">
+    <li>PI Cleaning Services may require 50% of the total invoice to be paid upfront before commencing the services.</li>
+    <li>Liability: PI Cleaning Services holds public liability insurance.</li>
+    <li>The client agrees to provide safe, unobstructed access at the agreed service time.</li>
+    <li>Both parties agree to keep the terms of this agreement confidential and not to disclose details to a third party without written consent.</li>
+  </ol>
+
+  <div class="sig-row" style="margin-top:20px;">
+    <div class="sig-block">
+      <div class="sig-label">Service Provider Name</div>
+      <div class="sig-value">PI Cleaning Services Pty Ltd</div>
+      <div class="sig-label" style="margin-top:14px;">Service Provider Signature</div>
+      <div class="sig-value" style="min-height:32px;border-bottom:1px solid #aaa;"></div>
+      <div class="sig-label" style="margin-top:12px;">Date</div>
+      <div class="sig-value" style="min-height:20px;border-bottom:1px solid #aaa;"></div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label">Client Name</div>
+      <div class="sig-value">${val(d.client_name,'')}</div>
+      <div class="sig-label" style="margin-top:14px;">Client Signature</div>
+      <div class="sig-value" style="min-height:32px;border-bottom:1px solid #aaa;"></div>
+      <div class="sig-label" style="margin-top:12px;">Date</div>
+      <div class="sig-value">${fmtDate(d.date)}</div>
+    </div>
+  </div>
+
+  <div class="footer-note">PI Cleaning Services Pty Ltd · ABN 53 654 625 831 · admin@picleaningservices.com.au · 0450 585 874</div>
+</div></body></html>`;
+}
+
+function downloadAgreementPDF() {
+  const d = getAgreementData();
+  const html = buildAgreementHTML(d);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const clientName = d.business || d.client_name || 'Client';
+  a.download = `Pi_Service_Agreement_${clientName.replace(/\s+/g,'_')}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // Toast feedback
+  showDocToast('📄 Agreement downloaded! Open the file in your browser and use Print → Save as PDF.', 'success');
+}
+
+function shareViaWhatsApp() {
+  const d = getAgreementData();
+  const clientName = d.business || d.contact || 'Client';
+  const serviceType = d.service_type || 'cleaning services';
+  const rate = d.total ? `$${d.total}` : (d.rate ? `$${d.rate} + GST` : 'as agreed');
+  const dateStr = d.date ? (() => { const [y,m,dd]=d.date.split('-'); return `${dd}/${m}/${y}`; })() : 'as agreed';
+
+  const msg = `Hi ${clientName || 'there'},\n\nPlease find below the details of your Client Service Agreement with *PI Cleaning Services*:\n\n` +
+    `📋 *Service:* ${serviceType}\n` +
+    (d.frequency ? `🔄 *Frequency:* ${d.frequency}\n` : '') +
+    (d.duration  ? `⏱ *Duration:* ${d.duration}\n`   : '') +
+    `💰 *Total Agreed:* ${rate}\n` +
+    (d.date      ? `📅 *Date:* ${dateStr}\n`          : '') +
+    `\n` +
+    `*Payment Terms:* Payment is due within 7 days of invoice. Accepted via bank transfer, credit/debit card, or cash.\n\n` +
+    `If you have any questions, please contact us:\n📞 0450 585 874\n📧 admin@picleaningservices.com.au\n\nThank you for choosing Pi Cleaning Services! 🌟`;
+
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+}
+
+function showDocToast(msg, type) {
+  // Simple in-panel feedback
+  let t = document.getElementById('docToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'docToast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9999;padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;max-width:320px;text-align:center;transition:opacity 0.4s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = type === 'success' ? 'rgba(29,185,84,0.18)' : 'rgba(226,75,74,0.18)';
+  t.style.border = type === 'success' ? '1px solid rgba(29,185,84,0.5)' : '1px solid rgba(226,75,74,0.5)';
+  t.style.color = type === 'success' ? '#7edb7e' : '#ff9999';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 4500);
 }
 </script>
 </body>
