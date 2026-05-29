@@ -74,6 +74,13 @@
     from{ opacity:0; transform:translateY(10px); }
     to  { opacity:1; transform:translateY(0); }
   }
+  .splash-version {
+    position:absolute; bottom:38px; left:50%; transform:translateX(-50%);
+    font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.18em; color:rgba(201,168,76,0.7);
+    opacity:0; animation:splashFadeUp 0.5s ease 1.2s forwards;
+    white-space:nowrap;
+  }
 
   /* ── TOPBAR ── */
   .topbar {
@@ -260,6 +267,23 @@
     backdrop-filter:blur(6px);
   }
 
+  .map-home-btn {
+    position:absolute; bottom:12px; left:12px;
+    background:rgba(10,22,40,0.92); border:1px solid rgba(201,168,76,0.45);
+    border-radius:10px; padding:9px 16px;
+    font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); cursor:pointer; z-index:10;
+    backdrop-filter:blur(8px);
+    display:flex; align-items:center; gap:7px;
+    transition:all 0.2s;
+    box-shadow:0 2px 12px rgba(0,0,0,0.35);
+  }
+  .map-home-btn:hover {
+    background:rgba(201,168,76,0.18); border-color:var(--gold);
+    box-shadow:0 4px 18px rgba(201,168,76,0.18);
+  }
+
   /* ════════════════════════════════
      NON-DASHBOARD PAGES
   ════════════════════════════════ */
@@ -302,7 +326,7 @@
 
   /* Main drawer shell */
   .drawer {
-    position:fixed; top:0; right:-440px; width:420px; height:100vh;
+    position:fixed; top:0; right:-460px; width:440px; height:100vh;
     background:var(--navy-mid); border-left:1px solid rgba(201,168,76,0.3);
     z-index:300; transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
     display:flex; flex-direction:column; overflow:hidden;
@@ -458,6 +482,34 @@
     border-color:rgba(240,165,0,0.5);
     background:rgba(240,165,0,0.06);
   }
+  /* Due within 30 days — tiffany blue glow */
+  .client-card.due-30 {
+    border-color:rgba(0,213,210,0.6);
+    background:rgba(0,213,210,0.05);
+    box-shadow:0 0 12px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25);
+    animation:tiffanyPulse 2.8s ease infinite;
+  }
+  @keyframes tiffanyPulse {
+    0%,100% { box-shadow:0 0 10px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25); border-color:rgba(0,213,210,0.55); }
+    50%      { box-shadow:0 0 22px 6px rgba(0,213,210,0.32), 0 0 0 1px rgba(0,213,210,0.5);  border-color:rgba(0,213,210,0.9); }
+  }
+  /* Service done within 7 days — neon green */
+  .client-card.service-done {
+    border-color:rgba(0,255,100,0.6);
+    background:rgba(0,255,100,0.05);
+    box-shadow:0 0 12px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25);
+    animation:donePulse 2.8s ease infinite;
+  }
+  @keyframes donePulse {
+    0%,100% { box-shadow:0 0 10px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25); border-color:rgba(0,255,100,0.55); }
+    50%      { box-shadow:0 0 22px 6px rgba(0,255,100,0.32), 0 0 0 1px rgba(0,255,100,0.5);  border-color:rgba(0,255,100,0.9); }
+  }
+  /* Badge styles for new statuses */
+  .due-badge.due30 { background:rgba(0,213,210,0.15); color:#00d5d2; border:1px solid rgba(0,213,210,0.45); }
+  .due-badge.done  { background:rgba(0,255,100,0.12); color:#00ff64; border:1px solid rgba(0,255,100,0.4); }
+  /* Avatar colours for new statuses */
+  .client-avatar.due30 { background:#00d5d2; color:var(--navy); }
+  .client-avatar.done  { background:#00ff64; color:var(--navy); }
   .client-card-top { display:flex; align-items:flex-start; gap:10px; }
   .client-avatar {
     width:38px; height:38px; border-radius:50%; flex-shrink:0;
@@ -652,6 +704,212 @@
     .mobile-sidebar-toggle { display:flex !important; }
   }
   .mobile-sidebar-toggle { display:none; }
+
+  /* ════ DRAWER NAV MENU (hamburger vertical menu) ════ */
+  .drawer-nav-menu {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 16px 14px;
+    max-height: calc(100vh - 80px); overflow-y: auto;
+  }
+  .drawer-nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px;
+    background: transparent; border: 1px solid transparent;
+    cursor: pointer; transition: all 0.2s; text-align: left;
+    width: 100%;
+  }
+  .drawer-nav-item:hover {
+    background: var(--gold-pale); border-color: rgba(201,168,76,0.3);
+  }
+  .drawer-nav-item.active {
+    background: rgba(201,168,76,0.12); border-color: var(--gold);
+  }
+  .nav-item-icon {
+    font-size: 20px; flex-shrink: 0; width: 28px; text-align: center;
+  }
+  .nav-item-text { flex: 1; min-width: 0; }
+  .nav-item-label {
+    font-size: 13px; font-weight: 600; color: var(--white);
+    margin-bottom: 2px; letter-spacing: 0.02em;
+  }
+  .drawer-nav-item.active .nav-item-label { color: var(--gold-light); }
+  .nav-item-sub { font-size: 10px; color: var(--white-muted); }
+  .nav-item-arrow {
+    font-size: 18px; color: var(--gold); opacity: 0.5; flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .drawer-nav-item.active .nav-item-arrow { opacity: 1; transform: translateX(2px); }
+  .new-feature-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+    padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(29,185,84,0.18); color: var(--success);
+    border: 1px solid rgba(29,185,84,0.4);
+  }
+  .drawer-back-btn {
+    display: none; align-items: center; gap: 4px;
+    background: transparent; border: none;
+    color: var(--gold); font-family: 'Montserrat', sans-serif;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    padding: 4px 8px 4px 0; letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+  }
+  .drawer-back-btn:hover { opacity: 0.75; }
+  .drawer-version-bar-inline {
+    margin: 20px 16px 0;
+    font-size: 10px; color: var(--white-muted); letter-spacing: 0.08em;
+    text-align: center; padding: 12px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+  }
+
+  /* ════ CLIENT SEARCH ════ */
+  .client-search-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px; padding: 9px 12px; margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .client-search-wrap:focus-within { border-color: rgba(201,168,76,0.55); }
+  .client-search-icon { font-size: 14px; flex-shrink: 0; opacity: 0.7; }
+  .client-search-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'Montserrat', sans-serif; font-size: 12px;
+    color: var(--white); placeholder-color: var(--white-muted);
+  }
+  .client-search-input::placeholder { color: var(--white-muted); }
+  .client-search-clear {
+    background: none; border: none; color: var(--white-muted);
+    font-size: 13px; cursor: pointer; padding: 0 2px; flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .client-search-clear:hover { color: var(--white); }
+
+  /* ════ SETTINGS TOGGLE ════ */
+  .settings-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.18); border-radius: 9px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .settings-toggle-row:hover { background: var(--gold-pale); border-color: rgba(201,168,76,0.35); }
+  .settings-toggle-label { font-size: 12px; font-weight: 600; color: var(--white); }
+  .settings-toggle-sub { font-size: 10px; color: var(--white-muted); margin-top: 2px; }
+  .toggle-switch {
+    position: relative; width: 42px; height: 24px; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0; border-radius: 24px;
+    background: rgba(255,255,255,0.12); transition: background 0.25s;
+    cursor: pointer;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--white); transition: transform 0.25s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: var(--gold); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
+
+  /* ════ CLIENTS & REMINDERS COMBINED PANEL ════ */
+  .cr-subtab-row {
+    display: flex; gap: 6px; margin-bottom: 18px;
+    background: rgba(255,255,255,0.03); border-radius: 10px; padding: 4px;
+  }
+  .cr-subtab {
+    flex: 1; padding: 9px 8px; border-radius: 7px; border: none;
+    font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--white-muted); background: transparent; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cr-subtab.active {
+    background: var(--gold); color: var(--navy);
+  }
+  .cr-subpanel { display: none; }
+  .cr-subpanel.active { display: block; }
+
+  /* ════ SETTINGS PANEL ════ */
+  .settings-section { margin-bottom: 8px; }
+  .settings-section-title {
+    font-size: 13px; font-weight: 700; color: var(--gold-light);
+    letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .settings-section-desc {
+    font-size: 11px; color: var(--white-muted); line-height: 1.7; margin-bottom: 14px;
+  }
+  .settings-option-group { display: flex; flex-direction: column; gap: 6px; }
+  .settings-option {
+    width: 100%; padding: 12px 14px; text-align: left;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 9px; cursor: pointer; transition: all 0.2s;
+  }
+  .settings-option:hover { background: var(--gold-pale); border-color: rgba(201,168,76,0.35); }
+  .settings-option.active { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+  .settings-option-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 3px;
+  }
+  .settings-option-label {
+    font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--white);
+  }
+  .settings-option.active .settings-option-label { color: var(--gold-light); }
+  .settings-option-check { font-size: 13px; color: var(--gold); font-weight: 700; }
+  .settings-option-sub { font-size: 10px; color: var(--white-muted); }
+  .settings-saved-msg {
+    font-size: 11px; color: var(--success); margin-top: 8px;
+    display: none; background: rgba(29,185,84,0.1);
+    border: 1px solid rgba(29,185,84,0.3); border-radius: 7px; padding: 8px 12px;
+  }
+  .settings-saved-msg.show { display: block; }
+
+  /* ════ NEW FEATURES PANEL ════ */
+  .new-feature-card {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px; padding: 16px; margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .new-feature-card:hover { background: var(--gold-pale); border-color: rgba(201,168,76,0.3); }
+  .nf-icon { font-size: 24px; flex-shrink: 0; width: 36px; text-align: center; margin-top: 2px; }
+  .nf-title {
+    font-size: 13px; font-weight: 700; color: var(--gold-light);
+    margin-bottom: 6px; letter-spacing: 0.02em;
+  }
+  .nf-desc { font-size: 11px; color: var(--white-muted); line-height: 1.7; }
+
+
+  /* ── PROSPECT CARDS ── */
+  .prospect-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.18);
+    border-radius:11px; padding:12px 14px;
+    display:flex; align-items:center; gap:12px;
+    transition:all 0.2s;
+  }
+  .prospect-card.sent { border-color:rgba(29,185,84,0.4); background:rgba(29,185,84,0.05); }
+  .prospect-card.skipped { opacity:0.45; }
+  .prospect-card.current { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+  .prospect-avatar {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; color:var(--gold);
+  }
+  .prospect-info { flex:1; min-width:0; }
+  .prospect-name { font-size:13px; font-weight:700; color:var(--white); }
+  .prospect-phone { font-size:11px; color:var(--white-muted); margin-top:2px; }
+  .prospect-status-badge {
+    font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px;
+    flex-shrink:0; letter-spacing:0.04em;
+  }
+  .prospect-status-badge.pending { background:rgba(201,168,76,0.12); color:var(--gold); border:1px solid rgba(201,168,76,0.3); }
+  .prospect-status-badge.sent { background:rgba(29,185,84,0.12); color:var(--success); border:1px solid rgba(29,185,84,0.35); }
+  .prospect-status-badge.skipped { background:rgba(255,255,255,0.06); color:var(--white-muted); border:1px solid rgba(255,255,255,0.12); }
+
+  @media (max-width: 600px) {
+    .drawer { width: 100vw !important; right: -100vw !important; }
+    .drawer.open { right: 0 !important; }
+  }
 </style>
 </head>
 <body>
@@ -664,36 +922,98 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+  <div class="splash-version">v2.0.4</div>
 </div>
 
 <!-- Overlay for drawer -->
 <div class="overlay" id="overlay" onclick="closeDrawer()"></div>
 
 <!-- ════ MULTI-PANEL DRAWER ════ -->
+<div id="drawer-backdrop" style="display:none;position:fixed;inset:0;z-index:150;background:var(--navy);" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
     <div class="drawer-header-top">
-      <div class="drawer-title" id="drawer-title">Menu</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="drawer-back-btn" id="drawerBackBtn" onclick="showDrawerMenu()">‹ Back</button>
+        <div class="drawer-title" id="drawer-title">Main Menu</div>
+      </div>
       <button class="close-btn" onclick="closeDrawer()">✕</button>
     </div>
-    <div class="drawer-tabs">
-      <button class="drawer-tab active" id="tab-review" onclick="switchDrawerTab('review')">⭐ Reviews</button>
-      <button class="drawer-tab" id="tab-clients" onclick="switchDrawerTab('clients')">👥 Clients</button>
-      <button class="drawer-tab" id="tab-reminders" onclick="switchDrawerTab('reminders')">🔔 Reminders</button>
-      <button class="drawer-tab" id="tab-jobs" onclick="switchDrawerTab('jobs')">📋 Jobs</button>
+  </div>
+  <!-- ── PANEL 0: MAIN MENU ── -->
+  <div class="drawer-panel active" id="panel-menu" style="padding-top:8px;">
+    <div class="drawer-nav-menu">
+      <button class="drawer-nav-item" id="tab-livemap" onclick="openLiveMap()">
+        <span class="nav-item-icon">🗺</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Live Map</div>
+          <div class="nav-item-sub">Track active employees in real time</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-prospects" onclick="switchDrawerTab('prospects')">
+        <span class="nav-item-icon">📣</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Prospects</div>
+          <div class="nav-item-sub">Bulk marketing SMS from your sheet</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-review" onclick="switchDrawerTab('review')">
+        <span class="nav-item-icon">⭐</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Request Reviews</div>
+          <div class="nav-item-sub">Send Google review links after jobs</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-clients-reminders" onclick="switchDrawerTab('clients-reminders')">
+        <span class="nav-item-icon">👥</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Clients &amp; Reminders</div>
+          <div class="nav-item-sub">Client database &amp; service reminders</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-jobs" onclick="switchDrawerTab('jobs')">
+        <span class="nav-item-icon">📋</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Jobs for the Day</div>
+          <div class="nav-item-sub">Today's schedule &amp; directions</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-settings" onclick="switchDrawerTab('settings')">
+        <span class="nav-item-icon">⚙️</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Settings</div>
+          <div class="nav-item-sub">Customise your app experience</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-newfeatures" onclick="switchDrawerTab('newfeatures')">
+        <span class="nav-item-icon">🚀</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">New Features</div>
+          <div class="nav-item-sub">What's new in v2.0.4</div>
+        </div>
+        <span class="new-feature-badge">NEW</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-documents" onclick="switchDrawerTab('documents')">
+        <span class="nav-item-icon">📄</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Documents</div>
+          <div class="nav-item-sub">Client service agreements &amp; forms</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
     </div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.4 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL 1: REVIEW REQUESTS ── -->
   <div class="drawer-panel active" id="panel-review">
     <div class="section-tag">After Every Job</div>
     <div class="section-heading">Send your client<br>a Google review link</div>
-    <div class="review-link-box">
-      <div style="font-size:20px;flex-shrink:0;">🔗</div>
-      <div>
-        <div class="review-link-text">Your Google Reviews page:</div>
-        <a class="review-hyperlink" href="https://www.google.com/search?q=Pi+Cleaning+Services+Reviews" target="_blank">Click here to review us ⭐</a>
-      </div>
-    </div>
     <div class="divider"></div>
     <div class="field-group">
       <label class="field-label">Client Name or Business</label>
@@ -720,72 +1040,81 @@
     <div class="toast" id="toast"></div>
   </div>
 
-  <!-- ── PANEL 2: CLIENTS ── -->
-  <div class="drawer-panel" id="panel-clients">
-    <!-- Google Sheets Connection -->
-    <div class="gs-setup-box">
-      <div class="gs-setup-title">🔗 Google Sheets Connection</div>
-      <div class="gs-setup-desc" id="gsSetupDesc">
-        Paste your Google Apps Script Web App URL below to connect your client database. 
-        <a href="#" onclick="showScriptHelp(); return false;">How to set this up ↗</a>
-      </div>
-      <div class="gs-url-entry" id="gsUrlEntry">
-        <div class="gs-url-row">
-          <input class="gs-url-input" id="gsWebAppUrl" placeholder="https://script.google.com/macros/s/..." />
-          <button class="gs-save-btn" onclick="saveGsUrl()">Save</button>
+  <!-- ── PANEL 2: CLIENTS & REMINDERS (combined) ── -->
+  <div class="drawer-panel" id="panel-clients-reminders">
+    <!-- Sub-tab switcher inside the panel -->
+    <div class="cr-subtab-row">
+      <button class="cr-subtab active" id="cr-tab-clients" onclick="switchCRTab('clients')">👥 Clients</button>
+      <button class="cr-subtab" id="cr-tab-reminders" onclick="switchCRTab('reminders')">🔔 Reminders</button>
+    </div>
+
+    <!-- ── CLIENTS SUB-PANEL ── -->
+    <div class="cr-subpanel active" id="cr-panel-clients">
+      <!-- Google Sheets Connection -->
+      <div class="gs-setup-box">
+        <div class="gs-setup-title">🔗 Google Sheets Connection</div>
+        <div class="gs-setup-desc" id="gsSetupDesc">
+          Paste your Google Apps Script Web App URL below to connect your client database.
+          <a href="#" onclick="showScriptHelp(); return false;">How to set this up ↗</a>
+        </div>
+        <div class="gs-url-entry" id="gsUrlEntry">
+          <div class="gs-url-row">
+            <input class="gs-url-input" id="gsWebAppUrl" placeholder="https://script.google.com/macros/s/..." />
+            <button class="gs-save-btn" onclick="saveGsUrl()">Save</button>
+          </div>
+        </div>
+        <div class="gs-connected-indicator" id="gsConnectedIndicator">
+          <span class="gs-neon-dot"></span> Sheets Connected &amp; Stable
         </div>
       </div>
-      <div class="gs-connected-indicator" id="gsConnectedIndicator">
-        <span class="gs-neon-dot"></span> Sheets Connected &amp; Stable
+      <!-- Refresh button -->
+      <button class="gs-load-btn" id="gsRefreshBtn" onclick="refreshClients()" style="margin-bottom:14px;">
+        <span id="gsRefreshIcon">↻</span> <span>Refresh</span>
+      </button>
+      <!-- Filter chips -->
+      <div class="clients-filter">
+        <button class="filter-chip active" onclick="filterClients('all', this)">All</button>
+        <button class="filter-chip urgent" onclick="filterClients('urgent', this)">🔴 Due Now</button>
+        <button class="filter-chip" onclick="filterClients('soon', this)">🟡 Due Soon</button>
+        <button class="filter-chip" onclick="filterClients('ok', this)">🟢 Up to Date</button>
       </div>
-
-    </div>
-
-    <!-- Refresh button -->
-    <button class="gs-load-btn" id="gsRefreshBtn" onclick="refreshClients()" style="margin-bottom:14px;">
-      <span id="gsRefreshIcon">↻</span> <span>Refresh</span>
-    </button>
-
-    <!-- Filter chips -->
-    <div class="clients-filter">
-      <button class="filter-chip active" onclick="filterClients('all', this)">All</button>
-      <button class="filter-chip urgent" onclick="filterClients('urgent', this)">🔴 Due Now</button>
-      <button class="filter-chip" onclick="filterClients('soon', this)">🟡 Due Soon</button>
-      <button class="filter-chip" onclick="filterClients('ok', this)">🟢 Up to Date</button>
-    </div>
-
-    <!-- Client list -->
-    <div id="clientsList">
-      <div class="no-clients">
-        <div class="no-clients-icon">👥</div>
-        <div>No clients loaded yet.</div>
-        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Connect your Google Sheet above and tap "Load Clients".</div>
+      <!-- Client search -->
+      <div class="client-search-wrap">
+        <span class="client-search-icon">🔍</span>
+        <input class="client-search-input" id="clientSearchInput" type="text" placeholder="Search by client name…" oninput="renderClients()" />
+        <button class="client-search-clear" id="clientSearchClear" onclick="clearClientSearch()" style="display:none;">✕</button>
       </div>
-    </div>
-  </div>
-
-  <!-- ── PANEL 3: SERVICE REMINDERS ── -->
-  <div class="drawer-panel" id="panel-reminders">
-    <div class="section-tag">6-Month Service Cycle</div>
-    <div class="section-heading">Send service<br>reminder messages</div>
-
-    <!-- Summary stats -->
-    <div class="reminder-summary" id="reminderSummary" style="display:none">
-      <div class="reminder-stat">
-        <div class="reminder-stat-num red" id="stat-overdue">0</div>
-        <div class="reminder-stat-label">Overdue</div>
+      <!-- Client list -->
+      <div id="clientsList">
+        <div class="no-clients">
+          <div class="no-clients-icon">👥</div>
+          <div>No clients loaded yet.</div>
+          <div style="font-size:10px;opacity:0.6;margin-top:6px;">Connect your Google Sheet above and tap "Refresh".</div>
+        </div>
       </div>
-      <div class="reminder-stat">
-        <div class="reminder-stat-num warn" id="stat-due-soon">0</div>
-        <div class="reminder-stat-label">Due in 14 Days</div>
+      <div class="toast" id="gsToast" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- ── REMINDERS SUB-PANEL ── -->
+    <div class="cr-subpanel" id="cr-panel-reminders">
+      <div class="section-tag">6-Month Service Cycle</div>
+      <div class="section-heading">Send service<br>reminder messages</div>
+      <!-- Summary stats -->
+      <div class="reminder-summary" id="reminderSummary" style="display:none">
+        <div class="reminder-stat">
+          <div class="reminder-stat-num red" id="stat-overdue">0</div>
+          <div class="reminder-stat-label">Overdue</div>
+        </div>
+        <div class="reminder-stat">
+          <div class="reminder-stat-num warn" id="stat-due-soon">0</div>
+          <div class="reminder-stat-label">Due in 14 Days</div>
+        </div>
       </div>
+      <div id="remindersConnect" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:11px;padding:16px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        💡 Connect your Google Sheet in the <strong style="color:var(--gold-light)">Clients</strong> tab first, then come back here to send service reminders.
+      </div>
+      <div id="remindersList"></div>
     </div>
-
-    <div id="remindersConnect" style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:11px;padding:16px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
-      💡 Connect your Google Sheet in the <strong style="color:var(--gold-light)">Clients</strong> tab first, then come back here to send service reminders to clients whose next service is due.
-    </div>
-
-    <div id="remindersList"></div>
   </div>
 
   <!-- ── PANEL 4: JOBS FOR THE DAY ── -->
@@ -813,7 +1142,408 @@
     </div>
   </div>
 
-  <div class="drawer-version-bar">V 2.0.2</div>
+  <!-- ── PANEL: SETTINGS ── -->
+  <div class="drawer-panel" id="panel-settings">
+    <div class="section-tag">App Preferences</div>
+    <div class="section-heading">Settings</div>
+
+    <!-- Date Format -->
+    <div class="settings-section">
+      <div class="settings-section-title">📅 Date Format</div>
+      <div class="settings-section-desc">Choose how dates are displayed throughout the app. Dates from Google Sheets are automatically converted to your chosen format.</div>
+      <div class="settings-option-group" id="dateFormatGroup">
+        <button class="settings-option active" onclick="setDateFormat('DD/MM/YY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">DD/MM/YY</span><span class="settings-option-check" id="dfcheck-DDMMYY">✓</span></div>
+          <div class="settings-option-sub">e.g. 26/05/26 — Australian standard</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('DD/MM/YYYY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">DD/MM/YYYY</span><span class="settings-option-check" id="dfcheck-DDMMYYYY"></span></div>
+          <div class="settings-option-sub">e.g. 26/05/2026 — Full year</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('MM/DD/YY', this)">
+          <div class="settings-option-top"><span class="settings-option-label">MM/DD/YY</span><span class="settings-option-check" id="dfcheck-MMDDYY"></span></div>
+          <div class="settings-option-sub">e.g. 05/26/26 — US format</div>
+        </button>
+        <button class="settings-option" onclick="setDateFormat('YYYY-MM-DD', this)">
+          <div class="settings-option-top"><span class="settings-option-label">YYYY-MM-DD</span><span class="settings-option-check" id="dfcheck-YYYYMMDD"></span></div>
+          <div class="settings-option-sub">e.g. 2026-05-26 — ISO standard</div>
+        </button>
+      </div>
+      <div class="settings-saved-msg" id="dateFormatSaved">✅ Date format saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Due-in-30 Glow Toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">💎 30-Day Due Glow</div>
+      <div class="settings-section-desc">When enabled, client cards whose service is due within 30 days show a teal blue glow indicator. Turn off if you prefer a cleaner look.</div>
+      <label class="settings-toggle-row" onclick="toggleDue30Glow()">
+        <div>
+          <div class="settings-toggle-label">Teal glow for clients due in 30 days</div>
+          <div class="settings-toggle-sub">Shows a blue-teal border glow on upcoming client cards</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="due30GlowToggle" onchange="toggleDue30Glow()" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+      <div class="settings-saved-msg" id="due30GlowSaved">✅ Setting saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Review Request Text Template -->
+    <div class="settings-section">
+      <div class="settings-section-title">⭐ Review Request Message</div>
+      <div class="settings-section-desc">Customise the SMS sent to clients asking for a Google review. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name. The review link is automatically included — use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">Click here to review us ⭐</code> as the placeholder where the link appears.</div>
+      <textarea class="reminder-msg-area" id="reviewTemplateText" style="margin-top:12px;min-height:160px;" placeholder="Hi {name}, thank you for choosing Pi Cleaning Services!..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReviewTemplate()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveReviewTemplate()">Save Review Text</button>
+      </div>
+      <div class="settings-saved-msg" id="reviewTemplateSaved">✅ Review text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 The review link is hardcoded and hidden — clients receive a clean "Click here to review us ⭐" link that opens Google Reviews with 5 stars pre-selected.
+      </div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Amend Reminder Text -->
+    <div class="settings-section">
+      <div class="settings-section-title">✉️ Amend Reminder Text</div>
+      <div class="settings-section-desc">Customise the SMS reminder message sent to clients when their service is due. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
+      <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
+      </div>
+      <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
+      </div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Marketing SMS Template -->
+    <div class="settings-section">
+      <div class="settings-section-title">📣 Marketing SMS Template</div>
+      <div class="settings-section-desc">Customise the bulk SMS message sent to prospects. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the prospect's first name.</div>
+      <textarea class="reminder-msg-area" id="marketingSmsText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetMarketingText()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveMarketingText()">Save Marketing Text</button>
+      </div>
+      <div class="settings-saved-msg" id="marketingTextSaved">✅ Marketing text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 This message pre-fills automatically when you send bulk SMS to prospects in the Prospects section.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: PROSPECTS ── -->
+  <div class="drawer-panel" id="panel-prospects">
+    <div class="section-tag">Marketing</div>
+    <div class="section-heading">Bulk SMS<br>to Prospects</div>
+
+    <!-- Sheet URL input -->
+    <div class="settings-section" style="margin-bottom:0;">
+      <div class="settings-section-title">🔗 Prospects Google Sheet</div>
+      <div class="settings-section-desc">Paste the <strong style="color:var(--gold-light)">published CSV link</strong> from your Prospects Google Sheet. The sheet must have <strong style="color:var(--gold-light)">Name</strong> and <strong style="color:var(--gold-light)">Phone</strong> as column headers in row 1.</div>
+
+      <!-- Step-by-step instructions -->
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:13px 14px;margin-top:10px;margin-bottom:12px;font-size:11px;color:rgba(255,255,255,0.7);line-height:1.9;">
+        <div style="font-weight:700;color:var(--gold-light);margin-bottom:6px;font-size:12px;">📋 How to get your CSV link:</div>
+        <div><span style="color:var(--gold);">1.</span> Open your Prospects Google Sheet</div>
+        <div><span style="color:var(--gold);">2.</span> Click <strong style="color:var(--white)">File → Share → Publish to web</strong></div>
+        <div><span style="color:var(--gold);">3.</span> Under "Link", select your sheet tab</div>
+        <div><span style="color:var(--gold);">4.</span> Change the format dropdown to <strong style="color:var(--white)">Comma-separated values (.csv)</strong></div>
+        <div><span style="color:var(--gold);">5.</span> Click <strong style="color:var(--white)">Publish</strong> → copy the URL → paste below</div>
+      </div>
+
+      <input class="field-input" type="url" id="prospectsSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" style="margin-top:4px;" />
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" onclick="saveProspectsUrl()">Save &amp; Connect</button>
+      </div>
+      <div class="settings-saved-msg" id="prospectsUrlSaved">✅ Sheet URL saved!</div>
+    </div>
+
+    <div class="divider" style="margin:18px 0;"></div>
+
+    <!-- Load + preview -->
+    <button class="gs-load-btn" id="prospectsLoadBtn" onclick="loadProspects()" style="margin-bottom:14px;">
+      <span id="prospectsLoadIcon">↓</span> Load Prospects from Sheet
+    </button>
+
+    <!-- Status / error -->
+    <div id="prospectsStatus" style="display:none;background:rgba(226,75,74,0.1);border:1px solid rgba(226,75,74,0.35);border-radius:9px;padding:12px;font-size:11px;color:#ff8a89;line-height:1.6;margin-bottom:14px;"></div>
+
+    <!-- Preview list -->
+    <div id="prospectsPreview" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:var(--gold-light);">
+          <span id="prospectsCount">0</span> prospects loaded
+        </div>
+        <button style="background:none;border:none;color:var(--white-muted);font-size:11px;cursor:pointer;text-decoration:underline;" onclick="clearProspects()">Clear</button>
+      </div>
+
+      <!-- Progress bar (shown during send session) -->
+      <div id="prospectProgress" style="display:none;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--white-muted);margin-bottom:6px;">
+          <span>Sending progress</span>
+          <span id="progressLabel">0 / 0</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:20px;height:8px;overflow:hidden;">
+          <div id="progressBar" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:20px;width:0%;transition:width 0.4s;"></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--white-muted);">
+          After tapping <strong style="color:var(--gold-light)">Send</strong> in Messages, come back here and tap <strong style="color:var(--gold-light)">Next →</strong>
+        </div>
+      </div>
+
+      <!-- Prospect list -->
+      <div id="prospectsList" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;padding-right:2px;"></div>
+
+      <!-- Action buttons -->
+      <div id="prospectsActions">
+        <button class="send-all-btn" id="startBulkBtn" onclick="startBulkSms()">
+          📣 Preview &amp; Send Bulk SMS
+        </button>
+      </div>
+
+      <!-- Step-through controls (shown during session) -->
+      <div id="bulkStepControls" style="display:none;">
+        <div style="background:rgba(201,168,76,0.09);border:1px solid rgba(201,168,76,0.3);border-radius:11px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px;">Now sending to</div>
+          <div style="font-size:16px;font-weight:700;color:var(--white);" id="currentProspectName">—</div>
+          <div style="font-size:12px;color:var(--white-muted);margin-top:2px;" id="currentProspectPhone">—</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid rgba(201,168,76,0.4);color:var(--gold);flex:0 0 auto;padding:9px 14px;" onclick="skipProspect()">Skip</button>
+          <button class="reminder-sms-btn" id="sendNextBtn" onclick="sendNextProspect()" style="flex:1;">📱 Open Messages →</button>
+        </div>
+        <button style="width:100%;margin-top:10px;background:none;border:1px solid rgba(226,75,74,0.4);border-radius:8px;padding:9px;color:#ff8a89;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;cursor:pointer;" onclick="cancelBulkSms()">✕ Cancel Campaign</button>
+      </div>
+
+      <!-- Done state -->
+      <div id="bulkDoneMsg" style="display:none;text-align:center;padding:20px;background:rgba(29,185,84,0.08);border:1px solid rgba(29,185,84,0.3);border-radius:12px;">
+        <div style="font-size:28px;margin-bottom:8px;">🎉</div>
+        <div style="font-size:14px;font-weight:700;color:var(--success);margin-bottom:4px;">Campaign Complete!</div>
+        <div style="font-size:11px;color:var(--white-muted);" id="bulkDoneSummary">All messages sent.</div>
+        <button class="reminder-sms-btn" style="margin-top:14px;max-width:180px;" onclick="resetBulkCampaign()">Start New Campaign</button>
+      </div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+      💡 Edit your marketing message anytime under <strong style="color:var(--gold-light)">Settings → Marketing SMS Template</strong>.
+    </div>
+  </div>
+
+  <!-- ── PANEL: NEW FEATURES ── -->
+  <div class="drawer-panel" id="panel-newfeatures">
+    <div class="section-tag">Latest Update</div>
+    <div class="section-heading">What's New<br>in v2.0.4</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">📄</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Documents Centre</div>
+        <div class="nf-desc">A brand-new Documents section is now available in the Main Menu. Open, fill in, download, or share the Client Service Agreement via WhatsApp — all from within the app.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">🔍</div>
+      <div class="nf-content">
+        <div class="nf-title">Client Name Search</div>
+        <div class="nf-desc">Instantly find any client by name with the new search bar in the Clients tab. Results filter live as you type — no scrolling through long lists.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">💎</div>
+      <div class="nf-content">
+        <div class="nf-title">30-Day Glow Toggle</div>
+        <div class="nf-desc">Under Settings, you can now turn the teal blue glow indicator on or off for clients whose service is due within 30 days. Full control over your view.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">⭐</div>
+      <div class="nf-content">
+        <div class="nf-title">Editable Review Request Message</div>
+        <div class="nf-desc">Customise the Google review SMS sent to clients directly in Settings. The review link is always included automatically — clients get a clean "Click here to review us" link, never a raw URL.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">🔒</div>
+      <div class="nf-content">
+        <div class="nf-title">Secured Google Reviews Link</div>
+        <div class="nf-desc">The Google Reviews link is now hardcoded and hidden inside the app. It can't be viewed or accessed from the UI — and clients always receive a clean hyperlink with 5 stars pre-selected.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">👥</div>
+      <div class="nf-content">
+        <div class="nf-title">Clients &amp; Reminders — One Tab</div>
+        <div class="nf-desc">Clients and Service Reminders are combined under a single tab in the menu, with a smooth sub-tab switcher. Quicker to navigate, easier to use.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">📱</div>
+      <div class="nf-content">
+        <div class="nf-title">Remind Directly from Clients</div>
+        <div class="nf-desc">Tap the "Remind" button on any client card and your phone's native Messages app opens instantly with a pre-filled reminder — no copying, no hassle.</div>
+      </div>
+    </div>
+    <div class="new-feature-card">
+      <div class="nf-icon">📣</div>
+      <div class="nf-content">
+        <div class="nf-title">Bulk Prospect SMS</div>
+        <div class="nf-desc">Load your prospects from Google Sheets and send a personalised marketing SMS to every one of them — step by step, with a preview list and progress tracker.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: DOCUMENTS ── -->
+  <div class="drawer-panel" id="panel-documents">
+    <div class="section-tag">Pi Cleaning Services</div>
+    <div class="section-heading">Client Service<br>Agreement</div>
+
+    <!-- Action buttons row -->
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button onclick="downloadAgreementPDF()" style="flex:1;padding:10px 8px;background:var(--gold);border:none;border-radius:9px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        ⬇ Download PDF
+      </button>
+      <button onclick="shareViaWhatsApp()" style="flex:1;padding:10px 8px;background:#25D366;border:none;border-radius:9px;color:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.557 4.123 1.528 5.855L.057 23.428a.5.5 0 0 0 .611.611l5.57-1.47C7.878 23.443 9.875 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.95 0-3.8-.538-5.386-1.47l-.385-.228-3.987 1.052 1.052-3.987-.228-.385A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Share via WA
+      </button>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:10px 13px;margin-bottom:18px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7;">
+      ✏️ Fill in the fields below, then <strong style="color:var(--gold-light)">Download PDF</strong> or <strong style="color:#25D366;">Share via WhatsApp</strong> to send to your client.
+    </div>
+
+    <!-- ══ AGREEMENT FORM ══ -->
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:14px;padding:18px 16px;">
+
+      <!-- Client Details -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Client Details</div>
+
+      <div class="field-group">
+        <label class="field-label">Business Name</label>
+        <input class="field-input" id="agr_business" type="text" placeholder="e.g. ABC Pty Ltd" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">ABN</label>
+        <input class="field-input" id="agr_abn" type="text" placeholder="e.g. 12 345 678 901" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contact Name</label>
+        <input class="field-input" id="agr_contact" type="text" placeholder="Full name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Phone</label>
+        <input class="field-input" id="agr_phone" type="tel" placeholder="+61 4xx xxx xxx" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="agr_email" type="email" placeholder="client@example.com" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Billing Address</label>
+        <input class="field-input" id="agr_billing" type="text" placeholder="Street, Suburb, State, Postcode" />
+      </div>
+
+      <!-- Scope of Work -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Scope of Work</div>
+
+      <div class="field-group">
+        <label class="field-label">Service Type</label>
+        <input class="field-input" id="agr_service_type" type="text" placeholder="e.g. Commercial Office Clean" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Frequency</label>
+        <input class="field-input" id="agr_frequency" type="text" placeholder="e.g. Weekly / Fortnightly / Monthly" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Estimated Duration</label>
+        <input class="field-input" id="agr_duration" type="text" placeholder="e.g. 3 hours per visit" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Special Instructions</label>
+        <textarea class="field-input" id="agr_special" rows="3" placeholder="Any special requirements or notes…" style="resize:vertical;min-height:70px;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Extra Services</label>
+        <input class="field-input" id="agr_extra" type="text" placeholder="e.g. Window cleaning, carpet steam" />
+      </div>
+
+      <!-- Pricing -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Pricing &amp; Quote</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Agreed Rate (excl. GST)</label>
+          <input class="field-input" id="agr_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST Amount</label>
+          <input class="field-input" id="agr_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:10px;">
+        <label class="field-label">Total Agreed Amount</label>
+        <input class="field-input" id="agr_total" type="text" placeholder="$ 0.00" />
+      </div>
+
+      <!-- Additional Services -->
+      <div class="field-group">
+        <label class="field-label">Additional Service 1 — Type</label>
+        <input class="field-input" id="agr_add1_type" type="text" placeholder="Service type" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Rate</label>
+          <input class="field-input" id="agr_add1_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST</label>
+          <input class="field-input" id="agr_add1_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:10px;">
+        <label class="field-label">Additional Service 2 — Type</label>
+        <input class="field-input" id="agr_add2_type" type="text" placeholder="Service type" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Rate</label>
+          <input class="field-input" id="agr_add2_rate" type="text" placeholder="$ 0.00" />
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">GST</label>
+          <input class="field-input" id="agr_add2_gst" type="text" placeholder="$ 0.00" />
+        </div>
+      </div>
+
+      <!-- Signatures -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">Signatures &amp; Date</div>
+
+      <div class="field-group">
+        <label class="field-label">Client Name (Print)</label>
+        <input class="field-input" id="agr_client_name_sig" type="text" placeholder="Full legal name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input class="field-input" id="agr_date" type="date" />
+      </div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:10px 13px;margin-top:14px;font-size:10px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      ℹ️ Physical signatures are obtained on the printed copy. This form generates a pre-filled PDF ready for signing.
+    </div>
+  </div>
+
 </div>
 
 <!-- TOPBAR -->
@@ -826,8 +1556,6 @@
     </div>
   </div>
   <div class="topbar-right">
-    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">🗺 Live Map</button>
-    <button class="nav-tab" id="tab-home" onclick="showPage('home')">⚙ Tools</button>
     <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
       <div class="menu-icon"><span></span><span></span><span></span></div>
       Main Menu
@@ -837,7 +1565,7 @@
 </header>
 
 <!-- ════════ DASHBOARD PAGE ════════ -->
-<div class="page" id="page-dashboard" style="display:flex;flex-direction:column;">
+<div class="page" id="page-dashboard" style="display:none;flex-direction:column;">
   <div class="dashboard-layout">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -881,12 +1609,15 @@
         </div>
       </div>
       <div class="last-update" id="last-update">Last refresh: —</div>
+      <button class="map-home-btn" onclick="showPage('home')" title="Back to Home">
+        ⌂ Home
+      </button>
     </div>
   </div>
 </div>
 
 <!-- ════════ HOME / TOOLS PAGE ════════ -->
-<div class="page" id="page-home" style="display:none;">
+<div class="page" id="page-home" style="display:block;">
   <section class="hero-page active" style="min-height:auto;padding-top:80px;">
     <div class="hero-bg"></div>
     <div class="hero-ring" style="width:480px;height:480px;"></div>
@@ -905,8 +1636,8 @@
     <div class="cards-grid">
       <div class="card" onclick="showPage('dashboard')"><div class="card-icon">🗺</div><div class="card-title">Live Map</div><div class="card-desc">Track active employees, their locations, and current jobs in real time.</div></div>
       <div class="card" onclick="openDrawerTab('review')"><div class="card-icon">⭐</div><div class="card-title">Review Requests</div><div class="card-desc">Send Google review links instantly after every job is done.</div></div>
-      <div class="card" onclick="openDrawerTab('clients')"><div class="card-icon">👥</div><div class="card-title">Clients</div><div class="card-desc">View your full client database, due dates and service history.</div></div>
-      <div class="card" onclick="openDrawerTab('reminders')"><div class="card-icon">🔔</div><div class="card-title">Service Reminders</div><div class="card-desc">Send SMS reminders to clients whose 6-month service is coming up.</div></div>
+      <div class="card" onclick="openDrawerTab('clients-reminders')"><div class="card-icon">👥</div><div class="card-title">Clients</div><div class="card-desc">View your full client database, due dates and service history.</div></div>
+      <div class="card" onclick="openDrawerTab('clients-reminders')"><div class="card-icon">🔔</div><div class="card-title">Service Reminders</div><div class="card-desc">Send SMS reminders to clients whose 6-month service is coming up.</div></div>
     </div>
   </section>
   <footer class="footer">© 2026 <span>Pi Cleaning Services</span> · All Rights Reserved · Built with excellence</footer>
@@ -917,7 +1648,9 @@
 //  CONFIG
 // ══════════════════════════════════════════
 const ADMIN_KEY = 'pi_active_employees';
-const GOOGLE_URL = "https://www.google.com/search?q=Pi+Cleaning+Services+Reviews";
+// Google Reviews — hardcoded, never displayed raw to clients
+const GOOGLE_URL = "https://www.google.com/search?sca_esv=89d8bdbef1fc9dde&rlz=1C5CHFA_enAU1097AU1097&sxsrf=ANbL-n7oZwPIj4Wx24OH6633iHS4z81ZKg:1779858490119&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOY6sGp_LHEBW2tQ7sAB4-48YuyKNI3t4zW0gr0qNMmGY2J5F929s-KfHVPFnJuNt1eEfIyiN2bUom5wNFsNtjwUIGH10zq5enhRFP3CDPld3ZZ5xrw%3D%3D&q=Pi+Cleaning+Services+Reviews&sa=X&ved=2ahUKEwi_hLfI2diUAxUSXmwGHVovN_wQ0bkNegQIPhAH&biw=1920&bih=1080&dpr=1";
+const REVIEW_LINK_TEXT = "Click here to review us ⭐";
 const FROM_EMAIL = "Admin@picleaningservices.com.au";
 const GS_URL_KEY = 'pi_gs_webapp_url';
 const GS_HARDCODED_URL = 'https://script.google.com/macros/s/AKfycbyHN01kkbbxKJFyPzTlKPlG2iNO5bp9m9NvZ000n2_-cHttqmKG_rYDJsK824A3skEE/exec';
@@ -928,9 +1661,8 @@ const CLIENTS_CACHE_KEY = 'pi_clients_cache';
 // ══════════════════════════════════════════
 function showPage(page) {
   document.getElementById('page-dashboard').style.display = page === 'dashboard' ? 'flex' : 'none';
-  document.getElementById('page-home').style.display = page === 'home' ? 'block' : 'none';
-  document.getElementById('tab-dashboard').classList.toggle('active', page === 'dashboard');
-  document.getElementById('tab-home').classList.toggle('active', page === 'home');
+  const homeEl = document.getElementById('page-home');
+  if (homeEl) homeEl.style.display = page === 'home' ? 'block' : 'none';
   if (page === 'dashboard') setTimeout(() => { if (map) map.invalidateSize(); }, 100);
 }
 
@@ -939,32 +1671,205 @@ function showPage(page) {
 // ══════════════════════════════════════════
 let currentDrawerTab = 'review';
 
+function openLiveMap() {
+  closeDrawer();
+  showPage('dashboard');
+  if (!mapInitialised) { initMap(); mapInitialised = true; refreshDashboard(); }
+  setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+}
+
 function toggleDrawer() {
-  // Always open the drawer when hamburger is clicked
-  ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.add('open'));
+  showDrawerMenu();
+  ['drawer','hamburger'].forEach(id => document.getElementById(id).classList.add('open'));
+  document.getElementById('drawer-backdrop').style.display = 'block';
 }
 function closeDrawer() {
   ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.remove('open'));
+  document.getElementById('drawer-backdrop').style.display = 'none';
+  setTimeout(() => { if (map) map.invalidateSize(); }, 100);
 }
 function openDrawerTab(tab) {
   switchDrawerTab(tab);
   document.getElementById('drawer').classList.add('open');
-  document.getElementById('overlay').classList.add('open');
   document.getElementById('hamburger').classList.add('open');
+  document.getElementById('drawer-backdrop').style.display = 'block';
+}
+
+// Settings: Date Format
+const DATE_FORMAT_KEY = 'pi_date_format';
+const REMINDER_TEXT_KEY = 'pi_reminder_text';
+
+function getDateFormat() {
+  return localStorage.getItem(DATE_FORMAT_KEY) || 'DD/MM/YY';
+}
+
+function setDateFormat(fmt, btn) {
+  localStorage.setItem(DATE_FORMAT_KEY, fmt);
+  // Uncheck all, check selected
+  ['DDMMYY','DDMMYYYY','MMDDYY','YYYYMMDD'].forEach(k => {
+    const el = document.getElementById('dfcheck-' + k);
+    if (el) el.textContent = '';
+  });
+  const keyMap = {'DD/MM/YY':'DDMMYY','DD/MM/YYYY':'DDMMYYYY','MM/DD/YY':'MMDDYY','YYYY-MM-DD':'YYYYMMDD'};
+  const checkEl = document.getElementById('dfcheck-' + (keyMap[fmt]||'DDMMYY'));
+  if (checkEl) checkEl.textContent = '✓';
+  // Toggle active class on option buttons
+  document.querySelectorAll('.settings-option').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const saved = document.getElementById('dateFormatSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+  // Re-render clients if loaded
+  if (allClients.length > 0) renderClients();
+}
+
+function loadSettingsUI() {
+  const fmt = getDateFormat();
+  const keyMap = {'DD/MM/YY':'DDMMYY','DD/MM/YYYY':'DDMMYYYY','MM/DD/YY':'MMDDYY','YYYY-MM-DD':'YYYYMMDD'};
+  ['DDMMYY','DDMMYYYY','MMDDYY','YYYYMMDD'].forEach(k => {
+    const el = document.getElementById('dfcheck-' + k);
+    if (el) el.textContent = '';
+  });
+  const checkKey = keyMap[fmt] || 'DDMMYY';
+  const el = document.getElementById('dfcheck-' + checkKey);
+  if (el) el.textContent = '✓';
+  // Reminder template
+  const ta = document.getElementById('customReminderText');
+  if (ta) ta.value = getSavedReminderTemplate();
+  // Marketing template
+  const mta = document.getElementById('marketingSmsText');
+  if (mta) mta.value = getSavedMarketingTemplate();
+  // Review template
+  const rta = document.getElementById('reviewTemplateText');
+  if (rta) rta.value = getSavedReviewTemplate('{name}');
+  // Due-30 glow toggle
+  const glow = localStorage.getItem('pi_due30_glow') !== 'off';
+  const tog = document.getElementById('due30GlowToggle');
+  if (tog) tog.checked = glow;
+}
+
+// ── CLIENT SEARCH ──
+function clearClientSearch() {
+  const inp = document.getElementById('clientSearchInput');
+  if (inp) inp.value = '';
+  const clr = document.getElementById('clientSearchClear');
+  if (clr) clr.style.display = 'none';
+  renderClients();
+}
+
+// ── DUE-30 GLOW TOGGLE ──
+const DUE30_GLOW_KEY = 'pi_due30_glow';
+function toggleDue30Glow() {
+  // Read from checkbox (may be called from label click or checkbox change)
+  const tog = document.getElementById('due30GlowToggle');
+  if (!tog) return;
+  const on = tog.checked;
+  localStorage.setItem(DUE30_GLOW_KEY, on ? 'on' : 'off');
+  const saved = document.getElementById('due30GlowSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
+  if (allClients.length > 0) renderClients();
+}
+function isDue30GlowOn() {
+  return localStorage.getItem(DUE30_GLOW_KEY) !== 'off';
+}
+
+// ── REVIEW TEMPLATE ──
+const REVIEW_TEMPLATE_KEY = 'pi_review_template';
+function getDefaultReviewTemplate() {
+  return 'Hi {name},\n\nThank you for choosing Pi Cleaning Services! We\'d love to hear about your experience.\n\nClick here to review us ⭐\n\nWarm regards,\nThe Pi Cleaning Services Team';
+}
+function getSavedReviewTemplate(name) {
+  const saved = localStorage.getItem(REVIEW_TEMPLATE_KEY);
+  const tpl = (saved && saved.trim()) ? saved.trim() : getDefaultReviewTemplate();
+  return tpl.replace(/{name}/g, name || '');
+}
+function saveReviewTemplate() {
+  const ta = document.getElementById('reviewTemplateText');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (text) { localStorage.setItem(REVIEW_TEMPLATE_KEY, text); }
+  else { localStorage.removeItem(REVIEW_TEMPLATE_KEY); }
+  const saved = document.getElementById('reviewTemplateSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+function resetReviewTemplate() {
+  const ta = document.getElementById('reviewTemplateText');
+  if (ta) ta.value = getDefaultReviewTemplate();
+  localStorage.removeItem(REVIEW_TEMPLATE_KEY);
+  const saved = document.getElementById('reviewTemplateSaved');
+  if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Review text saved!'; }, 2500); }
+}
+
+function getDefaultReminderTemplate() {
+  return 'Hi {name},\nThis is Pi Cleaning Services. Your scheduled service is coming up soon.\nPlease give us a call or reply to book in your next clean!\nWarm regards,\nThe Pi Cleaning Services Team';
+}
+
+function saveReminderText() {
+  const ta = document.getElementById('customReminderText');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (text) {
+    localStorage.setItem(REMINDER_TEXT_KEY, text);
+  } else {
+    // If blank, remove so the default kicks in
+    localStorage.removeItem(REMINDER_TEXT_KEY);
+  }
+  const saved = document.getElementById('reminderTextSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+
+function resetReminderText() {
+  const ta = document.getElementById('customReminderText');
+  if (ta) ta.value = getDefaultReminderTemplate();
+  localStorage.removeItem(REMINDER_TEXT_KEY);
+  const saved = document.getElementById('reminderTextSaved');
+  if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Reminder text saved!'; }, 2500); }
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  // Update tab buttons
-  ['review','clients','reminders','jobs'].forEach(t => {
-    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents'];
+  allPanelIds.forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.classList.toggle('active', t === tab);
   });
-  // Update drawer title
-  const titles = { review: '⭐ Request a Review', clients: '👥 Client Database', reminders: '🔔 Service Reminders', jobs: '📋 Jobs for the Day' };
-  document.getElementById('drawer-title').textContent = titles[tab] || 'Menu';
-  // Load data for reminders and jobs tabs
-  if (tab === 'reminders') renderReminders();
+  const titles = {
+    review: '⭐ Request a Review',
+    'clients-reminders': '👥 Clients & Reminders',
+    jobs: '📋 Jobs for the Day',
+    settings: '⚙️ Settings',
+    newfeatures: '🚀 New Features',
+    prospects: '📣 Prospects',
+    documents: '📄 Documents'
+  };
+  document.getElementById('drawer-title').textContent = titles[tab] || 'Main Menu';
+  // Show back button when in a section
+  const backBtn = document.getElementById('drawerBackBtn');
+  if (backBtn) backBtn.style.display = tab === 'menu' ? 'none' : 'inline-flex';
+  if (tab === 'clients-reminders') { renderClients(); renderReminders(); }
   if (tab === 'jobs') refreshJobs();
+  if (tab === 'settings') loadSettingsUI();
+  if (tab === 'prospects') loadProspectsUrlUI();
+}
+
+function showDrawerMenu() {
+  currentDrawerTab = 'menu';
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents'];
+  allPanelIds.forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.classList.toggle('active', t === 'menu');
+  });
+  document.getElementById('drawer-title').textContent = 'Main Menu';
+  const backBtn = document.getElementById('drawerBackBtn');
+  if (backBtn) backBtn.style.display = 'none';
+}
+
+function switchCRTab(sub) {
+  ['clients','reminders'].forEach(t => {
+    const tab = document.getElementById('cr-tab-' + t);
+    const panel = document.getElementById('cr-panel-' + t);
+    if (tab) tab.classList.toggle('active', t === sub);
+    if (panel) panel.classList.toggle('active', t === sub);
+  });
+  if (sub === 'reminders') renderReminders();
 }
 
 // ══════════════════════════════════════════
@@ -1004,7 +1909,7 @@ async function refreshClients() {
     const resp = await fetch(url + '?action=getClients');
     const data = await resp.json();
     if (data.clients) {
-      allClients = data.clients;
+      allClients = data.clients.map(normaliseDates);
       localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify(allClients));
       renderClients();
       updateDueBadge();
@@ -1089,36 +1994,67 @@ function openMaps(address) {
 }
 
 function showGsToast(msg, type) {
-  const t = document.getElementById('toast');
+  // Use gsToast if available, otherwise fall back to toast
+  const t = document.getElementById('gsToast') || document.getElementById('toast');
+  if (!t) return;
   t.innerHTML = msg; t.className = `toast show ${type}`;
   setTimeout(() => t.classList.remove('show'), 5000);
 }
 
 function daysUntil(dateStr) {
   if (!dateStr) return null;
-  const target = new Date(dateStr);
+  const target = parseDateAU(dateStr);
+  if (!target || isNaN(target.getTime())) return null;
+  // Use local midnight so Melbourne's UTC+10/11 never shifts the day
   const now = new Date();
-  now.setHours(0,0,0,0);
-  target.setHours(0,0,0,0);
-  return Math.ceil((target - now) / 86400000);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  target.setHours(0, 0, 0, 0);
+  return Math.ceil((target - todayMidnight) / 86400000);
 }
 
 function clientStatus(client) {
   const days = daysUntil(client.nextService);
-  if (days === null) return 'ok';
-  if (days <= 0) return 'urgent';     // overdue or today
-  if (days <= 14) return 'soon';      // due within 14 days
+
+  // Overdue / due very soon take highest priority
+  if (days !== null && days <= 0)  return 'urgent';   // overdue or today
+  if (days !== null && days <= 14) return 'soon';     // due within 14 days
+
+  // Service done within the last 7 days → green glow
+  if (client.serviceDone) {
+    const doneDate = parseDateAU(String(client.serviceDone).trim());
+    if (doneDate) {
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      doneDate.setHours(0, 0, 0, 0);
+      const daysSince = Math.floor((todayMidnight - doneDate) / 86400000);
+      if (daysSince >= 0 && daysSince <= 7) return 'done';
+    }
+  }
+
+  // Due within 30 days → tiffany blue glow
+  if (days !== null && days <= 30) return 'due30';
+
   return 'ok';
 }
 
 function renderClients() {
   const list = document.getElementById('clientsList');
+  const searchEl = document.getElementById('clientSearchInput');
+  const clearEl  = document.getElementById('clientSearchClear');
+  const searchQ  = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  // Show/hide clear button
+  if (clearEl) clearEl.style.display = searchQ ? 'block' : 'none';
+
   let filtered = allClients;
   if (clientFilter !== 'all') {
     filtered = allClients.filter(c => clientStatus(c) === clientFilter);
   }
+  // Apply name search
+  if (searchQ) {
+    filtered = filtered.filter(c => (c.name || '').toLowerCase().includes(searchQ));
+  }
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">${clientFilter === 'urgent' ? '🟢' : '👥'}</div><div>${clientFilter === 'urgent' ? 'No overdue clients — great!' : clientFilter === 'soon' ? 'No clients due in the next 14 days.' : 'No clients found.'}</div></div>`;
+    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">${searchQ ? '🔍' : clientFilter === 'urgent' ? '🟢' : '👥'}</div><div>${searchQ ? `No clients found for "<strong>${searchQ}</strong>"` : clientFilter === 'urgent' ? 'No overdue clients — great!' : clientFilter === 'soon' ? 'No clients due in the next 14 days.' : 'No clients found.'}</div></div>`;
     return;
   }
   // Sort: urgent first, soon next, ok last
@@ -1126,21 +2062,41 @@ function renderClients() {
     const order = { urgent:0, soon:1, ok:2 };
     return (order[clientStatus(a)]||2) - (order[clientStatus(b)]||2);
   });
+  const glowOn = isDue30GlowOn();
   list.innerHTML = filtered.map((c, i) => {
     const status = clientStatus(c);
     const days = daysUntil(c.nextService);
     const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const avatarCls = status === 'urgent' ? 'urgent' : status === 'soon' ? 'soon' : '';
-    const cardCls = status === 'urgent' ? 'due-urgent' : status === 'soon' ? 'due-soon' : '';
+
+    // Avatar colour class — suppress due30 if glow is off
+    const avatarCls = status === 'urgent' ? 'urgent'
+                    : status === 'soon'   ? 'soon'
+                    : (status === 'due30' && glowOn) ? 'due30'
+                    : status === 'done'   ? 'done'
+                    : '';
+
+    // Card border/glow class — suppress due30 if glow is off
+    const cardCls = status === 'urgent' ? 'due-urgent'
+                  : status === 'soon'   ? 'due-soon'
+                  : (status === 'due30' && glowOn) ? 'due-30'
+                  : status === 'done'   ? 'service-done'
+                  : '';
+
+    // Day label badge
     let dayLabel = '';
-    if (days !== null) {
-      if (days < 0) dayLabel = `<span class="due-badge urgent">Overdue ${Math.abs(days)}d</span>`;
+    if (status === 'done') {
+      dayLabel = `<span class="due-badge done">✔ Done</span>`;
+    } else if (days !== null) {
+      if (days < 0)       dayLabel = `<span class="due-badge urgent">Overdue ${Math.abs(days)}d</span>`;
       else if (days === 0) dayLabel = `<span class="due-badge urgent">Due Today</span>`;
       else if (days <= 14) dayLabel = `<span class="due-badge soon">Due in ${days}d</span>`;
-      else dayLabel = `<span class="due-badge ok">Due in ${days}d</span>`;
+      else if (days <= 30) dayLabel = `<span class="due-badge due30">Due in ${days}d</span>`;
+      else                dayLabel = `<span class="due-badge ok">Due in ${days}d</span>`;
     }
+    // Use the real allClients index for action buttons
+    const realIdx = allClients.indexOf(c);
     return `
-    <div class="client-card ${cardCls}" id="cc-${i}">
+    <div class="client-card ${cardCls}" id="cc-${realIdx}">
       <div class="client-card-top">
         <div class="client-avatar ${avatarCls}">${initials}</div>
         <div class="client-info">
@@ -1148,20 +2104,20 @@ function renderClients() {
           <div class="client-address">📍 ${c.address||'No address'}</div>
           <div class="client-meta">
             <div class="client-meta-item">📞 <span>${c.phone||'—'}</span></div>
-            <div class="client-meta-item">🗓 Next: <span>${c.nextService||'—'}</span></div>
+            <div class="client-meta-item">🗓 Next: <span>${formatDateDDMMYY(c.nextService)||'—'}</span></div>
           </div>
         </div>
       </div>
-      <div class="client-expanded" id="cex-${i}">
+      <div class="client-expanded" id="cex-${realIdx}">
         <div class="client-detail-row"><span class="client-detail-key">Email</span><span class="client-detail-val">${c.email||'—'}</span></div>
-        <div class="client-detail-row"><span class="client-detail-key">Last Service</span><span class="client-detail-val">${c.lastService||'—'}</span></div>
+        <div class="client-detail-row"><span class="client-detail-key">Last Service</span><span class="client-detail-val">${formatDateDDMMYY(c.lastService)||'—'}</span></div>
         <div class="client-detail-row"><span class="client-detail-key">Service Done</span><span class="client-detail-val">${c.serviceDone||'—'}</span></div>
         <div class="client-detail-row"><span class="client-detail-key">Notes</span><span class="client-detail-val">${c.notes||'—'}</span></div>
       </div>
       <div class="client-actions">
-        <button class="client-action-btn" onclick="toggleClientExpand(${i})">ℹ Details</button>
+        <button class="client-action-btn" onclick="toggleClientExpand(${realIdx})">ℹ Details</button>
         ${c.phone ? `<button class="client-action-btn" onclick="smsClient('${c.name}','${c.phone}')">📱 SMS</button>` : ''}
-        ${(status==='urgent'||status==='soon') ? `<button class="client-action-btn danger" onclick="quickReminder(${i})">🔔 Remind</button>` : ''}
+        ${(status==='urgent'||status==='soon') ? `<button class="client-action-btn danger" onclick="quickReminder(${realIdx})">🔔 Remind</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1186,16 +2142,25 @@ function smsClient(name, phone) {
 }
 
 function quickReminder(i) {
-  switchDrawerTab('reminders');
-  // Scroll to client in reminders after tab switch
-  setTimeout(() => {
-    const el = document.getElementById('rm-' + i);
-    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-  }, 200);
+  const client = allClients[i];
+  if (!client || !client.phone) {
+    switchDrawerTab('clients-reminders');
+    switchCRTab('reminders');
+    return;
+  }
+  const days = daysUntil(client.nextService);
+  // Always read the saved template fresh — getSavedReminderTemplate() goes straight to localStorage
+  const msg = buildReminderMsg(client, days !== null ? days : 0);
+  const body = encodeURIComponent(msg);
+  const phone = client.phone.replace(/\s/g, '');
+  window.location.href = `sms:${phone}?body=${body}`;
 }
 
 function updateDueBadge() {
-  const urgent = allClients.filter(c => clientStatus(c) !== 'ok').length;
+  const urgent = allClients.filter(c => {
+    const s = clientStatus(c);
+    return s === 'urgent' || s === 'soon' || s === 'due30';
+  }).length;
   const badge = document.getElementById('hbgBadge');
   if (urgent > 0) {
     badge.textContent = urgent > 9 ? '9+' : urgent;
@@ -1266,7 +2231,7 @@ function renderReminders() {
       </div>
       <div class="reminder-detail">
         📍 ${c.address||'No address'}<br>
-        🗓 Next service: ${c.nextService||'—'} · 📞 ${c.phone||'No phone'}
+        🗓 Next service: ${formatDateDDMMYY(c.nextService)||'—'} · 📞 ${c.phone||'No phone'}
       </div>
       <textarea class="reminder-msg-area" id="rmsg-${i}">${defaultMsg}</textarea>
       <div class="reminder-send-row">
@@ -1277,34 +2242,145 @@ function renderReminders() {
   }).join('');
 }
 
-function formatDateDDMMYY(dateStr) {
-  if (!dateStr) return '';
-  // Try to parse common date formats and output DD/MM/YY
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr; // fallback to raw if unparseable
-  const day = String(d.getDate()).padStart(2,'0');
-  const month = String(d.getMonth()+1).padStart(2,'0');
-  const year = String(d.getFullYear()).slice(-2);
-  return `${day}/${month}/${year}`;
+// ══════════════════════════════════════════════════════════════
+//  AUSTRALIAN DATE HANDLING — DD/MM/YYYY strictly throughout
+//  ▸ Apps Script sends dates as "DD/MM/YYYY" strings
+//  ▸ Internal storage: "DD/MM/YYYY" (4-digit year, no ambiguity)
+//  ▸ Display format:   "DD/MM/YY"  (2-digit year for compact UI)
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Parse any date value → Date object, always treating first number as DAY.
+ * Handles:
+ *   DD/MM/YYYY · DD/MM/YY   ← Australian (primary)
+ *   DD-MM-YYYY · DD-MM-YY   ← Australian with dashes
+ *   YYYY-MM-DD              ← ISO date (fallback for old cached data)
+ *   YYYY-MM-DDTHH:mm:ss...  ← ISO datetime (in case JSON ever sends Date objects)
+ */
+function parseDateAU(str) {
+  if (!str) return null;
+  str = String(str).trim();
+  if (!str || str === '—') return null;
+
+  let m;
+
+  // PRIMARY — DD/MM/YYYY or DD/MM/YY  (what Apps Script now always sends)
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) {
+    let dd = parseInt(m[1], 10);
+    let mm = parseInt(m[2], 10);
+    let yyyy = parseInt(m[3], 10);
+    if (yyyy < 100) yyyy += 2000;
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) {
+      const d = new Date(yyyy, mm - 1, dd);
+      // Reject if JS auto-rolled the date (e.g. 31/02 → 03/03)
+      if (d.getMonth() === mm - 1) return d;
+    }
+    return null;
+  }
+
+  // DD-MM-YYYY or DD-MM-YY
+  m = str.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+  if (m) {
+    let dd = parseInt(m[1], 10);
+    let mm = parseInt(m[2], 10);
+    let yyyy = parseInt(m[3], 10);
+    if (yyyy < 100) yyyy += 2000;
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) {
+      const d = new Date(yyyy, mm - 1, dd);
+      if (d.getMonth() === mm - 1) return d;
+    }
+    return null;
+  }
+
+  // ISO datetime string — e.g. "2026-05-06T00:00:00.000Z"
+  // Extract the date portion only, interpret in LOCAL time (not UTC)
+  // so Melbourne never gets shifted to the wrong day
+  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    const d = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
+/**
+ * Format a date string → "DD/MM/YY" for compact UI display.
+ */
+function formatDateDDMMYY(str) {
+  if (!str || str === '—') return '—';
+  const d = parseDateAU(str);
+  if (!d || isNaN(d.getTime())) return String(str).trim();
+  const fmt = (typeof getDateFormat === 'function') ? getDateFormat() : 'DD/MM/YY';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(d.getFullYear());
+  const yy = yyyy.slice(-2);
+  if (fmt === 'DD/MM/YYYY') return `${dd}/${mm}/${yyyy}`;
+  if (fmt === 'MM/DD/YY')   return `${mm}/${dd}/${yy}`;
+  if (fmt === 'YYYY-MM-DD') return `${yyyy}-${mm}-${dd}`;
+  return `${dd}/${mm}/${yy}`; // default DD/MM/YY
+}
+
+// Alias kept for backward compat
+function parseDDMMYY(str) { return parseDateAU(str); }
+
+/**
+ * Normalise all date fields on a client record to "DD/MM/YYYY" (4-digit year).
+ * Called immediately when data arrives from the API — so every downstream
+ * function always works with one consistent unambiguous format.
+ */
+function normaliseDates(client) {
+  ['nextService', 'lastService', 'serviceDone'].forEach(field => {
+    if (client[field]) {
+      const d = parseDateAU(String(client[field]).trim());
+      if (d && !isNaN(d.getTime())) {
+        // Store as DD/MM/YYYY — 4-digit year = zero ambiguity
+        client[field] = String(d.getDate()).padStart(2, '0') + '/' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                        d.getFullYear();
+      }
+    }
+  });
+  return client;
+}
+
+function getSavedReminderTemplate() {
+  // Always read fresh from localStorage — never cache in memory
+  const saved = localStorage.getItem('pi_reminder_text');
+  return (saved && saved.trim()) ? saved.trim() : getDefaultReminderTemplate();
 }
 
 function buildReminderMsg(client, days) {
-  const first = (client.name||'').split(' ')[0] || 'there';
-  let timeStr = '';
-  if (days < 0) timeStr = 'is now overdue';
-  else if (days === 0) timeStr = 'is due today';
-  else timeStr = `is coming up in ${days} days`;
-  return `Hi ${first},\n\nThis is Pi Cleaning Services. Your scheduled service ${timeStr}.\n\nPlease give us a call or reply to book in your next clean!\n\nWarm regards,\nThe Pi Cleaning Services Team`;
+  const first = (client.name || '').split(' ')[0] || 'there';
+  const absDays = Math.abs(days !== null ? days : 0);
+  const tpl = getSavedReminderTemplate();
+  // Replace {name} and {days} placeholders
+  return tpl.replace(/{name}/g, first).replace(/{days}/g, absDays);
 }
 
 function sendReminderSms(i, phone) {
-  const msg = document.getElementById('rmsg-' + i).value;
+  // Always re-build from the saved template at send time so edits in Settings are reflected immediately
+  const client = allClients[i];
+  let msg;
+  if (client) {
+    const days = daysUntil(client.nextService);
+    msg = buildReminderMsg(client, days !== null ? days : 0);
+    // Also refresh the textarea so the user sees what was actually sent
+    const ta = document.getElementById('rmsg-' + i);
+    if (ta) ta.value = msg;
+  } else {
+    // Fallback: use whatever is in the textarea
+    const ta = document.getElementById('rmsg-' + i);
+    msg = ta ? ta.value : '';
+  }
+  if (!msg) return;
   const body = encodeURIComponent(msg);
-  const p = phone.replace(/\s/g,'');
+  const p = phone.replace(/\s/g, '');
   window.location.href = `sms:${p}?body=${body}`;
-  // Mark as sent
   const badge = document.getElementById('rsent-' + i);
-  badge.classList.add('show');
+  if (badge) badge.classList.add('show');
 }
 
 function showScriptHelp() {
@@ -1316,6 +2392,7 @@ function showScriptHelp() {
 // ══════════════════════════════════════════
 let map, markers = {};
 let selectedEmpId = null;
+let mapInitialised = false;
 
 function initMap() {
   map = L.map('map', { center: [-37.8136, 144.9631], zoom: 11, zoomControl: true });
@@ -1438,7 +2515,7 @@ function loadEmployees() {
 function refreshDashboard() {
   const employees = loadEmployees();
   renderSidebar(employees);
-  updateMapMarkers(employees);
+  if (mapInitialised) updateMapMarkers(employees);
   const now = new Date();
   document.getElementById('last-update').textContent = `Last refresh: ${now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
   if (selectedEmpId && employees[selectedEmpId]) showEmpDetail(selectedEmpId);
@@ -1505,7 +2582,8 @@ function showConfirm() {
   if (!isReady()) return;
   const first = name.split(' ')[0];
   const toLine = `SMS to: ${contact}`;
-  document.getElementById('confirmPreview').innerHTML = `<div class="to-line">${toLine}</div>Hi ${first},<br><br>Thank you for choosing <strong style="color:var(--gold-light)">Pi Cleaning Services</strong>! We'd love to hear about your experience.<br><br><a class="plink" href="${GOOGLE_URL}" target="_blank">Click here to review us ⭐</a>`;
+  const tpl = getSavedReviewTemplate(first);
+  document.getElementById('confirmPreview').innerHTML = `<div class="to-line">${toLine}</div>${tpl.replace(/\n/g,'<br>').replace(/(Click here to review us ⭐|Click the link below to review us ⭐?)/g, `<a class="plink" href="${GOOGLE_URL}" target="_blank">$1</a>`)}`;
   document.getElementById('confirmPrompt').classList.add('show');
   document.getElementById('sendBtn').classList.remove('show');
   amendMode = false;
@@ -1520,21 +2598,16 @@ async function doSend() {
   const {name, contact} = getValues();
   const btn = document.getElementById('btnSendNow');
   if (contactMode === 'sms') {
-    const body = encodeURIComponent(`Hi ${name.split(' ')[0]},\n\nThank you for choosing Pi Cleaning Services! We'd love to hear about your experience:\n\n${GOOGLE_URL}\n\nWarm regards,\nThe Pi Cleaning Services Team`);
+    const first = name.split(' ')[0];
+    // Build message from saved template, replace link placeholder with actual URL
+    const tpl = getSavedReviewTemplate(first);
+    // In the SMS body, replace the link text with the actual URL so the phone renders it as a tappable link
+    const smsBody = tpl.replace(/(Click here to review us ⭐|Click the link below to review us ⭐?)/g, GOOGLE_URL);
+    const body = encodeURIComponent(smsBody);
     const phone = contact.replace(/\s/g,'');
     window.location.href = `sms:${phone}?body=${body}`;
     showToast('success', `📱 Opening Messages app for <strong>${name}</strong>!`);
     resetAfterSend(); return;
-  }
-  if (!ejsCreds.publicKey || !ejsCreds.serviceId || !ejsCreds.templateId) { showToast('error', '⚠️ Please fill in your EmailJS credentials first.'); return; }
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    await emailjs.send(ejsCreds.serviceId, ejsCreds.templateId, { to_name: name, to_email: contact, from_name: 'Pi Cleaning Services', from_email: FROM_EMAIL, review_url: GOOGLE_URL, message: `Hi ${name.split(' ')[0]}, thank you for choosing Pi Cleaning Services! Leave us a review: ${GOOGLE_URL}` });
-    showToast('success', `✅ Email sent to <strong>${name}</strong>!`);
-    resetAfterSend();
-  } catch(err) {
-    showToast('error', `❌ Failed: ${err.text || err.message}`);
-    btn.disabled = false; btn.textContent = '⭐ Send Now';
   }
 }
 function resetAfterSend() {
@@ -1568,18 +2641,547 @@ function dismissSplash() {
 setTimeout(dismissSplash, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
-  initMap();
+  // Map is only initialised when the user opens the Live Map from the menu
   refreshDashboard();
   // Hardcoded URL — always connected, show indicator immediately
   localStorage.setItem(GS_URL_KEY, GS_HARDCODED_URL);
-  document.getElementById('gsWebAppUrl').value = GS_HARDCODED_URL;
+  const gsInput = document.getElementById('gsWebAppUrl');
+  if (gsInput) gsInput.value = GS_HARDCODED_URL;
   showGsConnected();
+  // Seed the default reminder template if the user hasn't saved a custom one yet
+  if (!localStorage.getItem(REMINDER_TEXT_KEY)) {
+    localStorage.setItem(REMINDER_TEXT_KEY, getDefaultReminderTemplate());
+  }
+  // Seed review template default
+  if (!localStorage.getItem('pi_review_template')) {
+    localStorage.setItem('pi_review_template', getDefaultReviewTemplate());
+  }
+  // Seed glow toggle default (on)
+  if (!localStorage.getItem('pi_due30_glow')) {
+    localStorage.setItem('pi_due30_glow', 'on');
+  }
   // Load cached clients
   const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
   if (cached) {
-    try { allClients = JSON.parse(cached); renderClients(); updateDueBadge(); } catch(e) {}
+    try { allClients = JSON.parse(cached).map(normaliseDates); renderClients(); updateDueBadge(); } catch(e) {}
   }
+  // Init settings UI date format check marks
+  loadSettingsUI();
+  // Marketing template seeded after DOM ready — function defined below via hoisting-safe approach
+  setTimeout(() => {
+    if (!localStorage.getItem(MARKETING_TEXT_KEY || 'pi_marketing_text')) {
+      if (typeof getDefaultMarketingTemplate === 'function') {
+        localStorage.setItem('pi_marketing_text', getDefaultMarketingTemplate());
+      }
+    }
+  }, 0);
 });
+
+// ══════════════════════════════════════════
+//  MARKETING SMS TEMPLATE
+// ══════════════════════════════════════════
+const MARKETING_TEXT_KEY = 'pi_marketing_text';
+const PROSPECTS_URL_KEY  = 'pi_prospects_url';
+
+function getDefaultMarketingTemplate() {
+  return 'Hi {name},\nThis is Pi Cleaning Services. We\'d love to give your home the Pi treatment!\nWe\'re currently offering new clients a complimentary quote — no obligation.\nGive us a call or reply to this message to find out more.\nWarm regards,\nThe Pi Cleaning Services Team';
+}
+
+function getSavedMarketingTemplate() {
+  const saved = localStorage.getItem(MARKETING_TEXT_KEY);
+  return (saved && saved.trim()) ? saved.trim() : getDefaultMarketingTemplate();
+}
+
+function saveMarketingText() {
+  const ta = document.getElementById('marketingSmsText');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (text) { localStorage.setItem(MARKETING_TEXT_KEY, text); }
+  else { localStorage.removeItem(MARKETING_TEXT_KEY); }
+  const saved = document.getElementById('marketingTextSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+
+function resetMarketingText() {
+  const ta = document.getElementById('marketingSmsText');
+  if (ta) ta.value = getDefaultMarketingTemplate();
+  localStorage.removeItem(MARKETING_TEXT_KEY);
+  const saved = document.getElementById('marketingTextSaved');
+  if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Marketing text saved!'; }, 2500); }
+}
+
+function buildMarketingMsg(name) {
+  const first = (name || '').split(' ')[0] || 'there';
+  return getSavedMarketingTemplate().replace(/{name}/g, first);
+}
+
+// ══════════════════════════════════════════
+//  PROSPECTS PANEL
+// ══════════════════════════════════════════
+let prospectsList = [];      // [{name, phone, status: 'pending'|'sent'|'skipped'}]
+let bulkIndex = 0;           // current position in step-through
+let bulkActive = false;
+
+function saveProspectsUrl() {
+  const inp = document.getElementById('prospectsSheetUrl');
+  if (!inp || !inp.value.trim()) return;
+  localStorage.setItem(PROSPECTS_URL_KEY, inp.value.trim());
+  const saved = document.getElementById('prospectsUrlSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+
+function loadProspectsUrlUI() {
+  const saved = localStorage.getItem(PROSPECTS_URL_KEY);
+  const inp = document.getElementById('prospectsSheetUrl');
+  if (inp && saved) inp.value = saved;
+}
+
+async function loadProspects() {
+  const url = (document.getElementById('prospectsSheetUrl').value || '').trim()
+           || localStorage.getItem(PROSPECTS_URL_KEY) || '';
+  const statusEl = document.getElementById('prospectsStatus');
+  const loadBtn  = document.getElementById('prospectsLoadBtn');
+  const iconEl   = document.getElementById('prospectsLoadIcon');
+
+  if (!url) {
+    showProspectsError('Please enter your Prospects Google Sheet CSV URL above and tap "Save & Connect" first.');
+    return;
+  }
+
+  // Loading state
+  loadBtn.disabled = true;
+  iconEl.textContent = '⏳';
+  statusEl.style.display = 'none';
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Server returned HTTP ${res.status}. Check your URL is correct.`);
+    const text = await res.text();
+    // Detect if the response looks like HTML (wrong URL type)
+    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+      throw new Error('The URL returned a webpage, not CSV data. Make sure you published as "Comma-separated values (.csv)" — not as a webpage.');
+    }
+    const parsed = parseProspectsCSV(text);
+    if (!parsed.length) throw new Error('No data rows found. Make sure your sheet has "Name" and "Phone" column headers in row 1, with data in row 2 onwards.');
+    prospectsList = parsed.map(r => ({ name: r.name, phone: r.phone, status: 'pending' }));
+    bulkActive = false;
+    bulkIndex  = 0;
+    renderProspectsList();
+    document.getElementById('prospectsPreview').style.display = 'block';
+    document.getElementById('prospectsCount').textContent = prospectsList.length;
+    resetBulkUI();
+  } catch(e) {
+    showProspectsError(`Could not load sheet: ${e.message}`);
+  } finally {
+    loadBtn.disabled = false;
+    iconEl.textContent = '↓';
+  }
+}
+
+function parseProspectsCSV(text) {
+  // Normalise line endings
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n').filter(Boolean);
+  if (!lines.length) return [];
+
+  // Robust CSV column splitter — respects double-quoted fields (which may contain commas)
+  function splitCSVLine(line) {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    cols.push(cur.trim());
+    return cols;
+  }
+
+  const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/"/g, '').trim());
+  const nameIdx  = headers.findIndex(h => h.includes('name'));
+  const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('mobile') || h.includes('number'));
+  if (nameIdx < 0 || phoneIdx < 0) throw new Error('Could not find Name or Phone columns. Make sure row 1 has headers "Name" and "Phone".');
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols  = splitCSVLine(lines[i]);
+    const name  = (cols[nameIdx]  || '').replace(/^"|"$/g, '').trim();
+    const phone = (cols[phoneIdx] || '').replace(/^"|"$/g, '').trim();
+    if (name || phone) rows.push({ name, phone });
+  }
+  return rows;
+}
+
+function showProspectsError(msg) {
+  const el = document.getElementById('prospectsStatus');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+}
+
+function renderProspectsList() {
+  const container = document.getElementById('prospectsList');
+  container.innerHTML = '';
+  prospectsList.forEach((p, i) => {
+    const isCurrent = bulkActive && i === bulkIndex;
+    const initials = (p.name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    const card = document.createElement('div');
+    card.className = `prospect-card ${p.status} ${isCurrent ? 'current' : ''}`;
+    card.id = 'pcard-' + i;
+    const statusLabel = { pending: 'Pending', sent: 'Sent ✓', skipped: 'Skipped' }[p.status] || 'Pending';
+    card.innerHTML = `
+      <div class="prospect-avatar">${initials}</div>
+      <div class="prospect-info">
+        <div class="prospect-name">${p.name || '—'}</div>
+        <div class="prospect-phone">${p.phone || 'No phone'}</div>
+      </div>
+      <div class="prospect-status-badge ${p.status}">${statusLabel}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function clearProspects() {
+  prospectsList = [];
+  bulkActive = false;
+  bulkIndex  = 0;
+  document.getElementById('prospectsPreview').style.display = 'none';
+  document.getElementById('prospectsStatus').style.display = 'none';
+}
+
+function startBulkSms() {
+  const pending = prospectsList.filter(p => p.status === 'pending');
+  if (!pending.length) { showProspectsError('No pending prospects to send to.'); return; }
+  // Find first pending index
+  bulkIndex = prospectsList.findIndex(p => p.status === 'pending');
+  bulkActive = true;
+  document.getElementById('startBulkBtn').style.display = 'none';
+  document.getElementById('bulkStepControls').style.display = 'block';
+  document.getElementById('prospectProgress').style.display = 'block';
+  document.getElementById('bulkDoneMsg').style.display = 'none';
+  updateBulkProgress();
+  highlightCurrentProspect();
+}
+
+function updateBulkProgress() {
+  const total = prospectsList.length;
+  const done  = prospectsList.filter(p => p.status === 'sent' || p.status === 'skipped').length;
+  const pct   = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressBar').style.width   = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
+  document.getElementById('currentProspectName').textContent  = prospectsList[bulkIndex]?.name  || '—';
+  document.getElementById('currentProspectPhone').textContent = prospectsList[bulkIndex]?.phone || '—';
+}
+
+function highlightCurrentProspect() {
+  prospectsList.forEach((_, i) => {
+    const card = document.getElementById('pcard-' + i);
+    if (card) card.classList.toggle('current', i === bulkIndex);
+  });
+  // Scroll current card into view
+  const cur = document.getElementById('pcard-' + bulkIndex);
+  if (cur) cur.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function sendNextProspect() {
+  const p = prospectsList[bulkIndex];
+  if (!p || !p.phone) { advanceBulk(); return; }
+  const msg   = buildMarketingMsg(p.name);
+  const phone = p.phone.replace(/\s/g, '');
+  window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+  // Mark as sent and advance
+  prospectsList[bulkIndex].status = 'sent';
+  renderProspectsList();
+  advanceBulk();
+}
+
+function skipProspect() {
+  prospectsList[bulkIndex].status = 'skipped';
+  renderProspectsList();
+  advanceBulk();
+}
+
+function advanceBulk() {
+  // Find next pending
+  let next = -1;
+  for (let i = bulkIndex + 1; i < prospectsList.length; i++) {
+    if (prospectsList[i].status === 'pending') { next = i; break; }
+  }
+  if (next < 0) {
+    // All done
+    finishBulkCampaign();
+  } else {
+    bulkIndex = next;
+    updateBulkProgress();
+    highlightCurrentProspect();
+  }
+}
+
+function finishBulkCampaign() {
+  bulkActive = false;
+  document.getElementById('bulkStepControls').style.display = 'none';
+  document.getElementById('bulkDoneMsg').style.display = 'block';
+  const sent    = prospectsList.filter(p => p.status === 'sent').length;
+  const skipped = prospectsList.filter(p => p.status === 'skipped').length;
+  document.getElementById('bulkDoneSummary').textContent =
+    `${sent} messages sent · ${skipped} skipped`;
+  updateBulkProgress();
+}
+
+function cancelBulkSms() {
+  bulkActive = false;
+  resetBulkUI();
+  renderProspectsList();
+}
+
+function resetBulkUI() {
+  document.getElementById('startBulkBtn').style.display   = 'block';
+  document.getElementById('bulkStepControls').style.display = 'none';
+  document.getElementById('prospectProgress').style.display = 'none';
+  document.getElementById('bulkDoneMsg').style.display      = 'none';
+}
+
+function resetBulkCampaign() {
+  // Reset all statuses to pending for a fresh campaign
+  prospectsList = prospectsList.map(p => ({ ...p, status: 'pending' }));
+  bulkIndex  = 0;
+  bulkActive = false;
+  renderProspectsList();
+  resetBulkUI();
+}
+
+// ══════════════════════════════════════════
+//  DOCUMENTS — CLIENT SERVICE AGREEMENT
+// ══════════════════════════════════════════
+function getAgreementData() {
+  return {
+    business:       (document.getElementById('agr_business')?.value   || '').trim(),
+    abn:            (document.getElementById('agr_abn')?.value        || '').trim(),
+    contact:        (document.getElementById('agr_contact')?.value    || '').trim(),
+    phone:          (document.getElementById('agr_phone')?.value      || '').trim(),
+    email:          (document.getElementById('agr_email')?.value      || '').trim(),
+    billing:        (document.getElementById('agr_billing')?.value    || '').trim(),
+    service_type:   (document.getElementById('agr_service_type')?.value || '').trim(),
+    frequency:      (document.getElementById('agr_frequency')?.value  || '').trim(),
+    duration:       (document.getElementById('agr_duration')?.value   || '').trim(),
+    special:        (document.getElementById('agr_special')?.value    || '').trim(),
+    extra:          (document.getElementById('agr_extra')?.value      || '').trim(),
+    rate:           (document.getElementById('agr_rate')?.value       || '').trim(),
+    gst:            (document.getElementById('agr_gst')?.value        || '').trim(),
+    total:          (document.getElementById('agr_total')?.value      || '').trim(),
+    add1_type:      (document.getElementById('agr_add1_type')?.value  || '').trim(),
+    add1_rate:      (document.getElementById('agr_add1_rate')?.value  || '').trim(),
+    add1_gst:       (document.getElementById('agr_add1_gst')?.value   || '').trim(),
+    add2_type:      (document.getElementById('agr_add2_type')?.value  || '').trim(),
+    add2_rate:      (document.getElementById('agr_add2_rate')?.value  || '').trim(),
+    add2_gst:       (document.getElementById('agr_add2_gst')?.value   || '').trim(),
+    client_name:    (document.getElementById('agr_client_name_sig')?.value || '').trim(),
+    date:           (document.getElementById('agr_date')?.value       || '').trim(),
+  };
+}
+
+function buildAgreementHTML(d) {
+  const fmtDate = (iso) => {
+    if (!iso) return '_______________';
+    const [y,m,dd] = iso.split('-');
+    return `${dd}/${m}/${y}`;
+  };
+  const val = (v, fallback) => v || fallback || '_______________';
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#222;background:#fff;}
+    .page{width:210mm;min-height:297mm;padding:12mm 14mm;margin:0 auto;}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .company-name{font-size:22pt;font-weight:700;color:#1a2a4a;letter-spacing:1px;}
+    .company-detail{font-size:8.5pt;color:#444;line-height:1.7;margin-top:4px;}
+    .logo-circle{width:64px;height:64px;border-radius:50%;border:2px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-size:22pt;font-weight:700;color:#c9a84c;flex-shrink:0;}
+    .doc-title{font-size:16pt;font-weight:600;text-align:center;margin:12px 0;letter-spacing:0.5px;}
+    .section-bar{background:#1a2a4a;color:#fff;padding:6px 12px;font-size:11pt;font-weight:600;margin:12px 0 8px;border-radius:3px;}
+    table.fields{width:100%;border-collapse:collapse;margin-bottom:8px;}
+    table.fields td{border:1px solid #c9a84c;padding:6px 9px;font-size:9.5pt;vertical-align:top;}
+    table.fields td.label{background:rgba(201,168,76,0.18);font-weight:600;width:38%;color:#1a2a4a;}
+    table.fields td.value{min-height:20px;}
+    .terms-list{font-size:8.5pt;color:#333;line-height:1.8;padding-left:16px;}
+    .terms-list li{margin-bottom:2px;}
+    .sig-row{display:flex;gap:24px;margin-top:16px;}
+    .sig-block{flex:1;border-top:1px solid #1a2a4a;padding-top:6px;font-size:9pt;color:#555;}
+    .sig-label{font-size:8pt;letter-spacing:0.5px;text-transform:uppercase;color:#888;}
+    .sig-value{font-size:11pt;font-weight:600;color:#1a2a4a;min-height:20px;margin-top:4px;}
+    .footer-note{font-size:7.5pt;color:#999;text-align:center;margin-top:16px;border-top:1px solid #eee;padding-top:8px;}
+  </style></head><body><div class="page">
+  <div class="header">
+    <div>
+      <div class="company-name">PI CLEANING SERVICES PTY LTD</div>
+      <div class="company-detail">
+        ABN — 53 654 625 831<br>
+        Address — 2/4 Weddel Ct, Laverton North, Vic 3028<br>
+        Phone — 0450 585 874<br>
+        Email — admin@picleaningservices.com.au
+      </div>
+    </div>
+    <div class="logo-circle">π</div>
+  </div>
+
+  <div class="doc-title">Client Service Agreement</div>
+
+  <div class="section-bar">Client Details</div>
+  <table class="fields">
+    <tr><td class="label">Business Name</td><td class="value">${val(d.business)}</td></tr>
+    <tr><td class="label">ABN</td><td class="value">${val(d.abn)}</td></tr>
+    <tr><td class="label">Contact Name</td><td class="value">${val(d.contact)}</td></tr>
+    <tr><td class="label">Phone</td><td class="value">${val(d.phone)}</td></tr>
+    <tr><td class="label">Email</td><td class="value">${val(d.email)}</td></tr>
+    <tr><td class="label">Billing Address</td><td class="value">${val(d.billing)}</td></tr>
+  </table>
+
+  <div class="section-bar">Scope of Work</div>
+  <p style="font-size:9pt;margin-bottom:8px;color:#444;">The service provider agrees to perform the following cleaning services at the above property.</p>
+  <table class="fields">
+    <tr><td class="label">Service Type</td><td class="value">${val(d.service_type)}</td></tr>
+    <tr><td class="label">Frequency</td><td class="value">${val(d.frequency)}</td></tr>
+    <tr><td class="label">Estimated Duration</td><td class="value">${val(d.duration)}</td></tr>
+    <tr><td class="label">Special Instructions</td><td class="value" style="white-space:pre-wrap;">${val(d.special)}</td></tr>
+    <tr><td class="label">Extra Services</td><td class="value">${val(d.extra)}</td></tr>
+  </table>
+  <p style="font-size:8.5pt;color:#555;margin-bottom:6px;font-style:italic;">Any additional services requested outside of the agreed scope will be quoted separately and must be approved in writing by both parties prior to commencement.</p>
+
+  <div class="section-bar">Pricing &amp; Quote Acceptance</div>
+  <table class="fields" style="margin-bottom:6px;">
+    <tr>
+      <td class="label">Agreed Service Rate (excl. GST)</td>
+      <td class="value">$ ${val(d.rate,'___________')}</td>
+      <td class="label" style="width:22%;">GST</td>
+      <td class="value">$ ${val(d.gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label">Additional Service 1 — Type</td>
+      <td class="value">${val(d.add1_type,'___________')}</td>
+      <td class="label">GST</td>
+      <td class="value">$ ${val(d.add1_gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label">Additional Service 2 — Type</td>
+      <td class="value">${val(d.add2_type,'___________')}</td>
+      <td class="label">GST</td>
+      <td class="value">$ ${val(d.add2_gst,'_______')}</td>
+    </tr>
+    <tr>
+      <td class="label" style="font-size:10.5pt;">Total Agreed Amount</td>
+      <td class="value" colspan="3" style="font-size:12pt;font-weight:700;color:#1a2a4a;">$ ${val(d.total,'_______________')}</td>
+    </tr>
+  </table>
+  <p style="font-size:8pt;color:#555;font-style:italic;margin-bottom:8px;">By signing this agreement the client confirms they have read, understood and accepted the pricing above. The quoted amount constitutes the client's financial obligation to PI Cleaning Services upon completion of the services.</p>
+
+  <div class="section-bar">Payment Terms</div>
+  <ol class="terms-list">
+    <li>All invoices are issued in the same week as service completion.</li>
+    <li>Payment is due within 7 days of the invoice date, unless an alternative agreement has been made in writing.</li>
+    <li>Accepted payment methods are Bank Transfer, Credit/Debit Card, Cash — unless otherwise agreed in writing.</li>
+    <li>Bank details or payment instructions are provided in the invoice.</li>
+    <li>Invoices will be sent to the client's nominated email address or mobile number in PDF format.</li>
+    <li>The client is responsible for ensuring payments are made by the due date.</li>
+    <li>An additional processing fee of 1.9% may apply if the invoice is overdue past the agreed payment timeframe.</li>
+    <li>PI Cleaning Services may collect credit/debit card or payment details to process payments for services rendered.</li>
+    <li>All sensitive information is stored securely within an encrypted payment processing platform and will never be shared with unauthorised third parties.</li>
+    <li>All service prices are subject to change and PI Cleaning Services will provide notice of any change.</li>
+  </ol>
+
+  <div class="section-bar" style="margin-top:10px;">Debt Recovery</div>
+  <ol class="terms-list" start="11">
+    <li>PI Cleaning Services will follow standard follow-ups for payment recovery for up to 21 days of invoice date.</li>
+    <li>If the client fails to make full invoice payment within 21 days they may be referred to a debt collector or solicitor.</li>
+    <li>PI Cleaning Services may file a claim through the relevant Civil Administrative Tribunal (e.g. VCAT) for recovery of the unpaid amount.</li>
+    <li>All reasonable costs associated with debt recovery — including legal fees, tribunal filing fees, and collection agency charges — shall be borne by the client.</li>
+    <li>This agreement, together with any signed invoice or quote, constitutes sufficient evidence of the client's obligation to pay for services rendered.</li>
+  </ol>
+
+  <div class="section-bar" style="margin-top:10px;">General Terms &amp; Conditions</div>
+  <ol class="terms-list" start="16">
+    <li>PI Cleaning Services may require 50% of the total invoice to be paid upfront before commencing the services.</li>
+    <li>Liability: PI Cleaning Services holds public liability insurance.</li>
+    <li>The client agrees to provide safe, unobstructed access at the agreed service time.</li>
+    <li>Both parties agree to keep the terms of this agreement confidential and not to disclose details to a third party without written consent.</li>
+  </ol>
+
+  <div class="sig-row" style="margin-top:20px;">
+    <div class="sig-block">
+      <div class="sig-label">Service Provider Name</div>
+      <div class="sig-value">PI Cleaning Services Pty Ltd</div>
+      <div class="sig-label" style="margin-top:14px;">Service Provider Signature</div>
+      <div class="sig-value" style="min-height:32px;border-bottom:1px solid #aaa;"></div>
+      <div class="sig-label" style="margin-top:12px;">Date</div>
+      <div class="sig-value" style="min-height:20px;border-bottom:1px solid #aaa;"></div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label">Client Name</div>
+      <div class="sig-value">${val(d.client_name,'')}</div>
+      <div class="sig-label" style="margin-top:14px;">Client Signature</div>
+      <div class="sig-value" style="min-height:32px;border-bottom:1px solid #aaa;"></div>
+      <div class="sig-label" style="margin-top:12px;">Date</div>
+      <div class="sig-value">${fmtDate(d.date)}</div>
+    </div>
+  </div>
+
+  <div class="footer-note">PI Cleaning Services Pty Ltd · ABN 53 654 625 831 · admin@picleaningservices.com.au · 0450 585 874</div>
+</div></body></html>`;
+}
+
+function downloadAgreementPDF() {
+  const d = getAgreementData();
+  const html = buildAgreementHTML(d);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const clientName = d.business || d.client_name || 'Client';
+  a.download = `Pi_Service_Agreement_${clientName.replace(/\s+/g,'_')}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // Toast feedback
+  showDocToast('📄 Agreement downloaded! Open the file in your browser and use Print → Save as PDF.', 'success');
+}
+
+function shareViaWhatsApp() {
+  const d = getAgreementData();
+  const clientName = d.business || d.contact || 'Client';
+  const serviceType = d.service_type || 'cleaning services';
+  const rate = d.total ? `$${d.total}` : (d.rate ? `$${d.rate} + GST` : 'as agreed');
+  const dateStr = d.date ? (() => { const [y,m,dd]=d.date.split('-'); return `${dd}/${m}/${y}`; })() : 'as agreed';
+
+  const msg = `Hi ${clientName || 'there'},\n\nPlease find below the details of your Client Service Agreement with *PI Cleaning Services*:\n\n` +
+    `📋 *Service:* ${serviceType}\n` +
+    (d.frequency ? `🔄 *Frequency:* ${d.frequency}\n` : '') +
+    (d.duration  ? `⏱ *Duration:* ${d.duration}\n`   : '') +
+    `💰 *Total Agreed:* ${rate}\n` +
+    (d.date      ? `📅 *Date:* ${dateStr}\n`          : '') +
+    `\n` +
+    `*Payment Terms:* Payment is due within 7 days of invoice. Accepted via bank transfer, credit/debit card, or cash.\n\n` +
+    `If you have any questions, please contact us:\n📞 0450 585 874\n📧 admin@picleaningservices.com.au\n\nThank you for choosing Pi Cleaning Services! 🌟`;
+
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+}
+
+function showDocToast(msg, type) {
+  // Simple in-panel feedback
+  let t = document.getElementById('docToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'docToast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9999;padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;max-width:320px;text-align:center;transition:opacity 0.4s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = type === 'success' ? 'rgba(29,185,84,0.18)' : 'rgba(226,75,74,0.18)';
+  t.style.border = type === 'success' ? '1px solid rgba(29,185,84,0.5)' : '1px solid rgba(226,75,74,0.5)';
+  t.style.color = type === 'success' ? '#7edb7e' : '#ff9999';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 4500);
+}
 </script>
 </body>
 </html>
