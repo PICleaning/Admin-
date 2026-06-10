@@ -910,6 +910,17 @@
     .drawer { width: 100vw !important; right: -100vw !important; }
     .drawer.open { right: 0 !important; }
   }
+
+  /* ════ QUOTE CALCULATOR ════ */
+  .qc-freq-btn {
+    padding:10px 8px; background:rgba(255,255,255,0.03);
+    border:1px solid rgba(201,168,76,0.2); border-radius:9px;
+    font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600;
+    color:var(--white-muted); cursor:pointer; transition:all 0.2s;
+    text-align:center; line-height:1.4;
+  }
+  .qc-freq-btn:hover { background:var(--gold-pale); border-color:rgba(201,168,76,0.4); color:var(--white); }
+  .qc-freq-btn.active { background:rgba(201,168,76,0.14); border-color:var(--gold); color:var(--gold-light); }
 </style>
 </head>
 <body>
@@ -1014,6 +1025,14 @@
           <div class="nav-item-sub">Calculate &amp; export employee pay</div>
         </div>
         <span class="new-feature-badge">NEW</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-quotecalc" onclick="switchDrawerTab('quotecalc')" style="display:none;">
+        <span class="nav-item-icon">🧮</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Quote Calculator</div>
+          <div class="nav-item-sub">Show clients their subscription savings</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
       </button>
     </div>
     <div class="drawer-version-bar-inline">Pi Admin · V 2.0.5 · Pi Cleaning Services</div>
@@ -1415,6 +1434,33 @@
       </label>
       <div class="settings-saved-msg" id="payDailyModeSaved">✅ Setting saved!</div>
     </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Quote Calculator Toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">🧮 Quote Calculator</div>
+      <div class="settings-section-desc">Enable the Quote Calculator in the main menu to show clients how much they save with a subscription. Requires a 4-digit access code to enable or disable.</div>
+      <div id="qcPinSection" style="display:none;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--white-muted);margin-bottom:8px;">Enter access code to toggle:</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" id="qcPinInput" maxlength="4" placeholder="• • • •" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.3);border-radius:9px;padding:10px 14px;color:var(--white);font-family:'Montserrat',sans-serif;font-size:18px;letter-spacing:0.3em;text-align:center;outline:none;" oninput="checkQcPin()" />
+          <button onclick="cancelQcPin()" style="background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:9px 12px;color:var(--white-muted);font-family:'Montserrat',sans-serif;font-size:11px;cursor:pointer;">Cancel</button>
+        </div>
+        <div id="qcPinError" style="display:none;font-size:10px;color:var(--danger);margin-top:6px;">Incorrect code. Try again.</div>
+      </div>
+      <label class="settings-toggle-row" onclick="promptQcPin(event)">
+        <div>
+          <div class="settings-toggle-label">Show Quote Calculator in menu</div>
+          <div class="settings-toggle-sub" id="qcToggleSub">Enter code 2917 to enable</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="quoteCalcToggle" disabled />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+      <div class="settings-saved-msg" id="quoteCalcSaved">✅ Quote Calculator setting saved!</div>
+    </div>
   </div>
 
   <!-- ── PANEL: PROSPECTS ── -->
@@ -1581,6 +1627,114 @@
         <div class="nf-title">Bulk Prospect SMS</div>
         <div class="nf-desc">Load your prospects from Google Sheets and send a personalised marketing SMS to every one of them — step by step, with a preview list and progress tracker.</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL: QUOTE CALCULATOR ── -->
+  <div class="drawer-panel" id="panel-quotecalc">
+    <div class="section-tag">Residential Cleaning</div>
+    <div class="section-heading">Quote<br>Calculator</div>
+
+    <!-- Rate Inputs -->
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">⚙️ Pricing Configuration</div>
+
+      <div class="field-group" style="margin-bottom:12px;">
+        <label class="field-label">Standard Rate (No Subscription) — $/hr</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:14px;">$</span>
+          <input class="field-input" id="qc_std_rate" type="number" min="0" step="0.01" placeholder="e.g. 65.00" style="padding-left:28px;" oninput="qcRecalc()" />
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-bottom:12px;">
+        <label class="field-label">Subscription Monthly Price — $/month</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:14px;">$</span>
+          <input class="field-input" id="qc_sub_price" type="number" min="0" step="0.01" placeholder="e.g. 149.00" style="padding-left:28px;" oninput="qcRecalc()" />
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-bottom:0;">
+        <label class="field-label">Subscription Rate — $/hr</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:14px;">$</span>
+          <input class="field-input" id="qc_sub_rate" type="number" min="0" step="0.01" placeholder="e.g. 45.00" style="padding-left:28px;" oninput="qcRecalc()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Frequency Selector -->
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">📅 Cleaning Frequency</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="qc_freq_group">
+        <button class="qc-freq-btn active" data-visits="4" onclick="qcSetFreq(this)">Weekly<div style="font-size:9px;font-weight:400;opacity:0.7;margin-top:2px;">~4 visits/month</div></button>
+        <button class="qc-freq-btn" data-visits="2" onclick="qcSetFreq(this)">Fortnightly<div style="font-size:9px;font-weight:400;opacity:0.7;margin-top:2px;">~2 visits/month</div></button>
+        <button class="qc-freq-btn" data-visits="1" onclick="qcSetFreq(this)">Monthly<div style="font-size:9px;font-weight:400;opacity:0.7;margin-top:2px;">1 visit/month</div></button>
+        <button class="qc-freq-btn" data-visits="0" onclick="qcSetFreq(this)">Custom<div style="font-size:9px;font-weight:400;opacity:0.7;margin-top:2px;">set below</div></button>
+      </div>
+      <div id="qc_custom_visits_wrap" style="display:none;margin-top:10px;">
+        <label class="field-label">Visits per month</label>
+        <input class="field-input" id="qc_custom_visits" type="number" min="1" max="31" step="1" placeholder="e.g. 3" oninput="qcRecalc()" />
+      </div>
+    </div>
+
+    <!-- Hours Slider -->
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">⏱ Hours Per Visit</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--gold-light);" id="qc_hours_display">2h</div>
+      </div>
+      <input type="range" id="qc_hours_slider" min="1" max="12" step="0.5" value="2"
+        style="width:100%;accent-color:var(--gold);cursor:pointer;"
+        oninput="qcSliderUpdate(this.value)" />
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--white-muted);margin-top:4px;letter-spacing:0.04em;">
+        <span>1h</span><span>6h</span><span>12h</span>
+      </div>
+    </div>
+
+    <!-- Results Card -->
+    <div id="qc_results" style="display:none;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">📊 Monthly Breakdown</div>
+
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+        <!-- Without subscription row -->
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(201,168,76,0.12);">
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-muted);margin-bottom:6px;">Without Subscription</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:11px;color:var(--white-muted);" id="qc_nostd_detail">—</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:rgba(226,75,74,0.9);" id="qc_nostd_total">$0</div>
+          </div>
+        </div>
+        <!-- With subscription row -->
+        <div style="padding:14px 16px;background:rgba(29,185,84,0.05);">
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-muted);margin-bottom:6px;">With Subscription</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:11px;color:var(--white-muted);" id="qc_sub_detail">—</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--success);" id="qc_sub_total">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Savings highlight -->
+      <div id="qc_savings_card" style="background:linear-gradient(135deg,rgba(29,185,84,0.12),rgba(29,185,84,0.06));border:1px solid rgba(29,185,84,0.4);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--success);font-weight:700;margin-bottom:6px;">Monthly Saving</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;color:var(--success);line-height:1;" id="qc_saving_amount">$0</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;" id="qc_saving_pct">— % less per month</div>
+      </div>
+
+      <!-- Annual saving -->
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;color:var(--white-muted);">Estimated Annual Saving</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);" id="qc_annual_saving">$0</div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="qc_empty_state" style="text-align:center;padding:30px 20px;color:var(--white-muted);font-size:12px;line-height:2;">
+      <div style="font-size:32px;margin-bottom:10px;">🧮</div>
+      <div>Enter your pricing rates above</div>
+      <div style="font-size:10px;opacity:0.6;">then drag the slider to calculate.</div>
     </div>
   </div>
 
@@ -2011,7 +2165,7 @@ function resetReminderText() {
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === tab);
@@ -2024,7 +2178,8 @@ function switchDrawerTab(tab) {
     newfeatures: '🚀 New Features',
     prospects: '📣 Prospects',
     documents: '📄 Documents',
-    paycalc: '💰 Pay Calculator'
+    paycalc: '💰 Pay Calculator',
+    quotecalc: '🧮 Quote Calculator'
   };
   document.getElementById('drawer-title').textContent = titles[tab] || 'Main Menu';
   // Show back button when in a section
@@ -2039,7 +2194,7 @@ function switchDrawerTab(tab) {
 
 function showDrawerMenu() {
   currentDrawerTab = 'menu';
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === 'menu');
@@ -2862,6 +3017,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }, 0);
+  initQuoteCalc();
 });
 
 // ══════════════════════════════════════════
@@ -3760,6 +3916,147 @@ function exportPayPDF() {
   showDocToast('📄 Pay Sheet downloaded! Open in browser → Print → Save as PDF.', 'success');
 }
 
+
+// ══════════════════════════════════════════
+// QUOTE CALCULATOR
+// ══════════════════════════════════════════
+const QC_ENABLED_KEY = 'qcEnabled_v1';
+let qcVisitsPerMonth = 4; // default weekly
+
+function initQuoteCalc() {
+  const enabled = localStorage.getItem(QC_ENABLED_KEY) === 'true';
+  const toggle = document.getElementById('quoteCalcToggle');
+  const menuBtn = document.getElementById('tab-quotecalc');
+  if (toggle) toggle.checked = enabled;
+  if (menuBtn) menuBtn.style.display = enabled ? '' : 'none';
+  updateQcToggleSub(enabled);
+}
+
+function updateQcToggleSub(enabled) {
+  const sub = document.getElementById('qcToggleSub');
+  if (sub) sub.textContent = enabled ? 'Quote Calculator is visible in menu' : 'Enter code 2917 to enable';
+}
+
+function promptQcPin(e) {
+  e.preventDefault();
+  const section = document.getElementById('qcPinSection');
+  const input = document.getElementById('qcPinInput');
+  if (section.style.display === 'none' || section.style.display === '') {
+    section.style.display = 'block';
+    input.value = '';
+    document.getElementById('qcPinError').style.display = 'none';
+    setTimeout(() => input.focus(), 50);
+  }
+}
+
+function cancelQcPin() {
+  document.getElementById('qcPinSection').style.display = 'none';
+  document.getElementById('qcPinInput').value = '';
+  document.getElementById('qcPinError').style.display = 'none';
+}
+
+function checkQcPin() {
+  const val = document.getElementById('qcPinInput').value;
+  if (val.length < 4) return;
+  if (val === '2917') {
+    const currentEnabled = localStorage.getItem(QC_ENABLED_KEY) === 'true';
+    const newEnabled = !currentEnabled;
+    localStorage.setItem(QC_ENABLED_KEY, newEnabled);
+    const toggle = document.getElementById('quoteCalcToggle');
+    if (toggle) toggle.checked = newEnabled;
+    const menuBtn = document.getElementById('tab-quotecalc');
+    if (menuBtn) menuBtn.style.display = newEnabled ? '' : 'none';
+    updateQcToggleSub(newEnabled);
+    cancelQcPin();
+    const msg = document.getElementById('quoteCalcSaved');
+    if (msg) { msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2500); }
+  } else {
+    document.getElementById('qcPinError').style.display = 'block';
+    document.getElementById('qcPinInput').value = '';
+    setTimeout(() => document.getElementById('qcPinInput').focus(), 50);
+  }
+}
+
+function qcSetFreq(btn) {
+  document.querySelectorAll('.qc-freq-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const visits = parseInt(btn.dataset.visits);
+  const customWrap = document.getElementById('qc_custom_visits_wrap');
+  if (visits === 0) {
+    customWrap.style.display = 'block';
+    qcVisitsPerMonth = parseInt(document.getElementById('qc_custom_visits').value) || 0;
+  } else {
+    customWrap.style.display = 'none';
+    qcVisitsPerMonth = visits;
+  }
+  qcRecalc();
+}
+
+function qcSliderUpdate(val) {
+  const hrs = parseFloat(val);
+  document.getElementById('qc_hours_display').textContent = hrs % 1 === 0 ? hrs + 'h' : hrs + 'h';
+  qcRecalc();
+}
+
+function qcRecalc() {
+  const stdRate  = parseFloat(document.getElementById('qc_std_rate').value) || 0;
+  const subPrice = parseFloat(document.getElementById('qc_sub_price').value) || 0;
+  const subRate  = parseFloat(document.getElementById('qc_sub_rate').value) || 0;
+  const hrs      = parseFloat(document.getElementById('qc_hours_slider').value) || 2;
+
+  // update custom visits if needed
+  const activeFreq = document.querySelector('.qc-freq-btn.active');
+  if (activeFreq && parseInt(activeFreq.dataset.visits) === 0) {
+    qcVisitsPerMonth = parseInt(document.getElementById('qc_custom_visits').value) || 0;
+  }
+
+  const results  = document.getElementById('qc_results');
+  const empty    = document.getElementById('qc_empty_state');
+
+  if (!stdRate || !subPrice || !subRate || !qcVisitsPerMonth) {
+    results.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  const hrsDisplay = hrs % 1 === 0 ? hrs + 'h' : hrs + 'h';
+  document.getElementById('qc_hours_display').textContent = hrsDisplay;
+
+  const noSubMonthly  = stdRate * hrs * qcVisitsPerMonth;
+  const subMonthly    = subPrice + (subRate * hrs * qcVisitsPerMonth);
+  const saving        = noSubMonthly - subMonthly;
+  const savingPct     = noSubMonthly > 0 ? ((saving / noSubMonthly) * 100).toFixed(0) : 0;
+  const annualSaving  = saving * 12;
+
+  const freqLabel = activeFreq ? activeFreq.childNodes[0].textContent.trim() : '';
+
+  document.getElementById('qc_nostd_detail').textContent =
+    `$${stdRate.toFixed(2)}/hr × ${hrsDisplay} × ${qcVisitsPerMonth} visit${qcVisitsPerMonth !== 1 ? 's' : ''}`;
+  document.getElementById('qc_nostd_total').textContent  = '$' + noSubMonthly.toFixed(2);
+
+  document.getElementById('qc_sub_detail').textContent =
+    `$${subPrice.toFixed(2)} membership + $${subRate.toFixed(2)}/hr × ${hrsDisplay} × ${qcVisitsPerMonth} visit${qcVisitsPerMonth !== 1 ? 's' : ''}`;
+  document.getElementById('qc_sub_total').textContent    = '$' + subMonthly.toFixed(2);
+
+  document.getElementById('qc_saving_amount').textContent = saving > 0 ? '$' + saving.toFixed(2) : '$0';
+  document.getElementById('qc_saving_pct').textContent    = saving > 0 ? savingPct + '% less per month' : 'No saving at current rates';
+  document.getElementById('qc_annual_saving').textContent = saving > 0 ? '$' + annualSaving.toFixed(2) : '$0';
+
+  const savingsCard = document.getElementById('qc_savings_card');
+  if (saving <= 0) {
+    savingsCard.style.background = 'rgba(226,75,74,0.08)';
+    savingsCard.style.borderColor = 'rgba(226,75,74,0.35)';
+    document.getElementById('qc_saving_amount').style.color = 'var(--danger)';
+    document.getElementById('qc_saving_pct').textContent = 'Subscription costs more at these rates';
+  } else {
+    savingsCard.style.background = 'linear-gradient(135deg,rgba(29,185,84,0.12),rgba(29,185,84,0.06))';
+    savingsCard.style.borderColor = 'rgba(29,185,84,0.4)';
+    document.getElementById('qc_saving_amount').style.color = 'var(--success)';
+  }
+
+  results.style.display = 'block';
+  empty.style.display = 'none';
+}
 
 </script>
 </body>
