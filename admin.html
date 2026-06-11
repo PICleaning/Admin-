@@ -1445,6 +1445,28 @@
 
     <div class="divider" style="margin:20px 0;"></div>
 
+    <!-- Employee Menu Lock Toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔒 Employee Menu Lock</div>
+      <div class="settings-section-desc">When enabled, employees must enter the current rotating access code to open their hamburger menu. When off, the menu is freely accessible without a code.</div>
+      <label class="settings-toggle-row" id="menuLockToggleRow" onclick="toggleMenuLock(event)">
+        <div>
+          <div class="settings-toggle-label">Lock employee hamburger menu</div>
+          <div class="settings-toggle-sub" id="menuLockSub">Menu is currently <strong style="color:var(--success)">unlocked</strong> — no code required</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="menuLockToggle" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+      <div class="settings-saved-msg" id="menuLockSaved">✅ Menu lock setting saved!</div>
+      <div id="menuLockStatusBanner" style="display:none;background:rgba(226,75,74,0.09);border:1px solid rgba(226,75,74,0.35);border-radius:9px;padding:12px 14px;margin-top:10px;font-size:11px;color:rgba(255,255,255,0.7);line-height:1.7;">
+        🔐 <strong style="color:#ff8a89;">Menu lock is ON.</strong> Employees need the current rotating code to access their menu. Share the live code from <strong style="color:var(--gold-light);">Employee Access Codes</strong>.
+      </div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
     <!-- Quote Calculator Toggle -->
     <div class="settings-section">
       <div class="settings-section-title">🧮 Quote Calculator</div>
@@ -2129,6 +2151,8 @@ function loadSettingsUI() {
   const dailyOn = localStorage.getItem('pi_pay_daily_mode') === 'on';
   const dailyTog = document.getElementById('payDailyModeToggle');
   if (dailyTog) dailyTog.checked = dailyOn;
+  // Menu lock toggle
+  initMenuLock();
 }
 
 // ── CLIENT SEARCH ──
@@ -3596,6 +3620,103 @@ function togglePayDailyMode() {
 
 function isPayDailyMode() {
   return localStorage.getItem(PC_DAILY_MODE_KEY) === 'on';
+}
+
+// ══════════════════════════════════════════
+//  EMPLOYEE MENU LOCK
+//  Syncs lock state to Google Sheet via Apps Script
+//  Employee app reads the same value before opening the menu
+// ══════════════════════════════════════════
+const MENU_LOCK_KEY = 'pi_menu_lock'; // local cache so UI is instant on reload
+
+function isMenuLocked() {
+  return localStorage.getItem(MENU_LOCK_KEY) === 'on';
+}
+
+async function toggleMenuLock(e) {
+  if (e) e.preventDefault();
+  const tog    = document.getElementById('menuLockToggle');
+  const row    = document.getElementById('menuLockToggleRow');
+  const saved  = document.getElementById('menuLockSaved');
+  if (!tog) return;
+
+  const newState = !tog.checked;
+  tog.checked = newState;
+
+  // Optimistically update UI immediately
+  updateMenuLockUI(newState);
+  localStorage.setItem(MENU_LOCK_KEY, newState ? 'on' : 'off');
+
+  // Disable row while saving
+  if (row) row.style.pointerEvents = 'none';
+
+  try {
+    const url = getGsUrl(); // reuse existing admin GAS URL helper
+    const resp = await fetch(url + '?action=setMenuLock&state=' + (newState ? 'LOCKED' : 'UNLOCKED'));
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      if (saved) {
+        saved.textContent = newState ? '🔒 Menu locked — employees need a code!' : '🔓 Menu unlocked — employees can open freely.';
+        saved.classList.add('show');
+        setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Menu lock setting saved!'; }, 3000);
+      }
+    } else {
+      throw new Error(data.error || 'Sheet error');
+    }
+  } catch(err) {
+    // Roll back on failure
+    tog.checked = !newState;
+    localStorage.setItem(MENU_LOCK_KEY, newState ? 'off' : 'on');
+    updateMenuLockUI(!newState);
+    if (saved) {
+      saved.textContent = '❌ Failed to save — check your sheet connection.';
+      saved.style.background = 'rgba(226,75,74,0.1)';
+      saved.style.borderColor = 'rgba(226,75,74,0.35)';
+      saved.style.color = 'var(--danger)';
+      saved.classList.add('show');
+      setTimeout(() => {
+        saved.classList.remove('show');
+        saved.textContent = '✅ Menu lock setting saved!';
+        saved.style.background = '';
+        saved.style.borderColor = '';
+        saved.style.color = '';
+      }, 3500);
+    }
+  } finally {
+    if (row) row.style.pointerEvents = '';
+  }
+}
+
+function updateMenuLockUI(locked) {
+  const sub    = document.getElementById('menuLockSub');
+  const banner = document.getElementById('menuLockStatusBanner');
+  if (sub) {
+    sub.innerHTML = locked
+      ? 'Menu is currently <strong style="color:var(--danger)">locked</strong> — code required to open'
+      : 'Menu is currently <strong style="color:var(--success)">unlocked</strong> — no code required';
+  }
+  if (banner) banner.style.display = locked ? 'block' : 'none';
+}
+
+async function initMenuLock() {
+  // Show cached state instantly, then sync from sheet in background
+  const cached = isMenuLocked();
+  const tog = document.getElementById('menuLockToggle');
+  if (tog) tog.checked = cached;
+  updateMenuLockUI(cached);
+
+  // Fetch live state from sheet
+  try {
+    const url  = getGsUrl();
+    const resp = await fetch(url + '?action=getMenuLock');
+    const data = await resp.json();
+    if (data.state) {
+      const live = data.state === 'LOCKED';
+      localStorage.setItem(MENU_LOCK_KEY, live ? 'on' : 'off');
+      if (tog) tog.checked = live;
+      updateMenuLockUI(live);
+    }
+  } catch(e) { /* use cached */ }
 }
 
 function applyPayCalcMode() {
