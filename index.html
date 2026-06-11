@@ -1034,6 +1034,14 @@
         </div>
         <span class="nav-item-arrow">›</span>
       </button>
+      <button class="drawer-nav-item" id="tab-accesscodes" onclick="switchDrawerTab('accesscodes')">
+        <span class="nav-item-icon">🔐</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Employee Access Codes</div>
+          <div class="nav-item-sub">Live rotating menu passwords</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
     </div>
     <div class="drawer-version-bar-inline">Pi Admin · V 2.0.5 · Pi Cleaning Services</div>
   </div>
@@ -1879,6 +1887,43 @@
     </div>
   </div>
 
+  <!-- ── PANEL: EMPLOYEE ACCESS CODES ── -->
+  <div class="drawer-panel" id="panel-accesscodes">
+    <div class="section-tag">Security</div>
+    <div class="section-heading">Employee Access<br>Codes</div>
+
+    <!-- Current Password Card -->
+    <div id="ac-current-card" style="background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.06));border:1.5px solid rgba(201,168,76,0.5);border-radius:16px;padding:22px 20px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Current Code</div>
+      <div id="ac-current-pw" style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:#fff;letter-spacing:6px;margin-bottom:12px;">—</div>
+      <!-- Countdown bar -->
+      <div style="background:rgba(255,255,255,0.08);border-radius:99px;height:6px;overflow:hidden;margin-bottom:8px;">
+        <div id="ac-bar" style="height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:99px;transition:width 0.5s linear;"></div>
+      </div>
+      <div id="ac-countdown" style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.08em;">Refreshes in —</div>
+    </div>
+
+    <!-- Next Password Card -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:22px;">⏭</div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:4px;">Up Next</div>
+        <div id="ac-next-pw" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:4px;">—</div>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:20px;">
+      🔐 Codes rotate automatically every <strong style="color:var(--gold-light);">15 seconds</strong>. Share the current code with an employee when they need to access the menu. Never share the admin panel.
+    </div>
+
+    <!-- History Log -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Recent Code History</div>
+    <div id="ac-history" style="display:flex;flex-direction:column;gap:6px;">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
 </div>
 
 <!-- TOPBAR -->
@@ -2165,7 +2210,7 @@ function resetReminderText() {
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === tab);
@@ -2179,7 +2224,8 @@ function switchDrawerTab(tab) {
     prospects: '📣 Prospects',
     documents: '📄 Documents',
     paycalc: '💰 Pay Calculator',
-    quotecalc: '🧮 Quote Calculator'
+    quotecalc: '🧮 Quote Calculator',
+    accesscodes: '🔐 Employee Access Codes'
   };
   document.getElementById('drawer-title').textContent = titles[tab] || 'Main Menu';
   // Show back button when in a section
@@ -2190,11 +2236,12 @@ function switchDrawerTab(tab) {
   if (tab === 'settings') loadSettingsUI();
   if (tab === 'prospects') loadProspectsUrlUI();
   if (tab === 'paycalc') initPayCalc();
+  if (tab === 'accesscodes') initAccessCodes();
 }
 
 function showDrawerMenu() {
   currentDrawerTab = 'menu';
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc'];
+  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === 'menu');
@@ -4056,6 +4103,113 @@ function qcRecalc() {
 
   results.style.display = 'block';
   empty.style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+//  EMPLOYEE ACCESS CODES
+//  Rotates every 15 seconds using time-slot + master key hash
+// ══════════════════════════════════════════
+const AC_MASTER_KEY = 'EPAdmin2025!';   // ← secret master key (only in this admin file)
+const AC_INTERVAL   = 15;               // seconds per slot
+let   _acTimer      = null;
+let   _acHistory    = [];               // [{code, time}]
+let   _acLastSlot   = -1;
+
+function _acSlot(offset = 0) {
+  // Returns the integer slot number for now + offset seconds
+  return Math.floor((Date.now() / 1000 + offset) / AC_INTERVAL);
+}
+
+function _acCodeForSlot(slot) {
+  // Simple deterministic hash: slot + master key → 6-char alphanumeric
+  let s = String(slot) + AC_MASTER_KEY;
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h) + s.charCodeAt(i);
+    h |= 0;
+  }
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let out = '';
+  let val = Math.abs(h);
+  for (let i = 0; i < 6; i++) {
+    out += chars[val % chars.length];
+    val = Math.floor(val / chars.length) || (val + 7919);
+  }
+  return out;
+}
+
+function initAccessCodes() {
+  if (_acTimer) clearInterval(_acTimer);
+  _acRender();
+  _acTimer = setInterval(_acRender, 500); // tick every 0.5s for smooth countdown bar
+}
+
+function _acRender() {
+  const now        = Date.now() / 1000;
+  const slotStart  = Math.floor(now / AC_INTERVAL) * AC_INTERVAL;
+  const elapsed    = now - slotStart;
+  const remaining  = AC_INTERVAL - elapsed;
+  const currentSlot = _acSlot(0);
+  const nextSlot    = currentSlot + 1;
+
+  const currentCode = _acCodeForSlot(currentSlot);
+  const nextCode    = _acCodeForSlot(nextSlot);
+
+  // Add to history when slot changes
+  if (currentSlot !== _acLastSlot) {
+    if (_acLastSlot !== -1) {
+      const prevCode = _acCodeForSlot(_acLastSlot);
+      const prevTime = new Date(slotStart * 1000 - AC_INTERVAL * 1000);
+      _acHistory.unshift({ code: prevCode, time: prevTime });
+      if (_acHistory.length > 10) _acHistory.pop();
+    }
+    _acLastSlot = currentSlot;
+  }
+
+  // Update current code display
+  const pwEl = document.getElementById('ac-current-pw');
+  if (pwEl) pwEl.textContent = currentCode;
+
+  // Update next code
+  const nextEl = document.getElementById('ac-next-pw');
+  if (nextEl) nextEl.textContent = nextCode;
+
+  // Update countdown bar
+  const barEl = document.getElementById('ac-bar');
+  if (barEl) {
+    const pct = ((remaining / AC_INTERVAL) * 100).toFixed(1);
+    barEl.style.width = pct + '%';
+    // Colour goes gold → orange → red as it runs out
+    const r = remaining / AC_INTERVAL;
+    if (r > 0.5)      barEl.style.background = 'linear-gradient(90deg,#c9a84c,#e8c97a)';
+    else if (r > 0.25) barEl.style.background = 'linear-gradient(90deg,#f0a500,#f5c542)';
+    else              barEl.style.background = 'linear-gradient(90deg,#e24b4a,#ff7b7a)';
+  }
+
+  // Update countdown text
+  const cdEl = document.getElementById('ac-countdown');
+  if (cdEl) {
+    const secs = Math.ceil(remaining);
+    cdEl.textContent = 'Refreshes in ' + secs + 's';
+  }
+
+  // Render history
+  const histEl = document.getElementById('ac-history');
+  if (histEl) {
+    if (_acHistory.length === 0) {
+      histEl.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;padding:14px 0;">No history yet — codes will appear here as they rotate.</div>';
+    } else {
+      histEl.innerHTML = _acHistory.map((h, i) => {
+        const t = h.time;
+        const timeStr = t.toLocaleTimeString('en-AU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        return `<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:10px 14px;${i===0?'border-color:rgba(201,168,76,0.2);':''}">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:${i===0?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.3)'};letter-spacing:3px;flex:1;">${h.code}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);white-space:nowrap;">${timeStr}</div>
+          <div style="font-size:10px;color:rgba(226,75,74,0.7);font-weight:600;letter-spacing:0.06em;">EXPIRED</div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 </script>
