@@ -88,7 +88,7 @@
     background:rgba(10,22,40,0.97); border-bottom:1px solid rgba(201,168,76,0.2);
     display:flex; align-items:center; justify-content:space-between;
     padding:0 24px; z-index:200;
-    backdrop-filter: blur(12px);
+    
   }
   .logo-area { display:flex; align-items:center; gap:12px; }
   .logo-emblem {
@@ -255,7 +255,7 @@
     border-radius:12px; padding:8px 16px;
     font-size:11px; color:var(--white-muted);
     z-index:10; white-space:nowrap;
-    backdrop-filter:blur(8px);
+    
   }
   .map-info-bar span { color:var(--gold); font-weight:600; }
 
@@ -264,7 +264,7 @@
     background:rgba(10,22,40,0.85); border:1px solid rgba(201,168,76,0.2);
     border-radius:8px; padding:6px 10px;
     font-size:10px; color:var(--white-muted); z-index:10;
-    backdrop-filter:blur(6px);
+    
   }
 
   .map-home-btn {
@@ -274,7 +274,7 @@
     font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700;
     letter-spacing:0.08em; text-transform:uppercase;
     color:var(--gold); cursor:pointer; z-index:10;
-    backdrop-filter:blur(8px);
+    
     display:flex; align-items:center; gap:7px;
     transition:all 0.2s;
     box-shadow:0 2px 12px rgba(0,0,0,0.35);
@@ -445,8 +445,8 @@
     flex-shrink:0;
   }
   @keyframes neonPulse {
-    0%,100% { opacity:1; box-shadow:0 0 6px 3px rgba(0,255,100,0.7); }
-    50%      { opacity:0.6; box-shadow:0 0 14px 6px rgba(0,255,100,0.35); }
+    0%,100% { opacity:1; }
+    50%      { opacity:0.6; }
   }
   .gs-url-entry { transition:all 0.3s ease; overflow:hidden; }
   .gs-url-entry.hidden { display:none; }
@@ -466,7 +466,7 @@
   .client-card {
     background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
     border-radius:11px; padding:13px; margin-bottom:8px;
-    cursor:pointer; transition:all 0.2s; position:relative;
+    cursor:pointer; transition:background 0.2s, border-color 0.2s; position:relative;
   }
   .client-card:hover { background:rgba(201,168,76,0.06); border-color:rgba(201,168,76,0.3); }
   .client-card.due-urgent {
@@ -475,8 +475,13 @@
     animation:urgentPulse 2.5s ease infinite;
   }
   @keyframes urgentPulse {
-    0%,100%{border-color:rgba(226,75,74,0.5)}
-    50%{border-color:rgba(226,75,74,0.9)}
+    0%,100%{opacity:1} 50%{opacity:0.7}
+  }
+  @keyframes tiffanyPulse {
+    0%,100%{opacity:1} 50%{opacity:0.65}
+  }
+  @keyframes donePulse {
+    0%,100%{opacity:1} 50%{opacity:0.65}
   }
   .client-card.due-soon {
     border-color:rgba(240,165,0,0.5);
@@ -486,23 +491,15 @@
   .client-card.due-30 {
     border-color:rgba(0,213,210,0.6);
     background:rgba(0,213,210,0.05);
-    box-shadow:0 0 12px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25);
     animation:tiffanyPulse 2.8s ease infinite;
-  }
-  @keyframes tiffanyPulse {
-    0%,100% { box-shadow:0 0 10px 2px rgba(0,213,210,0.18), 0 0 0 1px rgba(0,213,210,0.25); border-color:rgba(0,213,210,0.55); }
-    50%      { box-shadow:0 0 22px 6px rgba(0,213,210,0.32), 0 0 0 1px rgba(0,213,210,0.5);  border-color:rgba(0,213,210,0.9); }
+    will-change: opacity;
   }
   /* Service done within 7 days — neon green */
   .client-card.service-done {
     border-color:rgba(0,255,100,0.6);
     background:rgba(0,255,100,0.05);
-    box-shadow:0 0 12px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25);
     animation:donePulse 2.8s ease infinite;
-  }
-  @keyframes donePulse {
-    0%,100% { box-shadow:0 0 10px 2px rgba(0,255,100,0.18), 0 0 0 1px rgba(0,255,100,0.25); border-color:rgba(0,255,100,0.55); }
-    50%      { box-shadow:0 0 22px 6px rgba(0,255,100,0.32), 0 0 0 1px rgba(0,255,100,0.5);  border-color:rgba(0,255,100,0.9); }
+    will-change: opacity;
   }
   /* Badge styles for new statuses */
   .due-badge.due30 { background:rgba(0,213,210,0.15); color:#00d5d2; border:1px solid rgba(0,213,210,0.45); }
@@ -626,7 +623,7 @@
     width:260px;
     background:rgba(10,22,40,0.95); border:1px solid rgba(201,168,76,0.35);
     border-radius:14px; padding:16px;
-    z-index:20; backdrop-filter:blur(10px);
+    z-index:20; 
     display:none; animation:fadeIn 0.2s ease;
   }
   .emp-detail-popup.visible { display:block; }
@@ -1140,8 +1137,7 @@
         <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px;padding:12px;margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <div>
-              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;">Weekly Total Pay</div>
-              <div id="pcd_preview_pay" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);">$0.00</div>
+              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;" id="pcd_period_label">Weekly Total Pay</div> style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);">$0.00</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:10px;color:var(--white-muted);">Total Hours</div>
@@ -1157,6 +1153,50 @@
         </button>
         <div class="settings-saved-msg" id="pcdAddSaved" style="margin-top:8px;">✅ Entry added!</div>
         <div class="settings-saved-msg" id="pcdAddError" style="margin-top:8px;background:rgba(226,75,74,0.1);border-color:rgba(226,75,74,0.3);color:#ff9999;"></div>
+      </div>
+    </div>
+
+    <!-- ══ START/FINISH TIME MODE ══ -->
+    <div id="pc_time_mode" style="display:none;">
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:14px;padding:18px 16px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">🕐 Start &amp; Finish Times</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.7;">Enter the start and finish time for each day worked. Hours are calculated automatically. Leave a day blank if not worked.</div>
+
+        <div class="field-group">
+          <label class="field-label">Employee Name</label>
+          <input class="field-input" id="pct_emp_name" type="text" placeholder="e.g. Maria Santos" oninput="updateTimePreview()" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Hourly Rate ($ / hr) — leave blank to use default</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:14px;">$</span>
+            <input class="field-input" id="pct_rate" type="number" min="0" step="0.01" placeholder="Uses default if blank" style="padding-left:28px;" oninput="updateTimePreview()" />
+          </div>
+        </div>
+
+        <!-- Day rows with start/finish inputs -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;" id="pct_days_container"></div>
+
+        <!-- Live preview -->
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px;padding:12px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;" id="pct_period_label">Weekly Total Pay</div> style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);">$0.00</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:var(--white-muted);">Total Hours</div>
+              <div id="pct_preview_hours" style="font-size:14px;font-weight:600;color:var(--white);">0h 0m</div>
+            </div>
+          </div>
+          <!-- Per-day breakdown -->
+          <div id="pct_day_breakdown" style="border-top:1px solid rgba(201,168,76,0.15);padding-top:8px;display:flex;flex-direction:column;gap:3px;"></div>
+        </div>
+
+        <button onclick="addTimePayEntry()" style="width:100%;padding:12px;background:var(--gold);border:none;border-radius:9px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+          ➕ Add to Pay Sheet
+        </button>
+        <div class="settings-saved-msg" id="pctAddSaved" style="margin-top:8px;">✅ Entry added!</div>
+        <div class="settings-saved-msg" id="pctAddError" style="margin-top:8px;background:rgba(226,75,74,0.1);border-color:rgba(226,75,74,0.3);color:#ff9999;"></div>
       </div>
     </div>
 
@@ -1193,7 +1233,7 @@
       <div style="font-size:10px;opacity:0.6;">Add your first employee above to get started.</div>
     </div>
   </div>
-  <div class="drawer-panel active" id="panel-review">
+  <div class="drawer-panel" id="panel-review">
     <div class="section-tag">After Every Job</div>
     <div class="section-heading">Send your client<br>a Google review link</div>
     <div class="divider"></div>
@@ -1428,19 +1468,42 @@
 
     <!-- Pay Calculator Mode -->
     <div class="settings-section">
-      <div class="settings-section-title">💰 Pay Calculator — Daily Mode</div>
-      <div class="settings-section-desc">When enabled, the Pay Calculator lets you enter hours and minutes worked for each individual day (Mon–Sun), calculates total weekly hours and pay automatically.</div>
-      <label class="settings-toggle-row" onclick="togglePayDailyMode()">
-        <div>
-          <div class="settings-toggle-label">Enable day-by-day time entry</div>
-          <div class="settings-toggle-sub">Enter hours per day instead of a single total</div>
-        </div>
-        <div class="toggle-switch">
-          <input type="checkbox" id="payDailyModeToggle" onchange="togglePayDailyMode()" />
-          <div class="toggle-track"></div>
-        </div>
-      </label>
-      <div class="settings-saved-msg" id="payDailyModeSaved">✅ Setting saved!</div>
+      <div class="settings-section-title">💰 Pay Calculator — Calculation Mode</div>
+      <div class="settings-section-desc">Choose how you enter employee hours in the Pay Calculator. Switch modes anytime — your pay sheet entries are preserved.</div>
+      <div class="settings-option-group" id="payCalcModeGroup">
+        <button class="settings-option" id="pcmode-simple" onclick="setPayCalcMode('simple', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Simple Mode</span><span class="settings-option-check" id="pcmode-check-simple"></span></div>
+          <div class="settings-option-sub">Enter total hours &amp; minutes worked for the period</div>
+        </button>
+        <button class="settings-option" id="pcmode-daily" onclick="setPayCalcMode('daily', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Day-by-Day Hours</span><span class="settings-option-check" id="pcmode-check-daily"></span></div>
+          <div class="settings-option-sub">Enter hours &amp; minutes for each individual day (Mon–Sun)</div>
+        </button>
+        <button class="settings-option" id="pcmode-time" onclick="setPayCalcMode('time', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Start &amp; Finish Times</span><span class="settings-option-check" id="pcmode-check-time"></span></div>
+          <div class="settings-option-sub">Enter start &amp; finish time per day — hours calculated automatically</div>
+        </button>
+      </div>
+      <div class="settings-saved-msg" id="payCalcModeSaved">✅ Mode saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Pay Period -->
+    <div class="settings-section">
+      <div class="settings-section-title">📆 Pay Period</div>
+      <div class="settings-section-desc">Choose whether the Day-by-Day and Start &amp; Finish Time modes calculate over one week (7 days) or a fortnight (14 days across Week 1 and Week 2).</div>
+      <div class="settings-option-group">
+        <button class="settings-option" id="pcperiod-weekly" onclick="setPayPeriod('weekly', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Weekly</span><span class="settings-option-check" id="pcperiod-check-weekly"></span></div>
+          <div class="settings-option-sub">7 days — Mon to Sun</div>
+        </button>
+        <button class="settings-option" id="pcperiod-fortnightly" onclick="setPayPeriod('fortnightly', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Fortnightly</span><span class="settings-option-check" id="pcperiod-check-fortnightly"></span></div>
+          <div class="settings-option-sub">14 days — Week 1 (Mon–Sun) + Week 2 (Mon–Sun)</div>
+        </button>
+      </div>
+      <div class="settings-saved-msg" id="payPeriodSaved">✅ Pay period saved!</div>
     </div>
 
     <div class="divider" style="margin:20px 0;"></div>
@@ -2089,6 +2152,8 @@ function closeDrawer() {
   ['drawer','overlay','hamburger'].forEach(id => document.getElementById(id).classList.remove('open'));
   document.getElementById('drawer-backdrop').style.display = 'none';
   setTimeout(() => { if (map) map.invalidateSize(); }, 100);
+  // Stop the access code timer — no need to run it when the drawer is closed
+  if (_acTimer) { clearInterval(_acTimer); _acTimer = null; }
 }
 function openDrawerTab(tab) {
   switchDrawerTab(tab);
@@ -2934,7 +2999,11 @@ function refreshDashboard() {
   if (selectedEmpId && employees[selectedEmpId]) showEmpDetail(selectedEmpId);
 }
 
-setInterval(refreshDashboard, 30000);
+setInterval(() => {
+  // Only refresh when the dashboard tab is actually visible — avoids wasted work
+  const dash = document.getElementById('page-dashboard');
+  if (dash && dash.classList.contains('active')) refreshDashboard();
+}, 30000);
 window.addEventListener('storage', e => { if (e.key === ADMIN_KEY) refreshDashboard(); });
 
 // ══════════════════════════════════════════
@@ -3603,23 +3672,96 @@ const PC_RATE_KEY      = 'pi_pc_default_rate';
 const PC_ENTRIES_KEY   = 'pi_pc_entries';
 const PC_DAILY_MODE_KEY = 'pi_pay_daily_mode';
 const PC_DAYS_NAMES    = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const PC_PERIOD_KEY    = 'pi_pay_period'; // 'weekly' | 'fortnightly'
 
 let payEntries = [];
 
-// ── Settings toggle ──
-function togglePayDailyMode() {
-  const tog = document.getElementById('payDailyModeToggle');
-  if (!tog) return;
-  const on = tog.checked;
-  localStorage.setItem(PC_DAILY_MODE_KEY, on ? 'on' : 'off');
-  const saved = document.getElementById('payDailyModeSaved');
-  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
-  // If pay calc panel is currently open, refresh it
-  applyPayCalcMode();
+// ── Pay Period ──
+function getPayPeriod() {
+  return localStorage.getItem(PC_PERIOD_KEY) || 'weekly';
 }
 
-function isPayDailyMode() {
-  return localStorage.getItem(PC_DAILY_MODE_KEY) === 'on';
+function isFortnightly() {
+  return getPayPeriod() === 'fortnightly';
+}
+
+function setPayPeriod(period, btnEl) {
+  localStorage.setItem(PC_PERIOD_KEY, period);
+  const saved = document.getElementById('payPeriodSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
+  updatePayPeriodUI();
+  // Rebuild day rows so they reflect the new period
+  const dCont = document.getElementById('pcd_days_container');
+  const tCont = document.getElementById('pct_days_container');
+  if (dCont) { dCont.dataset.built = ''; dCont.innerHTML = ''; }
+  if (tCont) { tCont.dataset.built = ''; tCont.innerHTML = ''; }
+  applyPayCalcMode();
+  updatePeriodLabels();
+}
+
+function updatePayPeriodUI() {
+  const period = getPayPeriod();
+  ['weekly','fortnightly'].forEach(p => {
+    const btn   = document.getElementById('pcperiod-' + p);
+    const check = document.getElementById('pcperiod-check-' + p);
+    if (btn)   btn.classList.toggle('active', p === period);
+    if (check) check.textContent = p === period ? '✓' : '';
+  });
+}
+
+function updatePeriodLabels() {
+  const label = isFortnightly() ? 'Fortnightly Total Pay' : 'Weekly Total Pay';
+  const dLabel = document.getElementById('pcd_period_label');
+  const tLabel = document.getElementById('pct_period_label');
+  if (dLabel) dLabel.textContent = label;
+  if (tLabel) tLabel.textContent = label;
+}
+
+// Returns array of day-name arrays: 1 week = [[Mon..Sun]], fortnight = [[Mon..Sun],[Mon..Sun]]
+function getPayPeriodWeeks() {
+  if (isFortnightly()) return [PC_DAYS_NAMES.slice(), PC_DAYS_NAMES.slice()];
+  return [PC_DAYS_NAMES.slice()];
+}
+
+// ── Settings: 3-way mode selector ──
+const PC_MODE_KEY = 'pi_pay_calc_mode'; // 'simple' | 'daily' | 'time'
+
+function getPayCalcMode() {
+  // Backwards compat: if old daily-mode key was 'on', treat as 'daily'
+  const legacy = localStorage.getItem(PC_DAILY_MODE_KEY);
+  const stored = localStorage.getItem(PC_MODE_KEY);
+  if (stored) return stored;
+  return legacy === 'on' ? 'daily' : 'simple';
+}
+
+function setPayCalcMode(mode, btnEl) {
+  localStorage.setItem(PC_MODE_KEY, mode);
+  localStorage.removeItem(PC_DAILY_MODE_KEY); // clear legacy key
+  const saved = document.getElementById('payCalcModeSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
+  applyPayCalcMode();
+  updatePayCalcModeUI();
+}
+
+function updatePayCalcModeUI() {
+  const mode = getPayCalcMode();
+  ['simple','daily','time'].forEach(m => {
+    const btn   = document.getElementById('pcmode-' + m);
+    const check = document.getElementById('pcmode-check-' + m);
+    if (btn)   btn.classList.toggle('active', m === mode);
+    if (check) check.textContent = m === mode ? '✓' : '';
+  });
+  updatePayPeriodUI();
+  updatePeriodLabels();
+}
+
+// Legacy: keep isPayDailyMode for any residual calls
+function isPayDailyMode() { return getPayCalcMode() === 'daily'; }
+// Legacy: keep togglePayDailyMode in case anything still calls it
+function togglePayDailyMode() {
+  const tog = document.getElementById('payDailyModeToggle');
+  const on  = tog ? tog.checked : false;
+  setPayCalcMode(on ? 'daily' : 'simple', null);
 }
 
 // ══════════════════════════════════════════
@@ -3722,11 +3864,14 @@ async function initMenuLock() {
 function applyPayCalcMode() {
   const simple = document.getElementById('pc_simple_mode');
   const daily  = document.getElementById('pc_daily_mode');
-  if (!simple || !daily) return;
-  const on = isPayDailyMode();
-  simple.style.display = on ? 'none' : 'block';
-  daily.style.display  = on ? 'block' : 'none';
-  if (on) buildDayRows();
+  const time   = document.getElementById('pc_time_mode');
+  if (!simple || !daily || !time) return;
+  const mode = getPayCalcMode();
+  simple.style.display = mode === 'simple' ? 'block' : 'none';
+  daily.style.display  = mode === 'daily'  ? 'block' : 'none';
+  time.style.display   = mode === 'time'   ? 'block' : 'none';
+  if (mode === 'daily') buildDayRows();
+  if (mode === 'time')  buildTimeDayRows();
 }
 
 // ── Init ──
@@ -3740,8 +3885,9 @@ function initPayCalc() {
     const stored = localStorage.getItem(PC_ENTRIES_KEY);
     if (stored) payEntries = JSON.parse(stored) || [];
   } catch(e) { payEntries = []; }
-  // Apply correct mode
+  // Apply correct mode and update settings UI
   applyPayCalcMode();
+  updatePayCalcModeUI();
   renderPaySheet();
   // Wire simple mode live preview
   ['pc_hours','pc_minutes','pc_rate','pc_days'].forEach(id => {
@@ -3752,8 +3898,10 @@ function initPayCalc() {
   if (saved) {
     const r1 = document.getElementById('pc_rate');
     const r2 = document.getElementById('pcd_rate');
+    const r3 = document.getElementById('pct_rate');
     if (r1 && !r1.value) r1.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
     if (r2 && !r2.value) r2.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
+    if (r3 && !r3.value) r3.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
   }
 }
 
@@ -3766,8 +3914,10 @@ function saveDefaultRate() {
     if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
     const r1 = document.getElementById('pc_rate');
     const r2 = document.getElementById('pcd_rate');
+    const r3 = document.getElementById('pct_rate');
     if (r1 && !r1.value) r1.placeholder = `Default: $${val.toFixed(2)}/hr`;
     if (r2 && !r2.value) r2.placeholder = `Default: $${val.toFixed(2)}/hr`;
+    if (r3 && !r3.value) r3.placeholder = `Default: $${val.toFixed(2)}/hr`;
   }
 }
 
@@ -3821,36 +3971,53 @@ function buildDayRows() {
   const container = document.getElementById('pcd_days_container');
   if (!container || container.dataset.built === '1') return;
   container.dataset.built = '1';
-  container.innerHTML = PC_DAYS_NAMES.map((day, i) => `
-    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.13);border-radius:10px;padding:10px 12px;">
-      <div style="font-size:11px;font-weight:700;color:var(--gold-light);margin-bottom:8px;">${day}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div>
-          <label class="field-label" style="font-size:9px;">Hours</label>
-          <input class="field-input" id="pcd_h_${i}" type="number" min="0" max="24" step="1" placeholder="0" style="padding:8px 10px;font-size:13px;" oninput="updateDailyPreview()" />
+  const weeks = getPayPeriodWeeks();
+  let html = '';
+  weeks.forEach((weekDays, wk) => {
+    if (weeks.length > 1) {
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);padding:6px 2px 4px;">Week ${wk + 1}</div>`;
+    }
+    weekDays.forEach((day, i) => {
+      const idx = wk * 7 + i;
+      html += `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.13);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gold-light);margin-bottom:8px;">${day}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label class="field-label" style="font-size:9px;">Hours</label>
+            <input class="field-input" id="pcd_h_${idx}" type="number" min="0" max="24" step="1" placeholder="0" style="padding:8px 10px;font-size:13px;" oninput="updateDailyPreview()" />
+          </div>
+          <div>
+            <label class="field-label" style="font-size:9px;">Minutes</label>
+            <input class="field-input" id="pcd_m_${idx}" type="number" min="0" max="59" step="1" placeholder="0" style="padding:8px 10px;font-size:13px;" oninput="updateDailyPreview()" />
+          </div>
         </div>
-        <div>
-          <label class="field-label" style="font-size:9px;">Minutes</label>
-          <input class="field-input" id="pcd_m_${i}" type="number" min="0" max="59" step="1" placeholder="0" style="padding:8px 10px;font-size:13px;" oninput="updateDailyPreview()" />
-        </div>
-      </div>
-    </div>`).join('');
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
 }
 
 function updateDailyPreview() {
   const rate = getEffectiveRate('pcd_rate');
+  const weeks = getPayPeriodWeeks();
+  const totalDays = weeks.reduce((s, w) => s + w.length, 0);
   let totalMins = 0;
   const breakdown = [];
-  PC_DAYS_NAMES.forEach((day, i) => {
-    const h = parseInt(document.getElementById('pcd_h_' + i)?.value || 0) || 0;
-    const m = parseInt(document.getElementById('pcd_m_' + i)?.value || 0) || 0;
+  for (let idx = 0; idx < totalDays; idx++) {
+    const wk  = Math.floor(idx / 7);
+    const di  = idx % 7;
+    const day = (weeks[wk] || PC_DAYS_NAMES)[di];
+    const h   = parseInt(document.getElementById('pcd_h_' + idx)?.value || 0) || 0;
+    const m   = parseInt(document.getElementById('pcd_m_' + idx)?.value || 0) || 0;
     const mins = (h * 60) + m;
     if (mins > 0) {
       const dayPay = Math.round((mins * rate / 60) * 100) / 100;
-      breakdown.push({ day, h, m, mins, dayPay });
+      const weekLabel = weeks.length > 1 ? `W${wk + 1} ` : '';
+      breakdown.push({ day: weekLabel + day, h, m, mins, dayPay });
     }
     totalMins += mins;
-  });
+  }
   const totalPay = Math.round((totalMins * rate / 60) * 100) / 100;
   const totalH   = Math.floor(totalMins / 60);
   const totalM   = totalMins % 60;
@@ -3858,7 +4025,6 @@ function updateDailyPreview() {
   const prevHrs  = document.getElementById('pcd_preview_hours');
   if (prevPay) prevPay.textContent = '$' + totalPay.toFixed(2);
   if (prevHrs) prevHrs.textContent = totalH + 'h ' + totalM + 'm';
-  // Day breakdown
   const bd = document.getElementById('pcd_day_breakdown');
   if (bd) {
     if (breakdown.length === 0) { bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter hours above to see breakdown</div>'; }
@@ -3882,37 +4048,206 @@ function addDailyPayEntry() {
   if (!name) { showPcError(errEl, '⚠️ Please enter an employee name.'); return; }
   if (rate <= 0) { showPcError(errEl, '⚠️ Please set a default hourly rate or enter one above.'); return; }
 
-  let totalMins = 0;
-  const dayData = [];
-  PC_DAYS_NAMES.forEach((day, i) => {
-    const h = parseInt(document.getElementById('pcd_h_' + i)?.value || 0) || 0;
-    const m = parseInt(document.getElementById('pcd_m_' + i)?.value || 0) || 0;
+  const weeks    = getPayPeriodWeeks();
+  const totalDays = weeks.reduce((s, w) => s + w.length, 0);
+  let totalMins  = 0;
+  const dayData  = [];
+
+  for (let idx = 0; idx < totalDays; idx++) {
+    const wk  = Math.floor(idx / 7);
+    const di  = idx % 7;
+    const day = (weeks[wk] || PC_DAYS_NAMES)[di];
+    const h   = parseInt(document.getElementById('pcd_h_' + idx)?.value || 0) || 0;
+    const m   = parseInt(document.getElementById('pcd_m_' + idx)?.value || 0) || 0;
     const mins = (h * 60) + m;
-    if (mins > 0) dayData.push({ day, h, m, mins });
+    if (mins > 0) dayData.push({ day, week: wk + 1, h, m, mins });
     totalMins += mins;
-  });
+  }
 
   if (totalMins === 0) { showPcError(errEl, '⚠️ Please enter hours for at least one day.'); return; }
 
-  const pay = Math.round((totalMins * rate / 60) * 100) / 100;
-  const days = dayData.filter(d => d.mins > 0).length;
-  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'daily', dayData });
+  const pay      = Math.round((totalMins * rate / 60) * 100) / 100;
+  const days     = dayData.length;
+  const period   = getPayPeriod();
+  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'daily', period, dayData });
   savePayEntries();
   renderPaySheet();
 
   // Clear inputs
   document.getElementById('pcd_emp_name').value = '';
   document.getElementById('pcd_rate').value = '';
-  PC_DAYS_NAMES.forEach((_, i) => {
-    const hEl = document.getElementById('pcd_h_' + i);
-    const mEl = document.getElementById('pcd_m_' + i);
+  for (let idx = 0; idx < totalDays; idx++) {
+    const hEl = document.getElementById('pcd_h_' + idx);
+    const mEl = document.getElementById('pcd_m_' + idx);
     if (hEl) hEl.value = '';
     if (mEl) mEl.value = '';
-  });
+  }
   document.getElementById('pcd_preview_pay').textContent = '$0.00';
   document.getElementById('pcd_preview_hours').textContent = '0h 0m';
   const bd = document.getElementById('pcd_day_breakdown');
   if (bd) bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter hours above to see breakdown</div>';
+
+  if (okEl) { okEl.classList.add('show'); setTimeout(() => okEl.classList.remove('show'), 2000); }
+}
+
+// ══ START/FINISH TIME MODE ══
+function buildTimeDayRows() {
+  const container = document.getElementById('pct_days_container');
+  if (!container || container.dataset.built === '1') return;
+  container.dataset.built = '1';
+  const weeks = getPayPeriodWeeks();
+  let html = '';
+  weeks.forEach((weekDays, wk) => {
+    if (weeks.length > 1) {
+      html += `<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);padding:6px 2px 4px;">Week ${wk + 1}</div>`;
+    }
+    weekDays.forEach((day, i) => {
+      const idx = wk * 7 + i;
+      html += `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.13);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gold-light);margin-bottom:8px;">${day}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label class="field-label" style="font-size:9px;">Start Time</label>
+            <input class="field-input" id="pct_start_${idx}" type="time" style="padding:8px 10px;font-size:13px;color-scheme:dark;" oninput="updateTimePreview()" />
+          </div>
+          <div>
+            <label class="field-label" style="font-size:9px;">Finish Time</label>
+            <input class="field-input" id="pct_end_${idx}" type="time" style="padding:8px 10px;font-size:13px;color-scheme:dark;" oninput="updateTimePreview()" />
+          </div>
+        </div>
+        <div id="pct_day_msg_${idx}" style="font-size:10px;margin-top:5px;min-height:14px;"></div>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function calcTimeDiff(startStr, endStr) {
+  if (!startStr || !endStr) return 0;
+  const [sh, sm] = startStr.split(':').map(Number);
+  const [eh, em] = endStr.split(':').map(Number);
+  let startMins = sh * 60 + sm;
+  let endMins   = eh * 60 + em;
+  if (endMins <= startMins) endMins += 24 * 60; // overnight
+  return Math.max(0, endMins - startMins);
+}
+
+function updateTimePreview() {
+  const rate   = getEffectiveRate('pct_rate');
+  const weeks  = getPayPeriodWeeks();
+  const totalDays = weeks.reduce((s, w) => s + w.length, 0);
+  let totalMins   = 0;
+  const breakdown = [];
+
+  for (let idx = 0; idx < totalDays; idx++) {
+    const wk      = Math.floor(idx / 7);
+    const di      = idx % 7;
+    const day     = (weeks[wk] || PC_DAYS_NAMES)[di];
+    const startEl = document.getElementById('pct_start_' + idx);
+    const endEl   = document.getElementById('pct_end_'   + idx);
+    const msgEl   = document.getElementById('pct_day_msg_' + idx);
+    const startStr = startEl ? startEl.value : '';
+    const endStr   = endEl   ? endEl.value   : '';
+    let mins = 0;
+
+    if (startStr && endStr) {
+      mins = calcTimeDiff(startStr, endStr);
+      const h = Math.floor(mins / 60), m = mins % 60;
+      const overnight = endStr <= startStr;
+      if (msgEl) { msgEl.textContent = `${h}h ${m}m${overnight ? ' (overnight)' : ''}`; msgEl.style.color = 'var(--success)'; }
+      if (mins > 0) {
+        const dayPay     = Math.round((mins * rate / 60) * 100) / 100;
+        const weekLabel  = weeks.length > 1 ? `W${wk + 1} ` : '';
+        breakdown.push({ day: weekLabel + day, h, m, mins, dayPay, startStr, endStr });
+      }
+    } else if (startStr || endStr) {
+      if (msgEl) { msgEl.textContent = 'Enter both start and finish'; msgEl.style.color = 'rgba(226,75,74,0.8)'; }
+    } else {
+      if (msgEl) msgEl.textContent = '';
+    }
+    totalMins += mins;
+  }
+
+  const totalPay = Math.round((totalMins * rate / 60) * 100) / 100;
+  const totalH   = Math.floor(totalMins / 60);
+  const totalM   = totalMins % 60;
+  const prevPay  = document.getElementById('pct_preview_pay');
+  const prevHrs  = document.getElementById('pct_preview_hours');
+  if (prevPay) prevPay.textContent = '$' + totalPay.toFixed(2);
+  if (prevHrs) prevHrs.textContent = totalH + 'h ' + totalM + 'm';
+
+  const bd = document.getElementById('pct_day_breakdown');
+  if (bd) {
+    if (breakdown.length === 0) {
+      bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter start &amp; finish times above to see breakdown</div>';
+    } else {
+      bd.innerHTML = breakdown.map(b => `
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;gap:6px;">
+          <span style="color:var(--white-muted);min-width:62px;">${b.day}</span>
+          <span style="color:rgba(255,255,255,0.45);font-size:10px;">${b.startStr} – ${b.endStr}</span>
+          <span style="color:var(--white);">${b.h}h ${b.m}m</span>
+          <span style="color:var(--gold);font-weight:600;">$${b.dayPay.toFixed(2)}</span>
+        </div>`).join('');
+    }
+  }
+}
+
+function addTimePayEntry() {
+  const name  = (document.getElementById('pct_emp_name')?.value || '').trim();
+  const rate  = getEffectiveRate('pct_rate');
+  const errEl = document.getElementById('pctAddError');
+  const okEl  = document.getElementById('pctAddSaved');
+
+  if (!name) { showPcError(errEl, '⚠️ Please enter an employee name.'); return; }
+  if (rate <= 0) { showPcError(errEl, '⚠️ Please set a default hourly rate or enter one above.'); return; }
+
+  const weeks     = getPayPeriodWeeks();
+  const totalDays = weeks.reduce((s, w) => s + w.length, 0);
+  let totalMins   = 0;
+  const dayData   = [];
+  let hasIncomplete = false;
+
+  for (let idx = 0; idx < totalDays; idx++) {
+    const wk       = Math.floor(idx / 7);
+    const di       = idx % 7;
+    const day      = (weeks[wk] || PC_DAYS_NAMES)[di];
+    const startStr = document.getElementById('pct_start_' + idx)?.value || '';
+    const endStr   = document.getElementById('pct_end_'   + idx)?.value || '';
+    if (startStr && endStr) {
+      const mins = calcTimeDiff(startStr, endStr);
+      if (mins > 0) dayData.push({ day, week: wk + 1, startStr, endStr, mins, h: Math.floor(mins/60), m: mins%60 });
+      totalMins += mins;
+    } else if (startStr || endStr) {
+      hasIncomplete = true;
+    }
+  }
+
+  if (hasIncomplete) { showPcError(errEl, '⚠️ Some days have only a start or finish time. Please complete or clear them.'); return; }
+  if (totalMins === 0) { showPcError(errEl, '⚠️ Please enter start and finish times for at least one day.'); return; }
+
+  const pay    = Math.round((totalMins * rate / 60) * 100) / 100;
+  const days   = dayData.length;
+  const period = getPayPeriod();
+  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'time', period, dayData });
+  savePayEntries();
+  renderPaySheet();
+
+  // Clear inputs
+  document.getElementById('pct_emp_name').value = '';
+  document.getElementById('pct_rate').value = '';
+  for (let idx = 0; idx < totalDays; idx++) {
+    const sEl = document.getElementById('pct_start_' + idx);
+    const eEl = document.getElementById('pct_end_'   + idx);
+    const mEl = document.getElementById('pct_day_msg_' + idx);
+    if (sEl) sEl.value = '';
+    if (eEl) eEl.value = '';
+    if (mEl) mEl.textContent = '';
+  }
+  document.getElementById('pct_preview_pay').textContent = '$0.00';
+  document.getElementById('pct_preview_hours').textContent = '0h 0m';
+  const bd = document.getElementById('pct_day_breakdown');
+  if (bd) bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter start &amp; finish times above to see breakdown</div>';
 
   if (okEl) { okEl.classList.add('show'); setTimeout(() => okEl.classList.remove('show'), 2000); }
 }
@@ -3957,13 +4292,18 @@ function renderPaySheet() {
     const mins = e.totalMinutes % 60;
     let detailLine = '';
     if (e.mode === 'daily' && e.dayData) {
-      detailLine = e.dayData.map(d => `${d.day}: ${d.h}h ${d.m}m`).join(' · ');
+      detailLine = e.dayData.map(d => `${d.week ? 'W'+d.week+' ' : ''}${d.day}: ${d.h}h ${d.m}m`).join(' · ');
+    } else if (e.mode === 'time' && e.dayData) {
+      detailLine = e.dayData.map(d => `${d.week ? 'W'+d.week+' ' : ''}${d.day}: ${d.startStr}–${d.endStr} (${d.h}h ${d.m}m)`).join(' · ');
     }
+    const periodBadge = e.period === 'fortnightly'
+      ? `<span style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.35);border-radius:8px;padding:2px 7px;color:var(--gold);margin-left:6px;">Fortnightly</span>`
+      : '';
     return `
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.18);border-radius:11px;padding:13px;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">${e.name}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;">${e.name}${periodBadge}</div>
             <div style="font-size:11px;color:var(--white-muted);line-height:1.8;">
               Days: <span style="color:var(--white);font-weight:600;">${e.days}</span> &nbsp;·&nbsp;
               Total: <span style="color:var(--white);font-weight:600;">${hrs}h ${mins}m</span> &nbsp;·&nbsp;
