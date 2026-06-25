@@ -544,6 +544,8 @@
   .client-action-btn:hover { background:rgba(201,168,76,0.2); }
   .client-action-btn.danger { border-color:rgba(226,75,74,0.35); color:var(--danger); background:rgba(226,75,74,0.06); }
   .client-action-btn.danger:hover { background:rgba(226,75,74,0.15); }
+  .client-action-btn.review { border-color:rgba(29,185,84,0.4); color:#3ddc6f; background:rgba(29,185,84,0.08); }
+  .client-action-btn.review:hover { background:rgba(29,185,84,0.2); }
   .client-expanded { display:none; margin-top:10px; border-top:1px solid rgba(201,168,76,0.12); padding-top:10px; }
   .client-expanded.show { display:block; }
   .client-detail-row { display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px; }
@@ -828,6 +830,21 @@
   .cr-subpanel { display: none; }
   .cr-subpanel.active { display: block; }
 
+  .pc-period-row {
+    display: flex; gap: 6px; margin-bottom: 14px;
+    background: rgba(255,255,255,0.03); border-radius: 10px; padding: 4px;
+  }
+  .pc-period-btn {
+    flex: 1; padding: 8px 8px; border-radius: 7px; border: none;
+    font-family: 'Montserrat', sans-serif; font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--white-muted); background: transparent; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pc-period-btn.active {
+    background: var(--gold); color: var(--navy);
+  }
+
   /* ════ SETTINGS PANEL ════ */
   .settings-section { margin-bottom: 8px; }
   .settings-section-title {
@@ -933,7 +950,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.0.5</div>
+  <div class="splash-version">v2.0.7</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1006,7 +1023,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.0.5</div>
+          <div class="nav-item-sub">What's new in v2.0.7</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1043,7 +1060,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.5 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.7 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -1119,6 +1136,12 @@
         <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);">📅 Day-by-Day Entry</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.7;">Enter the hours &amp; minutes worked each day. Leave a day blank if not worked.</div>
 
+        <!-- Pay period: Weekly / Fortnightly -->
+        <div class="pc-period-row">
+          <button class="pc-period-btn active" id="pcd-period-weekly" onclick="setDailyPeriod('weekly')">Weekly (7 Days)</button>
+          <button class="pc-period-btn" id="pcd-period-fortnightly" onclick="setDailyPeriod('fortnightly')">Fortnightly (14 Days)</button>
+        </div>
+
         <div class="field-group">
           <label class="field-label">Employee Name</label>
           <input class="field-input" id="pcd_emp_name" type="text" placeholder="e.g. Maria Santos" />
@@ -1140,7 +1163,7 @@
         <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px;padding:12px;margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <div>
-              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;">Weekly Total Pay</div>
+              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;" id="pcd_preview_label">Weekly Total Pay</div>
               <div id="pcd_preview_pay" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);">$0.00</div>
             </div>
             <div style="text-align:right;">
@@ -1160,14 +1183,71 @@
       </div>
     </div>
 
+    <!-- ══ TIME-BASED MODE (Start/Finish, Fortnightly) ══ -->
+    <div id="pc_timecard_mode" style="display:none;">
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.18);border-radius:14px;padding:18px 16px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.15);" id="pct_panel_title">⏰ Start / Finish Time</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:14px;line-height:1.7;">Enter clock-in &amp; clock-out times for each day. Hours are calculated automatically. Leave a day blank if not worked.</div>
+
+        <!-- Pay period: Weekly / Fortnightly -->
+        <div class="pc-period-row">
+          <button class="pc-period-btn active" id="pct-period-weekly" onclick="setTimecardPeriod('weekly')">Weekly (7 Days)</button>
+          <button class="pc-period-btn" id="pct-period-fortnightly" onclick="setTimecardPeriod('fortnightly')">Fortnightly (14 Days)</button>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Employee Name</label>
+          <input class="field-input" id="pct_emp_name" type="text" placeholder="e.g. Maria Santos" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Hourly Rate ($ / hr) — leave blank to use default</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;font-size:14px;">$</span>
+            <input class="field-input" id="pct_rate" type="number" min="0" step="0.01" placeholder="Uses default if blank" style="padding-left:28px;" oninput="updateTimecardPreview()" />
+          </div>
+        </div>
+
+        <!-- Week 1 -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-light);margin:14px 0 8px;" id="pct_week1_label">Week 1</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px;" id="pct_week1_container"></div>
+
+        <!-- Week 2 (fortnightly only) -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-light);margin:14px 0 8px;" id="pct_week2_label">Week 2</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;" id="pct_week2_container"></div>
+
+        <!-- Timecard live preview -->
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);border-radius:9px;padding:12px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white-muted);margin-bottom:2px;" id="pct_preview_label">Weekly Total Pay</div>
+              <div id="pct_preview_pay" style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);">$0.00</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:var(--white-muted);">Total Hours</div>
+              <div id="pct_preview_hours" style="font-size:14px;font-weight:600;color:var(--white);">0h 0m</div>
+            </div>
+          </div>
+          <!-- Per-day breakdown -->
+          <div id="pct_day_breakdown" style="border-top:1px solid rgba(201,168,76,0.15);padding-top:8px;display:flex;flex-direction:column;gap:3px;max-height:220px;overflow-y:auto;"></div>
+        </div>
+
+        <button onclick="addTimecardPayEntry()" style="width:100%;padding:12px;background:var(--gold);border:none;border-radius:9px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+          ➕ Add to Pay Sheet
+        </button>
+        <div class="settings-saved-msg" id="pctAddSaved" style="margin-top:8px;">✅ Entry added!</div>
+        <div class="settings-saved-msg" id="pctAddError" style="margin-top:8px;background:rgba(226,75,74,0.1);border-color:rgba(226,75,74,0.3);color:#ff9999;"></div>
+      </div>
+    </div>
+
     <!-- Pay Sheet / Results Table (shared between modes) -->
     <div id="pc_sheet_wrap" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;color:var(--gold-light);">Pay Sheet</div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="clearPaySheet()" style="background:none;border:1px solid rgba(226,75,74,0.4);color:#ff8a89;border-radius:7px;padding:5px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Clear All</button>
-          <button onclick="exportPayPDF()" style="background:var(--gold);border:none;border-radius:7px;padding:5px 12px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.06em;">⬇ Export PDF</button>
-        </div>
+        <button onclick="clearPaySheet()" style="background:none;border:1px solid rgba(226,75,74,0.4);color:#ff8a89;border-radius:7px;padding:5px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Clear All</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button onclick="exportPayPDF()" style="flex:1;background:var(--gold);border:none;border-radius:7px;padding:9px 8px;color:var(--navy);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.06em;">⬇ Export PDF</button>
+        <button onclick="sharePaySheetWhatsApp()" style="flex:1;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.45);border-radius:7px;padding:9px 8px;color:#3ddc6f;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.06em;">📤 Send via WhatsApp</button>
       </div>
       <div id="pc_entries_list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
       <!-- Totals bar -->
@@ -1428,19 +1508,45 @@
 
     <!-- Pay Calculator Mode -->
     <div class="settings-section">
-      <div class="settings-section-title">💰 Pay Calculator — Daily Mode</div>
-      <div class="settings-section-desc">When enabled, the Pay Calculator lets you enter hours and minutes worked for each individual day (Mon–Sun), calculates total weekly hours and pay automatically.</div>
-      <label class="settings-toggle-row" onclick="togglePayDailyMode()">
+      <div class="settings-section-title">💰 Pay Calculator — Entry Method</div>
+      <div class="settings-section-desc">Choose how you enter employee time worked in the Pay Calculator. Switch any time — your saved pay sheet entries are kept either way.</div>
+      <div class="settings-option-group" id="payMethodGroup">
+        <button class="settings-option active" onclick="setPayMethod('simple', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Simple Total</span><span class="settings-option-check" id="pmcheck-simple">✓</span></div>
+          <div class="settings-option-sub">Enter total hours &amp; minutes worked</div>
+        </button>
+        <button class="settings-option" onclick="setPayMethod('daily', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Daily (Mon–Sun)</span><span class="settings-option-check" id="pmcheck-daily"></span></div>
+          <div class="settings-option-sub">Enter hours &amp; minutes per day — weekly or fortnightly</div>
+        </button>
+        <button class="settings-option" onclick="setPayMethod('timecard', this)">
+          <div class="settings-option-top"><span class="settings-option-label">Start/Finish Time</span><span class="settings-option-check" id="pmcheck-timecard"></span></div>
+          <div class="settings-option-sub">Enter clock-in &amp; clock-out times for each day — weekly or fortnightly</div>
+        </button>
+      </div>
+      <div class="settings-saved-msg" id="payDailyModeSaved">✅ Setting saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Employee Menu Lock Toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔒 Employee Menu Lock</div>
+      <div class="settings-section-desc">When enabled, employees must enter the current rotating access code to open their hamburger menu. When off, the menu is freely accessible without a code.</div>
+      <label class="settings-toggle-row" id="menuLockToggleRow" onclick="toggleMenuLock(event)">
         <div>
-          <div class="settings-toggle-label">Enable day-by-day time entry</div>
-          <div class="settings-toggle-sub">Enter hours per day instead of a single total</div>
+          <div class="settings-toggle-label">Lock employee hamburger menu</div>
+          <div class="settings-toggle-sub" id="menuLockSub">Menu is currently <strong style="color:var(--success)">unlocked</strong> — no code required</div>
         </div>
         <div class="toggle-switch">
-          <input type="checkbox" id="payDailyModeToggle" onchange="togglePayDailyMode()" />
+          <input type="checkbox" id="menuLockToggle" />
           <div class="toggle-track"></div>
         </div>
       </label>
-      <div class="settings-saved-msg" id="payDailyModeSaved">✅ Setting saved!</div>
+      <div class="settings-saved-msg" id="menuLockSaved">✅ Menu lock setting saved!</div>
+      <div id="menuLockStatusBanner" style="display:none;background:rgba(226,75,74,0.09);border:1px solid rgba(226,75,74,0.35);border-radius:9px;padding:12px 14px;margin-top:10px;font-size:11px;color:rgba(255,255,255,0.7);line-height:1.7;">
+        🔐 <strong style="color:#ff8a89;">Menu lock is ON.</strong> Employees need the current rotating code to access their menu. Share the live code from <strong style="color:var(--gold-light);">Employee Access Codes</strong>.
+      </div>
     </div>
 
     <div class="divider" style="margin:20px 0;"></div>
@@ -1572,7 +1678,35 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.0.5</div>
+    <div class="section-heading">What's New<br>in v2.0.7</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">🗓️</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Weekly or Fortnightly — v2.0.7</div>
+        <div class="nf-desc">Daily (Mon–Sun) and Start/Finish Time pay methods now both let you choose Weekly (7 days) or Fortnightly (14 days) right in the calculator — switch any time, your saved pay sheet entries are kept either way.</div>
+      </div>
+    </div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">⏰</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Start/Finish Time Pay Method — v2.0.6</div>
+        <div class="nf-desc">New pay calculator method! Enter each employee's clock-in &amp; clock-out time for every day across a 2-week pay period and the app works out hours and pay automatically. Switch between Simple, Daily, or Start/Finish methods any time in Settings.</div>
+      </div>
+    </div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">📤</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Send Pay Sheets via WhatsApp — v2.0.6</div>
+        <div class="nf-desc">Send your pay sheet summary — or a single employee's pay — straight to WhatsApp or WA Business with one tap. Names, hours and pay are pre-filled and ready to send.</div>
+      </div>
+    </div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">⭐</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">One-Tap Review Requests — v2.0.6</div>
+        <div class="nf-desc">When a client's card glows green (service done within the last 7 days), a new "Request Review" button appears. Tap it and your phone's Messages app opens instantly with the client's number, your review message, and the Google review link all pre-filled.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon">💰</div>
       <div class="nf-content">
@@ -2093,8 +2227,8 @@ function setDateFormat(fmt, btn) {
   const keyMap = {'DD/MM/YY':'DDMMYY','DD/MM/YYYY':'DDMMYYYY','MM/DD/YY':'MMDDYY','YYYY-MM-DD':'YYYYMMDD'};
   const checkEl = document.getElementById('dfcheck-' + (keyMap[fmt]||'DDMMYY'));
   if (checkEl) checkEl.textContent = '✓';
-  // Toggle active class on option buttons
-  document.querySelectorAll('.settings-option').forEach(b => b.classList.remove('active'));
+  // Toggle active class on option buttons (scoped to this group only)
+  document.querySelectorAll('#dateFormatGroup .settings-option').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   const saved = document.getElementById('dateFormatSaved');
   if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
@@ -2125,10 +2259,20 @@ function loadSettingsUI() {
   const glow = localStorage.getItem('pi_due30_glow') !== 'off';
   const tog = document.getElementById('due30GlowToggle');
   if (tog) tog.checked = glow;
-  // Pay Daily Mode toggle
-  const dailyOn = localStorage.getItem('pi_pay_daily_mode') === 'on';
-  const dailyTog = document.getElementById('payDailyModeToggle');
-  if (dailyTog) dailyTog.checked = dailyOn;
+  // Pay Method selector (3-way)
+  const payMethod = getPayMethod();
+  ['simple','daily','timecard'].forEach(k => {
+    const chk = document.getElementById('pmcheck-' + k);
+    if (chk) chk.textContent = '';
+  });
+  const activeCheck = document.getElementById('pmcheck-' + payMethod);
+  if (activeCheck) activeCheck.textContent = '✓';
+  document.querySelectorAll('#payMethodGroup .settings-option').forEach(b => {
+    b.classList.remove('active');
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${payMethod}'`)) b.classList.add('active');
+  });
+  // Menu lock toggle
+  initMenuLock();
 }
 
 // ── CLIENT SEARCH ──
@@ -2506,6 +2650,7 @@ function renderClients() {
       <div class="client-actions">
         <button class="client-action-btn" onclick="toggleClientExpand(${realIdx})">ℹ Details</button>
         ${c.phone ? `<button class="client-action-btn" onclick="smsClient('${c.name}','${c.phone}')">📱 SMS</button>` : ''}
+        ${(c.phone && status==='done') ? `<button class="client-action-btn review" onclick="requestReviewClient('${c.name}','${c.phone}')">⭐ Request Review</button>` : ''}
         ${(status==='urgent'||status==='soon') ? `<button class="client-action-btn danger" onclick="quickReminder(${realIdx})">🔔 Remind</button>` : ''}
       </div>
     </div>`;
@@ -2528,6 +2673,18 @@ function smsClient(name, phone) {
   const body = encodeURIComponent(`Hi ${name.split(' ')[0]},\n\nThis is Pi Cleaning Services. We wanted to reach out to you.`);
   const p = phone.replace(/\s/g,'');
   window.location.href = `sms:${p}?body=${body}`;
+}
+
+function requestReviewClient(name, phone) {
+  if (!phone) return;
+  const first = name.split(' ')[0];
+  // Build message from saved review template, substituting the link placeholder with the actual hardcoded review URL
+  const tpl = getSavedReviewTemplate(first);
+  const smsBody = tpl.replace(/(Click here to review us ⭐|Click the link below to review us ⭐?)/g, GOOGLE_URL);
+  const body = encodeURIComponent(smsBody);
+  const p = phone.replace(/\s/g,'');
+  window.location.href = `sms:${p}?body=${body}`;
+  showGsToast(`⭐ Opening Messages app to request a review from ${first}!`, 'success');
 }
 
 function quickReminder(i) {
@@ -3577,35 +3734,230 @@ function showDocToast(msg, type) {
 // ══════════════════════════════════════════
 const PC_RATE_KEY      = 'pi_pc_default_rate';
 const PC_ENTRIES_KEY   = 'pi_pc_entries';
-const PC_DAILY_MODE_KEY = 'pi_pay_daily_mode';
+const PC_DAILY_MODE_KEY = 'pi_pay_daily_mode'; // legacy key, kept for backward compatibility
+const PC_METHOD_KEY    = 'pi_pay_method'; // 'simple' | 'daily' | 'timecard'
 const PC_DAYS_NAMES    = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const PC_FORTNIGHT_LABELS = (() => {
+  const labels = [];
+  ['Week 1','Week 2'].forEach(wk => PC_DAYS_NAMES.forEach(d => labels.push(`${wk} · ${d}`)));
+  return labels;
+})();
+const PCD_PERIOD_KEY = 'pi_pcd_period'; // 'weekly' | 'fortnightly' (Daily/Day-by-Day mode)
+const PCT_PERIOD_KEY = 'pi_pct_period'; // 'weekly' | 'fortnightly' (Start/Finish Time mode)
 
 let payEntries = [];
 
-// ── Settings toggle ──
-function togglePayDailyMode() {
-  const tog = document.getElementById('payDailyModeToggle');
-  if (!tog) return;
-  const on = tog.checked;
-  localStorage.setItem(PC_DAILY_MODE_KEY, on ? 'on' : 'off');
+// ── Daily mode: Weekly / Fortnightly period ──
+function getDailyPeriod() {
+  const saved = localStorage.getItem(PCD_PERIOD_KEY);
+  return saved === 'fortnightly' ? 'fortnightly' : 'weekly';
+}
+
+// Sync the button/label UI to match the saved period, without rebuilding rows
+// (used on initial load / panel switch so in-progress entries aren't wiped)
+function syncDailyPeriodUI() {
+  const period = getDailyPeriod();
+  const wkBtn = document.getElementById('pcd-period-weekly');
+  const ftBtn = document.getElementById('pcd-period-fortnightly');
+  if (wkBtn) wkBtn.classList.toggle('active', period === 'weekly');
+  if (ftBtn) ftBtn.classList.toggle('active', period === 'fortnightly');
+  const label = document.getElementById('pcd_preview_label');
+  if (label) label.textContent = (period === 'fortnightly' ? 'Fortnightly' : 'Weekly') + ' Total Pay';
+}
+
+function setDailyPeriod(period) {
+  localStorage.setItem(PCD_PERIOD_KEY, period);
+  syncDailyPeriodUI();
+  // Rebuild the day rows for the new period and reset the live preview
+  const container = document.getElementById('pcd_days_container');
+  if (container) container.dataset.built = '';
+  buildDayRows();
+  updateDailyPreview();
+}
+
+// ── Timecard mode: Weekly / Fortnightly period ──
+function getTimecardPeriod() {
+  const saved = localStorage.getItem(PCT_PERIOD_KEY);
+  return saved === 'weekly' ? 'weekly' : 'fortnightly'; // default stays fortnightly (existing behaviour)
+}
+
+// Sync the button/label/week2-visibility UI to match the saved period, without
+// rebuilding rows (used on initial load / panel switch so entries aren't wiped)
+function syncTimecardPeriodUI() {
+  const period = getTimecardPeriod();
+  const wkBtn = document.getElementById('pct-period-weekly');
+  const ftBtn = document.getElementById('pct-period-fortnightly');
+  if (wkBtn) wkBtn.classList.toggle('active', period === 'weekly');
+  if (ftBtn) ftBtn.classList.toggle('active', period === 'fortnightly');
+  const title = document.getElementById('pct_panel_title');
+  if (title) title.textContent = '⏰ Start / Finish Time' + (period === 'fortnightly' ? ' — Fortnightly' : '');
+  const label = document.getElementById('pct_preview_label');
+  if (label) label.textContent = (period === 'fortnightly' ? 'Fortnightly' : 'Weekly') + ' Total Pay';
+  const week1Label = document.getElementById('pct_week1_label');
+  const week2Label = document.getElementById('pct_week2_label');
+  const week2Container = document.getElementById('pct_week2_container');
+  if (week1Label) week1Label.style.display = period === 'fortnightly' ? 'block' : 'none';
+  if (week2Label) week2Label.style.display = period === 'fortnightly' ? 'block' : 'none';
+  if (week2Container) week2Container.style.display = period === 'fortnightly' ? 'flex' : 'none';
+}
+
+function setTimecardPeriod(period) {
+  localStorage.setItem(PCT_PERIOD_KEY, period);
+  syncTimecardPeriodUI();
+  // Rebuild the time rows for the new period and reset the live preview
+  const w1 = document.getElementById('pct_week1_container');
+  const w2 = document.getElementById('pct_week2_container');
+  if (w1) w1.dataset.built = '';
+  if (w2) w2.dataset.built = '';
+  buildTimecardRows();
+  updateTimecardPreview();
+}
+
+// ── Settings: Pay Method (3-way) ──
+function getPayMethod() {
+  const saved = localStorage.getItem(PC_METHOD_KEY);
+  if (saved === 'simple' || saved === 'daily' || saved === 'timecard') return saved;
+  // Migrate legacy daily-mode toggle if present
+  if (localStorage.getItem(PC_DAILY_MODE_KEY) === 'on') return 'daily';
+  return 'simple';
+}
+
+function setPayMethod(method, btn) {
+  localStorage.setItem(PC_METHOD_KEY, method);
+  // Keep legacy key in sync so any old references behave correctly
+  localStorage.setItem(PC_DAILY_MODE_KEY, method === 'daily' ? 'on' : 'off');
+  // Uncheck all, check selected (scoped to this group only)
+  ['simple','daily','timecard'].forEach(k => {
+    const el = document.getElementById('pmcheck-' + k);
+    if (el) el.textContent = '';
+  });
+  const checkEl = document.getElementById('pmcheck-' + method);
+  if (checkEl) checkEl.textContent = '✓';
+  document.querySelectorAll('#payMethodGroup .settings-option').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
   const saved = document.getElementById('payDailyModeSaved');
   if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
   // If pay calc panel is currently open, refresh it
   applyPayCalcMode();
 }
 
+// Legacy helper kept so any other existing call sites still work
 function isPayDailyMode() {
-  return localStorage.getItem(PC_DAILY_MODE_KEY) === 'on';
+  return getPayMethod() === 'daily';
+}
+
+function isPayTimecardMode() {
+  return getPayMethod() === 'timecard';
+}
+
+// ══════════════════════════════════════════
+//  EMPLOYEE MENU LOCK
+//  Syncs lock state to Google Sheet via Apps Script
+//  Employee app reads the same value before opening the menu
+// ══════════════════════════════════════════
+const MENU_LOCK_KEY = 'pi_menu_lock'; // local cache so UI is instant on reload
+
+function isMenuLocked() {
+  return localStorage.getItem(MENU_LOCK_KEY) === 'on';
+}
+
+async function toggleMenuLock(e) {
+  if (e) e.preventDefault();
+  const tog    = document.getElementById('menuLockToggle');
+  const row    = document.getElementById('menuLockToggleRow');
+  const saved  = document.getElementById('menuLockSaved');
+  if (!tog) return;
+
+  const newState = !tog.checked;
+  tog.checked = newState;
+
+  // Optimistically update UI immediately
+  updateMenuLockUI(newState);
+  localStorage.setItem(MENU_LOCK_KEY, newState ? 'on' : 'off');
+
+  // Disable row while saving
+  if (row) row.style.pointerEvents = 'none';
+
+  try {
+    const url = getGsUrl(); // reuse existing admin GAS URL helper
+    const resp = await fetch(url + '?action=setMenuLock&state=' + (newState ? 'LOCKED' : 'UNLOCKED'));
+    const data = await resp.json();
+    if (data.status === 'ok') {
+      if (saved) {
+        saved.textContent = newState ? '🔒 Menu locked — employees need a code!' : '🔓 Menu unlocked — employees can open freely.';
+        saved.classList.add('show');
+        setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Menu lock setting saved!'; }, 3000);
+      }
+    } else {
+      throw new Error(data.error || 'Sheet error');
+    }
+  } catch(err) {
+    // Roll back on failure
+    tog.checked = !newState;
+    localStorage.setItem(MENU_LOCK_KEY, newState ? 'off' : 'on');
+    updateMenuLockUI(!newState);
+    if (saved) {
+      saved.textContent = '❌ Failed to save — check your sheet connection.';
+      saved.style.background = 'rgba(226,75,74,0.1)';
+      saved.style.borderColor = 'rgba(226,75,74,0.35)';
+      saved.style.color = 'var(--danger)';
+      saved.classList.add('show');
+      setTimeout(() => {
+        saved.classList.remove('show');
+        saved.textContent = '✅ Menu lock setting saved!';
+        saved.style.background = '';
+        saved.style.borderColor = '';
+        saved.style.color = '';
+      }, 3500);
+    }
+  } finally {
+    if (row) row.style.pointerEvents = '';
+  }
+}
+
+function updateMenuLockUI(locked) {
+  const sub    = document.getElementById('menuLockSub');
+  const banner = document.getElementById('menuLockStatusBanner');
+  if (sub) {
+    sub.innerHTML = locked
+      ? 'Menu is currently <strong style="color:var(--danger)">locked</strong> — code required to open'
+      : 'Menu is currently <strong style="color:var(--success)">unlocked</strong> — no code required';
+  }
+  if (banner) banner.style.display = locked ? 'block' : 'none';
+}
+
+async function initMenuLock() {
+  // Show cached state instantly, then sync from sheet in background
+  const cached = isMenuLocked();
+  const tog = document.getElementById('menuLockToggle');
+  if (tog) tog.checked = cached;
+  updateMenuLockUI(cached);
+
+  // Fetch live state from sheet
+  try {
+    const url  = getGsUrl();
+    const resp = await fetch(url + '?action=getMenuLock');
+    const data = await resp.json();
+    if (data.state) {
+      const live = data.state === 'LOCKED';
+      localStorage.setItem(MENU_LOCK_KEY, live ? 'on' : 'off');
+      if (tog) tog.checked = live;
+      updateMenuLockUI(live);
+    }
+  } catch(e) { /* use cached */ }
 }
 
 function applyPayCalcMode() {
-  const simple = document.getElementById('pc_simple_mode');
-  const daily  = document.getElementById('pc_daily_mode');
-  if (!simple || !daily) return;
-  const on = isPayDailyMode();
-  simple.style.display = on ? 'none' : 'block';
-  daily.style.display  = on ? 'block' : 'none';
-  if (on) buildDayRows();
+  const simple   = document.getElementById('pc_simple_mode');
+  const daily    = document.getElementById('pc_daily_mode');
+  const timecard = document.getElementById('pc_timecard_mode');
+  if (!simple || !daily || !timecard) return;
+  const method = getPayMethod();
+  simple.style.display   = method === 'simple'   ? 'block' : 'none';
+  daily.style.display    = method === 'daily'    ? 'block' : 'none';
+  timecard.style.display = method === 'timecard' ? 'block' : 'none';
+  if (method === 'daily') { syncDailyPeriodUI(); buildDayRows(); }
+  if (method === 'timecard') { syncTimecardPeriodUI(); buildTimecardRows(); }
 }
 
 // ── Init ──
@@ -3631,8 +3983,10 @@ function initPayCalc() {
   if (saved) {
     const r1 = document.getElementById('pc_rate');
     const r2 = document.getElementById('pcd_rate');
+    const r3 = document.getElementById('pct_rate');
     if (r1 && !r1.value) r1.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
     if (r2 && !r2.value) r2.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
+    if (r3 && !r3.value) r3.placeholder = `Default: $${parseFloat(saved).toFixed(2)}/hr`;
   }
 }
 
@@ -3645,8 +3999,10 @@ function saveDefaultRate() {
     if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
     const r1 = document.getElementById('pc_rate');
     const r2 = document.getElementById('pcd_rate');
+    const r3 = document.getElementById('pct_rate');
     if (r1 && !r1.value) r1.placeholder = `Default: $${val.toFixed(2)}/hr`;
     if (r2 && !r2.value) r2.placeholder = `Default: $${val.toFixed(2)}/hr`;
+    if (r3 && !r3.value) r3.placeholder = `Default: $${val.toFixed(2)}/hr`;
   }
 }
 
@@ -3700,7 +4056,8 @@ function buildDayRows() {
   const container = document.getElementById('pcd_days_container');
   if (!container || container.dataset.built === '1') return;
   container.dataset.built = '1';
-  container.innerHTML = PC_DAYS_NAMES.map((day, i) => `
+  const labels = getDailyPeriod() === 'fortnightly' ? PC_FORTNIGHT_LABELS : PC_DAYS_NAMES;
+  container.innerHTML = labels.map((day, i) => `
     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.13);border-radius:10px;padding:10px 12px;">
       <div style="font-size:11px;font-weight:700;color:var(--gold-light);margin-bottom:8px;">${day}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -3718,9 +4075,10 @@ function buildDayRows() {
 
 function updateDailyPreview() {
   const rate = getEffectiveRate('pcd_rate');
+  const labels = getDailyPeriod() === 'fortnightly' ? PC_FORTNIGHT_LABELS : PC_DAYS_NAMES;
   let totalMins = 0;
   const breakdown = [];
-  PC_DAYS_NAMES.forEach((day, i) => {
+  labels.forEach((day, i) => {
     const h = parseInt(document.getElementById('pcd_h_' + i)?.value || 0) || 0;
     const m = parseInt(document.getElementById('pcd_m_' + i)?.value || 0) || 0;
     const mins = (h * 60) + m;
@@ -3757,13 +4115,15 @@ function addDailyPayEntry() {
   const rate  = getEffectiveRate('pcd_rate');
   const errEl = document.getElementById('pcdAddError');
   const okEl  = document.getElementById('pcdAddSaved');
+  const period = getDailyPeriod();
+  const labels = period === 'fortnightly' ? PC_FORTNIGHT_LABELS : PC_DAYS_NAMES;
 
   if (!name) { showPcError(errEl, '⚠️ Please enter an employee name.'); return; }
   if (rate <= 0) { showPcError(errEl, '⚠️ Please set a default hourly rate or enter one above.'); return; }
 
   let totalMins = 0;
   const dayData = [];
-  PC_DAYS_NAMES.forEach((day, i) => {
+  labels.forEach((day, i) => {
     const h = parseInt(document.getElementById('pcd_h_' + i)?.value || 0) || 0;
     const m = parseInt(document.getElementById('pcd_m_' + i)?.value || 0) || 0;
     const mins = (h * 60) + m;
@@ -3775,14 +4135,14 @@ function addDailyPayEntry() {
 
   const pay = Math.round((totalMins * rate / 60) * 100) / 100;
   const days = dayData.filter(d => d.mins > 0).length;
-  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'daily', dayData });
+  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'daily', period, dayData });
   savePayEntries();
   renderPaySheet();
 
   // Clear inputs
   document.getElementById('pcd_emp_name').value = '';
   document.getElementById('pcd_rate').value = '';
-  PC_DAYS_NAMES.forEach((_, i) => {
+  labels.forEach((_, i) => {
     const hEl = document.getElementById('pcd_h_' + i);
     const mEl = document.getElementById('pcd_m_' + i);
     if (hEl) hEl.value = '';
@@ -3792,6 +4152,146 @@ function addDailyPayEntry() {
   document.getElementById('pcd_preview_hours').textContent = '0h 0m';
   const bd = document.getElementById('pcd_day_breakdown');
   if (bd) bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter hours above to see breakdown</div>';
+
+  if (okEl) { okEl.classList.add('show'); setTimeout(() => okEl.classList.remove('show'), 2000); }
+}
+
+// ══ TIME-BASED MODE (Start/Finish, Fortnightly) ══
+function _pctMinutesFromTime(str) {
+  if (!str) return null;
+  const parts = str.split(':');
+  if (parts.length !== 2) return null;
+  const h = parseInt(parts[0], 10), m = parseInt(parts[1], 10);
+  if (isNaN(h) || isNaN(m)) return null;
+  return (h * 60) + m;
+}
+
+function _pctRowHTML(i, label) {
+  return `
+    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(201,168,76,0.13);border-radius:10px;padding:10px 12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold-light);margin-bottom:8px;">${label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div>
+          <label class="field-label" style="font-size:9px;">Start Time</label>
+          <input class="field-input" id="pct_s_${i}" type="time" style="padding:8px 10px;font-size:13px;" oninput="updateTimecardPreview()" />
+        </div>
+        <div>
+          <label class="field-label" style="font-size:9px;">Finish Time</label>
+          <input class="field-input" id="pct_f_${i}" type="time" style="padding:8px 10px;font-size:13px;" oninput="updateTimecardPreview()" />
+        </div>
+      </div>
+    </div>`;
+}
+
+function buildTimecardRows() {
+  const w1 = document.getElementById('pct_week1_container');
+  const w2 = document.getElementById('pct_week2_container');
+  if (!w1 || !w2) return;
+  const period = getTimecardPeriod();
+  if (w1.dataset.built !== '1') {
+    w1.dataset.built = '1';
+    w1.innerHTML = PC_DAYS_NAMES.map((day, i) => _pctRowHTML(i, day)).join('');
+  }
+  if (period === 'fortnightly') {
+    if (w2.dataset.built !== '1') {
+      w2.dataset.built = '1';
+      w2.innerHTML = PC_DAYS_NAMES.map((day, i) => _pctRowHTML(i + 7, day)).join('');
+    }
+  } else {
+    // Weekly: week 2 inputs aren't shown, so make sure they're cleared/not built to avoid stale leftover values
+    w2.dataset.built = '';
+    w2.innerHTML = '';
+  }
+}
+
+function updateTimecardPreview() {
+  const rate = getEffectiveRate('pct_rate');
+  const labels = getTimecardPeriod() === 'fortnightly' ? PC_FORTNIGHT_LABELS : PC_DAYS_NAMES;
+  let totalMins = 0;
+  const breakdown = [];
+  labels.forEach((label, i) => {
+    const startEl = document.getElementById('pct_s_' + i);
+    const finishEl = document.getElementById('pct_f_' + i);
+    if (!startEl || !finishEl) return;
+    const start = startEl.value, finish = finishEl.value;
+    if (!start || !finish) return;
+    const startMins = _pctMinutesFromTime(start);
+    const finishMins = _pctMinutesFromTime(finish);
+    if (startMins === null || finishMins === null) return;
+    const mins = finishMins - startMins;
+    if (mins <= 0) return; // finish must be after start on the same day
+    const dayPay = Math.round((mins * rate / 60) * 100) / 100;
+    breakdown.push({ day: label, start, finish, mins, dayPay });
+    totalMins += mins;
+  });
+  const totalPay = Math.round((totalMins * rate / 60) * 100) / 100;
+  const totalH   = Math.floor(totalMins / 60);
+  const totalM   = totalMins % 60;
+  const prevPay  = document.getElementById('pct_preview_pay');
+  const prevHrs  = document.getElementById('pct_preview_hours');
+  if (prevPay) prevPay.textContent = '$' + totalPay.toFixed(2);
+  if (prevHrs) prevHrs.textContent = totalH + 'h ' + totalM + 'm';
+  const bd = document.getElementById('pct_day_breakdown');
+  if (bd) {
+    if (breakdown.length === 0) { bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter start &amp; finish times above to see breakdown</div>'; }
+    else {
+      bd.innerHTML = breakdown.map(b => `
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span style="color:var(--white-muted);">${b.day}</span>
+          <span style="color:var(--white);">${b.start}–${b.finish}</span>
+          <span style="color:var(--gold);font-weight:600;">$${b.dayPay.toFixed(2)}</span>
+        </div>`).join('');
+    }
+  }
+}
+
+function addTimecardPayEntry() {
+  const name  = (document.getElementById('pct_emp_name')?.value || '').trim();
+  const rate  = getEffectiveRate('pct_rate');
+  const errEl = document.getElementById('pctAddError');
+  const okEl  = document.getElementById('pctAddSaved');
+  const period = getTimecardPeriod();
+  const labels = period === 'fortnightly' ? PC_FORTNIGHT_LABELS : PC_DAYS_NAMES;
+
+  if (!name) { showPcError(errEl, '⚠️ Please enter an employee name.'); return; }
+  if (rate <= 0) { showPcError(errEl, '⚠️ Please set a default hourly rate or enter one above.'); return; }
+
+  let totalMins = 0;
+  const dayData = [];
+  labels.forEach((label, i) => {
+    const start = document.getElementById('pct_s_' + i)?.value || '';
+    const finish = document.getElementById('pct_f_' + i)?.value || '';
+    if (!start || !finish) return;
+    const startMins = _pctMinutesFromTime(start);
+    const finishMins = _pctMinutesFromTime(finish);
+    if (startMins === null || finishMins === null) return;
+    const mins = finishMins - startMins;
+    if (mins <= 0) return;
+    dayData.push({ day: label, start, finish, mins });
+    totalMins += mins;
+  });
+
+  if (totalMins === 0) { showPcError(errEl, '⚠️ Please enter a valid start &amp; finish time for at least one day.'); return; }
+
+  const pay = Math.round((totalMins * rate / 60) * 100) / 100;
+  const days = dayData.length;
+  payEntries.push({ id: Date.now(), name, days, rate, totalMinutes: totalMins, pay, mode: 'timecard', period, dayData });
+  savePayEntries();
+  renderPaySheet();
+
+  // Clear inputs
+  document.getElementById('pct_emp_name').value = '';
+  document.getElementById('pct_rate').value = '';
+  labels.forEach((_, i) => {
+    const sEl = document.getElementById('pct_s_' + i);
+    const fEl = document.getElementById('pct_f_' + i);
+    if (sEl) sEl.value = '';
+    if (fEl) fEl.value = '';
+  });
+  document.getElementById('pct_preview_pay').textContent = '$0.00';
+  document.getElementById('pct_preview_hours').textContent = '0h 0m';
+  const bd = document.getElementById('pct_day_breakdown');
+  if (bd) bd.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;">Enter start &amp; finish times above to see breakdown</div>';
 
   if (okEl) { okEl.classList.add('show'); setTimeout(() => okEl.classList.remove('show'), 2000); }
 }
@@ -3837,6 +4337,8 @@ function renderPaySheet() {
     let detailLine = '';
     if (e.mode === 'daily' && e.dayData) {
       detailLine = e.dayData.map(d => `${d.day}: ${d.h}h ${d.m}m`).join(' · ');
+    } else if (e.mode === 'timecard' && e.dayData) {
+      detailLine = e.dayData.map(d => `${d.day}: ${d.start}–${d.finish}`).join(' · ');
     }
     return `
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.18);border-radius:11px;padding:13px;">
@@ -3852,7 +4354,10 @@ function renderPaySheet() {
           </div>
           <div style="text-align:right;flex-shrink:0;">
             <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);">$${e.pay.toFixed(2)}</div>
-            <button onclick="removePayEntry(${e.id})" style="background:none;border:none;color:rgba(226,75,74,0.7);font-size:11px;cursor:pointer;font-weight:700;margin-top:2px;">Remove</button>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:2px;">
+              <button onclick="sharePayEntryWhatsApp(${e.id})" style="background:none;border:none;color:#3ddc6f;font-size:11px;cursor:pointer;font-weight:700;">Send</button>
+              <button onclick="removePayEntry(${e.id})" style="background:none;border:none;color:rgba(226,75,74,0.7);font-size:11px;cursor:pointer;font-weight:700;">Remove</button>
+            </div>
           </div>
         </div>
       </div>`;
@@ -3884,6 +4389,8 @@ function exportPayPDF() {
     let dayBreakdown = '';
     if (e.mode === 'daily' && e.dayData) {
       dayBreakdown = `<br/><span style="font-size:8.5pt;color:#666;">${e.dayData.map(d=>`${d.day}: ${d.h}h ${d.m}m`).join(' &nbsp;·&nbsp; ')}</span>`;
+    } else if (e.mode === 'timecard' && e.dayData) {
+      dayBreakdown = `<br/><span style="font-size:8.5pt;color:#666;">${e.dayData.map(d=>`${d.day}: ${d.start}–${d.finish}`).join(' &nbsp;·&nbsp; ')}</span>`;
     }
     return `
       <tr>
@@ -3948,7 +4455,7 @@ function exportPayPDF() {
     </tr>
   </tbody>
 </table>
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.0.5 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.0.7 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -3961,6 +4468,50 @@ function exportPayPDF() {
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   showDocToast('📄 Pay Sheet downloaded! Open in browser → Print → Save as PDF.', 'success');
+}
+
+// ── Send via WhatsApp / WA Business ──
+function sharePaySheetWhatsApp() {
+  if (payEntries.length === 0) { alert('No entries to send.'); return; }
+  const now     = new Date();
+  const dateStr = now.toLocaleDateString('en-AU', { day:'2-digit', month:'2-digit', year:'numeric' });
+  const totalMins = payEntries.reduce((s, e) => s + e.totalMinutes, 0);
+  const totalPay  = Math.round(payEntries.reduce((s, e) => s + e.pay, 0) * 100) / 100;
+  const totalH    = Math.floor(totalMins / 60);
+  const totalM    = totalMins % 60;
+
+  const lines = payEntries.map(e => {
+    const hrs  = Math.floor(e.totalMinutes / 60);
+    const mins = e.totalMinutes % 60;
+    return `• ${e.name} — ${hrs}h ${mins}m — $${e.pay.toFixed(2)}`;
+  }).join('\n');
+
+  const msg = `*PI Cleaning Services — Pay Sheet*\n${dateStr}\n\n${lines}\n\n` +
+    `Total: ${totalH}h ${totalM}m — *$${totalPay.toFixed(2)}*\n\n` +
+    `(Full PDF can be attached separately — tap Export PDF first, then attach the file here.)`;
+
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+}
+
+function sharePayEntryWhatsApp(id) {
+  const e = payEntries.find(en => en.id === id);
+  if (!e) return;
+  const hrs  = Math.floor(e.totalMinutes / 60);
+  const mins = e.totalMinutes % 60;
+  let detailLine = '';
+  if (e.mode === 'daily' && e.dayData) {
+    detailLine = '\n' + e.dayData.map(d => `${d.day}: ${d.h}h ${d.m}m`).join('\n');
+  } else if (e.mode === 'timecard' && e.dayData) {
+    detailLine = '\n' + e.dayData.map(d => `${d.day}: ${d.start}–${d.finish}`).join('\n');
+  }
+  const msg = `*PI Cleaning Services — Pay Summary*\n\n` +
+    `Employee: *${e.name}*\n` +
+    `Total Hours: ${hrs}h ${mins}m\n` +
+    `Rate: $${e.rate.toFixed(2)}/hr\n` +
+    `Total Pay: *$${e.pay.toFixed(2)}*${detailLine}`;
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
 }
 
 
