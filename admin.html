@@ -2048,7 +2048,7 @@
 
     <!-- Info box -->
     <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:20px;">
-      🔐 Codes rotate automatically every <strong style="color:var(--gold-light);">15 seconds</strong>. Share the current code with an employee when they need to access the menu. Never share the admin panel.
+      🔐 Codes rotate automatically every <strong style="color:var(--gold-light);">60 seconds</strong>. Share the current code with an employee when they need to access the menu. Never share the admin panel.
     </div>
 
     <!-- History Log -->
@@ -4658,10 +4658,10 @@ function qcRecalc() {
 
 // ══════════════════════════════════════════
 //  EMPLOYEE ACCESS CODES
-//  Rotates every 15 seconds using time-slot + master key hash
+//  Rotates every 60 seconds using time-slot + master key hash
 // ══════════════════════════════════════════
 const AC_MASTER_KEY = 'EPAdmin2025!';   // ← secret master key (only in this admin file)
-const AC_INTERVAL   = 15;               // seconds per slot
+const AC_INTERVAL   = 60;               // seconds per slot
 let   _acTimer      = null;
 let   _acHistory    = [];               // [{code, time}]
 let   _acLastSlot   = -1;
