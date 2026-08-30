@@ -946,6 +946,10 @@
   .prospect-status-badge.pending { background:rgba(201,168,76,0.12); color:var(--gold); border:1px solid rgba(201,168,76,0.3); }
   .prospect-status-badge.sent { background:rgba(29,185,84,0.12); color:var(--success); border:1px solid rgba(29,185,84,0.35); }
   .prospect-status-badge.skipped { background:rgba(255,255,255,0.06); color:var(--white-muted); border:1px solid rgba(255,255,255,0.12); }
+  .prospect-status-badge.blocked { background:rgba(226,75,74,0.12); color:#ff8a89; border:1px solid rgba(226,75,74,0.35); }
+  .prospect-card.blocked { opacity:0.6; border-color:rgba(226,75,74,0.3); background:rgba(226,75,74,0.03); }
+  .prospect-last-sent { font-size:10px; color:var(--white-muted); margin-top:3px; opacity:0.85; }
+  .prospect-last-sent.recent { color:#ff8a89; opacity:1; }
 
   @media (max-width: 600px) {
     .drawer { width: 100vw !important; right: -100vw !important; }
@@ -1596,6 +1600,25 @@
 
     <div class="divider" style="margin:20px 0;"></div>
 
+    <!-- Prospect Resend Protection Toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔒 Prospect Resend Protection</div>
+      <div class="settings-section-desc">By default, a number that already received a bulk marketing SMS in the last 12 months is automatically locked out of future "Bulk SMS to Prospects" campaigns — it's shown in the list as 🔒 Locked with the date it was last messaged, and skipped when you send. Turn this ON to temporarily lift that lock and allow bulk messages to be sent again to those numbers.</div>
+      <label class="settings-toggle-row" id="prospectResendToggleRow" onclick="toggleProspectResendOverride(event)">
+        <div>
+          <div class="settings-toggle-label">Allow resending to recently-messaged numbers</div>
+          <div class="settings-toggle-sub">Off = numbers messaged within 12 months are locked out of Prospects bulk SMS</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="prospectResendToggle" onchange="toggleProspectResendOverride(event)" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+      <div class="settings-saved-msg" id="prospectResendToggleSaved">✅ Setting saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
     <!-- Pay Calculator Mode -->
     <div class="settings-section">
       <div class="settings-section-title">💰 Pay Calculator — Entry Method</div>
@@ -1671,6 +1694,10 @@
   <div class="drawer-panel" id="panel-prospects">
     <div class="section-tag">Marketing</div>
     <div class="section-heading">Bulk SMS<br>to Prospects</div>
+
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:11px 13px;margin-bottom:16px;font-size:11px;color:rgba(255,255,255,0.65);line-height:1.7;">
+      🔒 <strong style="color:var(--gold-light)">Resend protection:</strong> a number that already received a bulk prospect SMS in the last 12 months is shown as locked below and skipped automatically. Manage this in <strong style="color:var(--gold-light)">Settings → Prospect Resend Protection</strong>.
+    </div>
 
     <!-- Sheet URL input -->
     <div class="settings-section" style="margin-bottom:0;">
@@ -2363,6 +2390,9 @@ function loadSettingsUI() {
   });
   // Menu lock toggle
   initMenuLock();
+  // Prospect resend-protection override toggle
+  const resendTog = document.getElementById('prospectResendToggle');
+  if (resendTog) resendTog.checked = isProspectResendOverrideOn();
 }
 
 // ── CLIENT SEARCH ──
@@ -2388,6 +2418,35 @@ function toggleDue30Glow() {
 }
 function isDue30GlowOn() {
   return localStorage.getItem(DUE30_GLOW_KEY) !== 'off';
+}
+
+// ── PROSPECT RESEND-PROTECTION OVERRIDE TOGGLE ──
+// Off (default) = numbers messaged via Bulk SMS to Prospects within the last
+// 12 months are locked out of future prospect campaigns. On = that lock is
+// temporarily lifted so those numbers can be messaged again.
+const PROSPECT_RESEND_OVERRIDE_KEY = 'pi_prospect_allow_resend';
+function isProspectResendOverrideOn() {
+  return localStorage.getItem(PROSPECT_RESEND_OVERRIDE_KEY) === 'on';
+}
+function toggleProspectResendOverride() {
+  const tog = document.getElementById('prospectResendToggle');
+  if (!tog) return;
+  const on = tog.checked;
+  localStorage.setItem(PROSPECT_RESEND_OVERRIDE_KEY, on ? 'on' : 'off');
+  const saved = document.getElementById('prospectResendToggleSaved');
+  if (saved) {
+    saved.textContent = on
+      ? '⚠️ Resend protection OFF — recently messaged numbers can be sent to again.'
+      : '✅ Resend protection ON — numbers messaged in the last 12 months are locked.';
+    saved.classList.add('show');
+    setTimeout(() => saved.classList.remove('show'), 3000);
+  }
+  // Live-update any already-loaded prospects list so locked/unlocked states
+  // reflect the new setting immediately.
+  if (typeof recalcProspectLocks === 'function' && prospectsList.length > 0) {
+    recalcProspectLocks();
+    renderProspectsList();
+  }
 }
 
 // ── REVIEW TEMPLATE ──
@@ -3353,9 +3412,100 @@ function buildMarketingMsg(name) {
 }
 
 // ══════════════════════════════════════════
+//  PROSPECT SEND HISTORY (12-month resend lock)
+//  Remembers, per phone number, the last time a Bulk SMS to Prospects
+//  message was sent to it — independent of any one sheet load — so the
+//  same number isn't bulk-messaged again within 12 months unless the
+//  "Allow resending" override is switched on in Settings.
+// ══════════════════════════════════════════
+const PROSPECT_SEND_LOG_KEY = 'pi_prospect_send_log';
+const PROSPECT_LOCK_MONTHS  = 12;
+
+// Normalise a phone number down to a comparable key: digits only, and just
+// the last 9 (an AU mobile/landline number without the leading 0 or +61),
+// so "0450 585 874", "+61450585874" and "61 450 585 874" are all recognised
+// as the same number.
+function normalizeProspectPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.length > 9 ? digits.slice(-9) : digits;
+}
+
+function getProspectSendLog() {
+  try {
+    return JSON.parse(localStorage.getItem(PROSPECT_SEND_LOG_KEY) || '{}') || {};
+  } catch(e) { return {}; }
+}
+
+function saveProspectSendLog(log) {
+  try { localStorage.setItem(PROSPECT_SEND_LOG_KEY, JSON.stringify(log)); } catch(e) {}
+}
+
+// Records "now" as the last-sent time for this phone number.
+function recordProspectSent(phone) {
+  const key = normalizeProspectPhone(phone);
+  if (!key) return;
+  const log = getProspectSendLog();
+  log[key] = new Date().toISOString();
+  saveProspectSendLog(log);
+}
+
+// Returns the ISO timestamp this number was last bulk-messaged, or null.
+function getProspectLastSent(phone) {
+  const key = normalizeProspectPhone(phone);
+  if (!key) return null;
+  const log = getProspectSendLog();
+  return log[key] || null;
+}
+
+function monthsSince(iso) {
+  const then = new Date(iso);
+  if (isNaN(then.getTime())) return Infinity;
+  const ms = Date.now() - then.getTime();
+  return ms / (1000 * 60 * 60 * 24 * 30.44); // average month length
+}
+
+function isProspectLocked(phone) {
+  const last = getProspectLastSent(phone);
+  if (!last) return false;
+  return monthsSince(last) < PROSPECT_LOCK_MONTHS;
+}
+
+// Formats an ISO timestamp using the app's chosen date format (falls back
+// to DD/MM/YY), for display next to a prospect's phone number.
+function formatProspectSentDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const fmt = (typeof getDateFormat === 'function') ? getDateFormat() : 'DD/MM/YY';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(d.getFullYear());
+  const yy = yyyy.slice(-2);
+  if (fmt === 'DD/MM/YYYY') return `${dd}/${mm}/${yyyy}`;
+  if (fmt === 'MM/DD/YY')   return `${mm}/${dd}/${yy}`;
+  if (fmt === 'YYYY-MM-DD') return `${yyyy}-${mm}-${dd}`;
+  return `${dd}/${mm}/${yy}`;
+}
+
+// Re-evaluates lock/pending status for every prospect currently loaded,
+// based on send history + the Settings override toggle. Only touches
+// entries still 'pending' or 'blocked' — leaves 'sent'/'skipped' from the
+// current session alone.
+function recalcProspectLocks() {
+  const overrideOn = (typeof isProspectResendOverrideOn === 'function') && isProspectResendOverrideOn();
+  prospectsList.forEach(p => {
+    p.lastSent = getProspectLastSent(p.phone);
+    if (p.status === 'sent' || p.status === 'skipped') return;
+    const locked = !overrideOn && isProspectLocked(p.phone);
+    p.status = locked ? 'blocked' : 'pending';
+  });
+}
+
+// ══════════════════════════════════════════
 //  PROSPECTS PANEL
 // ══════════════════════════════════════════
-let prospectsList = [];      // [{name, phone, status: 'pending'|'sent'|'skipped'}]
+let prospectsList = [];      // [{name, phone, status: 'pending'|'sent'|'skipped'|'blocked', lastSent}]
 let bulkIndex = 0;           // current position in step-through
 let bulkActive = false;
 
@@ -3400,7 +3550,8 @@ async function loadProspects() {
     }
     const parsed = parseProspectsCSV(text);
     if (!parsed.length) throw new Error('No data rows found. Make sure your sheet has "Name" and "Phone" column headers in row 1, with data in row 2 onwards.');
-    prospectsList = parsed.map(r => ({ name: r.name, phone: r.phone, status: 'pending' }));
+    prospectsList = parsed.map(r => ({ name: r.name, phone: r.phone, status: 'pending', lastSent: null }));
+    recalcProspectLocks();
     bulkActive = false;
     bulkIndex  = 0;
     renderProspectsList();
@@ -3464,12 +3615,27 @@ function renderProspectsList() {
     const card = document.createElement('div');
     card.className = `prospect-card ${p.status} ${isCurrent ? 'current' : ''}`;
     card.id = 'pcard-' + i;
-    const statusLabel = { pending: 'Pending', sent: 'Sent ✓', skipped: 'Skipped' }[p.status] || 'Pending';
+    const statusLabel = { pending: 'Pending', sent: 'Sent ✓', skipped: 'Skipped', blocked: '🔒 Locked' }[p.status] || 'Pending';
+    const lastSent = p.lastSent || getProspectLastSent(p.phone);
+    let lastSentLine = '';
+    if (lastSent) {
+      const dateStr = formatProspectSentDate(lastSent);
+      if (p.status === 'blocked') {
+        lastSentLine = `<div class="prospect-last-sent recent">🔒 Sent ${dateStr} — locked for 12 months</div>`;
+      } else if (monthsSince(lastSent) < PROSPECT_LOCK_MONTHS) {
+        lastSentLine = `<div class="prospect-last-sent recent">⚠️ Sent ${dateStr} (resend allowed — override on)</div>`;
+      } else {
+        lastSentLine = `<div class="prospect-last-sent">Last sent ${dateStr}</div>`;
+      }
+    } else {
+      lastSentLine = `<div class="prospect-last-sent">Never messaged before</div>`;
+    }
     card.innerHTML = `
       <div class="prospect-avatar">${initials}</div>
       <div class="prospect-info">
         <div class="prospect-name">${p.name || '—'}</div>
         <div class="prospect-phone">${p.phone || 'No phone'}</div>
+        ${lastSentLine}
       </div>
       <div class="prospect-status-badge ${p.status}">${statusLabel}</div>
     `;
@@ -3487,7 +3653,15 @@ function clearProspects() {
 
 function startBulkSms() {
   const pending = prospectsList.filter(p => p.status === 'pending');
-  if (!pending.length) { showProspectsError('No pending prospects to send to.'); return; }
+  if (!pending.length) {
+    const blockedCount = prospectsList.filter(p => p.status === 'blocked').length;
+    if (blockedCount > 0) {
+      showProspectsError(`No prospects available to send to — ${blockedCount} number${blockedCount === 1 ? '' : 's'} already received a bulk SMS within the last 12 months. Turn on "Allow resending to recently-messaged numbers" in Settings if you want to message them again.`);
+    } else {
+      showProspectsError('No pending prospects to send to.');
+    }
+    return;
+  }
   // Find first pending index
   bulkIndex = prospectsList.findIndex(p => p.status === 'pending');
   bulkActive = true;
@@ -3500,7 +3674,9 @@ function startBulkSms() {
 }
 
 function updateBulkProgress() {
-  const total = prospectsList.length;
+  // "Locked" prospects sit outside the sendable queue entirely, so they're
+  // excluded from the total — otherwise the bar could never reach 100%.
+  const total = prospectsList.filter(p => p.status !== 'blocked').length;
   const done  = prospectsList.filter(p => p.status === 'sent' || p.status === 'skipped').length;
   const pct   = total ? Math.round((done / total) * 100) : 0;
   document.getElementById('progressBar').style.width   = pct + '%';
@@ -3525,7 +3701,9 @@ function sendNextProspect() {
   const msg   = buildMarketingMsg(p.name);
   const phone = p.phone.replace(/\s/g, '');
   window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
-  // Mark as sent and advance
+  // Mark as sent, record it in the 12-month send history, and advance
+  recordProspectSent(p.phone);
+  prospectsList[bulkIndex].lastSent = getProspectLastSent(p.phone);
   prospectsList[bulkIndex].status = 'sent';
   renderProspectsList();
   advanceBulk();
@@ -3559,8 +3737,9 @@ function finishBulkCampaign() {
   document.getElementById('bulkDoneMsg').style.display = 'block';
   const sent    = prospectsList.filter(p => p.status === 'sent').length;
   const skipped = prospectsList.filter(p => p.status === 'skipped').length;
+  const blocked = prospectsList.filter(p => p.status === 'blocked').length;
   document.getElementById('bulkDoneSummary').textContent =
-    `${sent} messages sent · ${skipped} skipped`;
+    `${sent} messages sent · ${skipped} skipped` + (blocked ? ` · ${blocked} locked (messaged in last 12 months)` : '');
   updateBulkProgress();
 }
 
@@ -3578,8 +3757,12 @@ function resetBulkUI() {
 }
 
 function resetBulkCampaign() {
-  // Reset all statuses to pending for a fresh campaign
+  // Reset all statuses to pending for a fresh campaign, then re-apply the
+  // 12-month resend lock — so numbers just messaged in this session (or
+  // any previous one) are correctly re-locked rather than the "Start New
+  // Campaign" button becoming a way to bypass resend protection.
   prospectsList = prospectsList.map(p => ({ ...p, status: 'pending' }));
+  recalcProspectLocks();
   bulkIndex  = 0;
   bulkActive = false;
   renderProspectsList();
