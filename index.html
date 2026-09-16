@@ -657,7 +657,7 @@
   .emp-marker-pin.break { background:var(--warn); }
   .emp-marker-pin.clocked-out { background:rgba(150,150,150,0.8); }
 
-  /* ════ JOBS FOR THE DAY ════ */
+  /* ════ JOB CARD (legacy — kept for now, unused by Jobs Done) ════ */
   .job-card {
     background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.2);
     border-radius:13px; padding:15px; margin-bottom:10px;
@@ -784,6 +784,115 @@
     transition: color 0.2s;
   }
   .client-search-clear:hover { color: var(--white); }
+
+  /* ════ JOBS DONE PANEL ════ */
+  .jd-btn-row { display:flex; gap:8px; margin-bottom:14px; }
+  .jd-btn-row .gs-load-btn { margin-top:0; }
+  .jd-add-btn { background:rgba(0,255,100,0.1); border-color:rgba(0,255,100,0.35); color:#4ee88a; }
+  .jd-add-btn:hover { background:rgba(0,255,100,0.2); }
+
+  .jd-card {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15);
+    border-radius:11px; padding:13px; margin-bottom:8px;
+  }
+  .jd-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .jd-card-name { font-size:13px; font-weight:600; color:var(--white); }
+  .jd-card-address { font-size:11px; color:var(--white-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jd-card-dates { display:flex; flex-wrap:wrap; gap:10px; font-size:10px; margin-bottom:10px; }
+  .jd-card-dates .jd-date-item { color:var(--white-muted); }
+  .jd-card-dates .jd-date-item span { color:var(--gold); font-weight:600; }
+  .jd-card-log-btn {
+    width:100%; padding:8px; background:rgba(201,168,76,0.1);
+    border:1px solid rgba(201,168,76,0.3); border-radius:7px;
+    font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--gold-light);
+    cursor:pointer; transition:all 0.2s;
+  }
+  .jd-card-log-btn:hover { background:rgba(201,168,76,0.22); }
+
+  /* Status tick — green ✓ for the first 7 days after a service is logged
+     done; after that, a day-countdown to the next service: green while
+     comfortably up to date, blue inside 30 days, orange inside 14 days
+     (or overdue). The .glow modifier (toggled in Settings) adds the pulse. */
+  .jd-status-badge {
+    min-width:24px; height:22px; padding:0 7px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; letter-spacing:0.02em; line-height:1;
+  }
+  .jd-status-badge.green {
+    background:rgba(0,255,100,0.14); color:#00ff64;
+    border:1px solid rgba(0,255,100,0.4);
+  }
+  .jd-status-badge.blue {
+    background:rgba(41,121,255,0.16); color:#5a9dff;
+    border:1px solid rgba(41,121,255,0.5);
+  }
+  .jd-status-badge.orange {
+    background:rgba(240,165,0,0.16); color:var(--warn);
+    border:1px solid rgba(240,165,0,0.55);
+  }
+  .jd-status-badge.glow.blue   { animation: jdBluePulse 2.4s ease infinite; }
+  .jd-status-badge.glow.orange { animation: jdOrangePulse 1.8s ease infinite; }
+  @keyframes jdBluePulse {
+    0%,100% { box-shadow:0 0 6px 1px rgba(41,121,255,0.25); border-color:rgba(41,121,255,0.5); }
+    50%      { box-shadow:0 0 14px 4px rgba(41,121,255,0.55); border-color:rgba(41,121,255,0.9); }
+  }
+  @keyframes jdOrangePulse {
+    0%,100% { box-shadow:0 0 6px 1px rgba(240,165,0,0.25); border-color:rgba(240,165,0,0.5); }
+    50%      { box-shadow:0 0 16px 5px rgba(240,165,0,0.6); border-color:rgba(240,165,0,0.95); }
+  }
+
+  /* Next Service interval quick-picker (inside the Jobs Done modal) */
+  .jd-interval-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .jd-interval-chip {
+    padding:7px 11px; border-radius:16px; border:1px solid rgba(201,168,76,0.25);
+    background:transparent; color:var(--white-muted); font-family:'Montserrat',sans-serif;
+    font-size:10px; font-weight:600; letter-spacing:0.03em; cursor:pointer; transition:all 0.2s;
+  }
+  .jd-interval-chip:hover { border-color:rgba(201,168,76,0.5); color:var(--white); }
+  .jd-interval-chip.active { background:var(--gold-pale); border-color:var(--gold); color:var(--gold); }
+
+  /* Modal */
+  .jd-modal-overlay {
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(5,10,20,0.72); backdrop-filter:blur(3px);
+    align-items:flex-end; justify-content:center;
+  }
+  .jd-modal-overlay.show { display:flex; }
+  .jd-modal-box {
+    width:100%; max-width:480px; max-height:88vh; overflow-y:auto;
+    background:var(--navy-mid); border:1px solid rgba(201,168,76,0.3);
+    border-radius:18px 18px 0 0; padding:22px 18px calc(22px + env(safe-area-inset-bottom));
+    animation:jdSlideUp 0.25s ease;
+  }
+  @media (min-width:560px) {
+    .jd-modal-overlay { align-items:center; }
+    .jd-modal-box { border-radius:16px; }
+  }
+  @keyframes jdSlideUp { from { transform:translateY(24px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+  .jd-modal-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--gold); margin-bottom:4px; }
+  .jd-modal-sub { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:18px; line-height:1.6; }
+  .jd-field-group { margin-bottom:12px; }
+  .jd-field-row { display:flex; gap:10px; }
+  .jd-field-row .jd-field-group { flex:1; }
+  .jd-field-label { display:block; font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--white-muted); margin-bottom:6px; }
+  .jd-field-optional { text-transform:none; font-weight:400; letter-spacing:0; opacity:0.7; }
+  .jd-existing-notice {
+    background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.35);
+    border-radius:9px; padding:10px 12px; font-size:11px; color:var(--warn);
+    line-height:1.6; margin-bottom:14px;
+  }
+  .jd-modal-actions { display:flex; gap:10px; margin-top:6px; }
+  .jd-btn-cancel, .jd-btn-save {
+    flex:1; padding:12px; border-radius:9px; font-family:'Montserrat',sans-serif;
+    font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    cursor:pointer; transition:all 0.2s; border:1px solid transparent;
+  }
+  .jd-btn-cancel { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.12); color:var(--white-muted); }
+  .jd-btn-cancel:hover { background:rgba(255,255,255,0.09); }
+  .jd-btn-save { background:var(--gold); color:var(--navy); }
+  .jd-btn-save:hover { background:var(--gold-light); }
+  .jd-btn-save.loading { opacity:0.6; pointer-events:none; }
 
   /* ════ SETTINGS TOGGLE ════ */
   .settings-toggle-row {
@@ -1032,10 +1141,10 @@
         <span class="nav-item-arrow">›</span>
       </button>
       <button class="drawer-nav-item" id="tab-jobs" onclick="switchDrawerTab('jobs')">
-        <span class="nav-item-icon">📋</span>
+        <span class="nav-item-icon">✅</span>
         <div class="nav-item-text">
-          <div class="nav-item-label">Jobs for the Day</div>
-          <div class="nav-item-sub">Today's schedule &amp; directions</div>
+          <div class="nav-item-label">Jobs Done</div>
+          <div class="nav-item-sub">Log completed services &amp; sync to Sheets</div>
         </div>
         <span class="nav-item-arrow">›</span>
       </button>
@@ -1473,27 +1582,107 @@
     </div>
   </div>
 
-  <!-- ── PANEL 4: JOBS FOR THE DAY ── -->
+  <!-- ── PANEL 4: JOBS DONE ── -->
   <div class="drawer-panel" id="panel-jobs">
-    <div class="section-tag">Today's Schedule</div>
-    <div class="section-heading">Jobs for<br>the day</div>
+    <div class="section-tag">Client Service Log</div>
+    <div class="section-heading">Jobs<br>Done</div>
 
-    <!-- Jobs connected indicator -->
+    <!-- Jobs Done connected indicator -->
     <div class="gs-connected-indicator show" style="margin-bottom:14px;">
-      <span class="gs-neon-dot"></span> Connected to Assigned Jobs Sheet
+      <span class="gs-neon-dot"></span> Connected to Clients Sheet
     </div>
 
-    <!-- Refresh jobs -->
-    <button class="gs-load-btn" id="jobsRefreshBtn" onclick="refreshJobs()" style="margin-bottom:16px;">
-      <span id="jobsRefreshIcon">↻</span> <span>Refresh Jobs</span>
-    </button>
+    <!-- Refresh + Add New row -->
+    <div class="jd-btn-row">
+      <button class="gs-load-btn" id="jobsDoneRefreshBtn" onclick="refreshJobsDone()">
+        <span id="jobsDoneRefreshIcon">↻</span> <span>Refresh</span>
+      </button>
+      <button class="gs-load-btn jd-add-btn" onclick="openJobDoneModal()">
+        <span>＋</span> <span>Log Job Done</span>
+      </button>
+    </div>
 
-    <!-- Jobs list -->
-    <div id="jobsList">
+    <!-- Client search -->
+    <div class="client-search-wrap">
+      <span class="client-search-icon">🔍</span>
+      <input class="client-search-input" id="jobsDoneSearchInput" type="text" placeholder="Search by client name…" oninput="renderJobsDoneList()" />
+      <button class="client-search-clear" id="jobsDoneSearchClear" onclick="clearJobsDoneSearch()" style="display:none;">✕</button>
+    </div>
+
+    <!-- Jobs Done list -->
+    <div id="jobsDoneList">
       <div class="no-clients">
-        <div class="no-clients-icon">📋</div>
-        <div>No jobs loaded yet.</div>
-        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Tap Refresh Jobs to load today's schedule.</div>
+        <div class="no-clients-icon">✅</div>
+        <div>No client data loaded yet.</div>
+        <div style="font-size:10px;opacity:0.6;margin-top:6px;">Tap Refresh to load your client list from Google Sheets.</div>
+      </div>
+    </div>
+    <div class="toast" id="jobsDoneToast" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- ── JOBS DONE: ADD / LOG SERVICE MODAL ── -->
+  <div class="jd-modal-overlay" id="jdModalOverlay" onclick="if(event.target===this) closeJobDoneModal()">
+    <div class="jd-modal-box">
+      <div class="jd-modal-title" id="jdModalTitle">Log Job Done</div>
+      <div class="jd-modal-sub" id="jdModalSub">Enter the client's service details below.</div>
+
+      <div class="jd-field-group">
+        <label class="jd-field-label">Client Name</label>
+        <input class="field-input" id="jdName" type="text" placeholder="Client full name" />
+      </div>
+      <div class="jd-field-row" id="jdNewClientFields">
+        <div class="jd-field-group">
+          <label class="jd-field-label">Address</label>
+          <input class="field-input" id="jdAddress" type="text" placeholder="Service address" />
+        </div>
+      </div>
+      <div class="jd-field-row" id="jdNewClientFields2">
+        <div class="jd-field-group" style="flex:1;">
+          <label class="jd-field-label">Phone</label>
+          <input class="field-input" id="jdPhone" type="text" placeholder="04xx xxx xxx" />
+        </div>
+        <div class="jd-field-group" style="flex:1;">
+          <label class="jd-field-label">Email</label>
+          <input class="field-input" id="jdEmail" type="email" placeholder="client@email.com" />
+        </div>
+      </div>
+
+      <div class="jd-field-row">
+        <div class="jd-field-group" style="flex:1;">
+          <label class="jd-field-label">Last Service Date</label>
+          <input class="field-input" id="jdLastService" type="date" />
+        </div>
+        <div class="jd-field-group" style="flex:1;">
+          <label class="jd-field-label">Service Done Date</label>
+          <input class="field-input" id="jdServiceDone" type="date" />
+        </div>
+      </div>
+      <div class="jd-field-group">
+        <label class="jd-field-label">Next Service Interval <span class="jd-field-optional">(fills the date below from Last Service)</span></label>
+        <div class="jd-interval-row" id="jdIntervalRow">
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,2,'w')">2 Weeks</button>
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,4,'w')">4 Weeks</button>
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,6,'w')">6 Weeks</button>
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,8,'w')">8 Weeks</button>
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,6,'m')">6 Months</button>
+        </div>
+      </div>
+      <div class="jd-field-group">
+        <label class="jd-field-label">Next Service Date <span class="jd-field-optional">(leave blank to auto-set +6 months)</span></label>
+        <input class="field-input" id="jdNextService" type="date" oninput="document.querySelectorAll('.jd-interval-chip').forEach(b=>b.classList.remove('active'))" />
+      </div>
+      <div class="jd-field-group">
+        <label class="jd-field-label">Notes</label>
+        <input class="field-input" id="jdNotes" type="text" placeholder="Optional notes" />
+      </div>
+
+      <div class="jd-existing-notice" id="jdExistingNotice" style="display:none;">
+        ⚠️ This client already has service data on file — saving will update it.
+      </div>
+
+      <div class="jd-modal-actions">
+        <button class="jd-btn-cancel" onclick="closeJobDoneModal()">Cancel</button>
+        <button class="jd-btn-save" id="jdSaveBtn" onclick="saveJobDone()">Save</button>
       </div>
     </div>
   </div>
@@ -1545,6 +1734,49 @@
         </div>
       </label>
       <div class="settings-saved-msg" id="due30GlowSaved">✅ Setting saved!</div>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Jobs Settings folder -->
+    <div class="settings-section">
+      <div class="settings-section-title">✅ Jobs Settings</div>
+      <div class="settings-section-desc">Control the status tick shown on each client card in the "Jobs Done" tab. Each one switches on or off independently.</div>
+
+      <label class="settings-toggle-row" onclick="toggleJdTick()" style="margin-bottom:8px;">
+        <div>
+          <div class="settings-toggle-label">Recently Done tick (7 days)</div>
+          <div class="settings-toggle-sub">Green ✓ for 7 days after a service is logged done, then switches to a day countdown</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="jdTickToggle" onchange="toggleJdTick()" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+
+      <label class="settings-toggle-row" onclick="toggleJdBlueGlow()" style="margin-bottom:8px;">
+        <div>
+          <div class="settings-toggle-label">Blue glow (due in 30 days)</div>
+          <div class="settings-toggle-sub">Pulses blue once a client's next service is within 30 days</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="jdBlueGlowToggle" onchange="toggleJdBlueGlow()" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+
+      <label class="settings-toggle-row" onclick="toggleJdOrangeGlow()">
+        <div>
+          <div class="settings-toggle-label">Orange glow (due in 14 days)</div>
+          <div class="settings-toggle-sub">Pulses orange once a client's next service is within 14 days, or overdue</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="jdOrangeGlowToggle" onchange="toggleJdOrangeGlow()" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+
+      <div class="settings-saved-msg" id="jdSettingsSaved">✅ Setting saved!</div>
     </div>
 
     <div class="divider" style="margin:20px 0;"></div>
@@ -2376,6 +2608,13 @@ function loadSettingsUI() {
   const glow = localStorage.getItem('pi_due30_glow') !== 'off';
   const tog = document.getElementById('due30GlowToggle');
   if (tog) tog.checked = glow;
+  // Jobs Settings toggles
+  const jdTickTog = document.getElementById('jdTickToggle');
+  if (jdTickTog) jdTickTog.checked = isJdTickOn();
+  const jdBlueTog = document.getElementById('jdBlueGlowToggle');
+  if (jdBlueTog) jdBlueTog.checked = isJdBlueGlowOn();
+  const jdOrangeTog = document.getElementById('jdOrangeGlowToggle');
+  if (jdOrangeTog) jdOrangeTog.checked = isJdOrangeGlowOn();
   // Pay Method selector (3-way)
   const payMethod = getPayMethod();
   ['simple','daily','timecard'].forEach(k => {
@@ -2418,6 +2657,41 @@ function toggleDue30Glow() {
 }
 function isDue30GlowOn() {
   return localStorage.getItem(DUE30_GLOW_KEY) !== 'off';
+}
+
+// ── JOBS SETTINGS TOGGLES (Jobs Done status tick) ──
+const JD_TICK_KEY        = 'pi_jd_tick_on';     // 7-day green "recently done" tick
+const JD_BLUE_GLOW_KEY   = 'pi_jd_blue_glow';   // 30-day blue glow
+const JD_ORANGE_GLOW_KEY = 'pi_jd_orange_glow'; // 14-day orange glow
+
+function isJdTickOn()       { return localStorage.getItem(JD_TICK_KEY) !== 'off'; }
+function isJdBlueGlowOn()   { return localStorage.getItem(JD_BLUE_GLOW_KEY) !== 'off'; }
+function isJdOrangeGlowOn() { return localStorage.getItem(JD_ORANGE_GLOW_KEY) !== 'off'; }
+
+function jdSettingsSavedFlash() {
+  const saved = document.getElementById('jdSettingsSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
+}
+function toggleJdTick() {
+  const tog = document.getElementById('jdTickToggle');
+  if (!tog) return;
+  localStorage.setItem(JD_TICK_KEY, tog.checked ? 'on' : 'off');
+  jdSettingsSavedFlash();
+  if (allClients.length > 0) renderJobsDoneList();
+}
+function toggleJdBlueGlow() {
+  const tog = document.getElementById('jdBlueGlowToggle');
+  if (!tog) return;
+  localStorage.setItem(JD_BLUE_GLOW_KEY, tog.checked ? 'on' : 'off');
+  jdSettingsSavedFlash();
+  if (allClients.length > 0) renderJobsDoneList();
+}
+function toggleJdOrangeGlow() {
+  const tog = document.getElementById('jdOrangeGlowToggle');
+  if (!tog) return;
+  localStorage.setItem(JD_ORANGE_GLOW_KEY, tog.checked ? 'on' : 'off');
+  jdSettingsSavedFlash();
+  if (allClients.length > 0) renderJobsDoneList();
 }
 
 // ── PROSPECT RESEND-PROTECTION OVERRIDE TOGGLE ──
@@ -2511,7 +2785,7 @@ function switchDrawerTab(tab) {
   const titles = {
     review: '⭐ Request a Review',
     'clients-reminders': '👥 Clients & Reminders',
-    jobs: '📋 Jobs for the Day',
+    jobs: '✅ Jobs Done',
     settings: '⚙️ Settings',
     newfeatures: '🚀 New Features',
     prospects: '📣 Prospects',
@@ -2525,7 +2799,7 @@ function switchDrawerTab(tab) {
   const backBtn = document.getElementById('drawerBackBtn');
   if (backBtn) backBtn.style.display = tab === 'menu' ? 'none' : 'inline-flex';
   if (tab === 'clients-reminders') { renderClients(); renderReminders(); }
-  if (tab === 'jobs') refreshJobs();
+  if (tab === 'jobs') refreshJobsDone();
   if (tab === 'settings') loadSettingsUI();
   if (tab === 'prospects') loadProspectsUrlUI();
   if (tab === 'paycalc') initPayCalc();
@@ -2608,66 +2882,257 @@ async function refreshClients() {
 }
 
 // ══════════════════════════════════════════
-//  JOBS FOR THE DAY
+//  JOBS DONE  (client service log — reads & writes the same Clients sheet)
 // ══════════════════════════════════════════
-let allJobs = [];
+let jobsDoneEditRowIndex = null; // null = adding a brand-new client
 
-async function refreshJobs() {
-  const btn = document.getElementById('jobsRefreshBtn');
-  const icon = document.getElementById('jobsRefreshIcon');
+async function refreshJobsDone() {
+  const btn = document.getElementById('jobsDoneRefreshBtn');
+  const icon = document.getElementById('jobsDoneRefreshIcon');
   const url = getGsUrl();
-  if (!url) { renderJobsList([]); return; }
+  if (!url) { renderJobsDoneList(); return; }
   if (btn) { btn.classList.add('loading'); icon.textContent = '⏳'; }
   try {
-    const resp = await fetch(url + '?action=getJobs');
+    const resp = await fetch(url + '?action=getClients');
     const data = await resp.json();
-    if (data.jobs) {
-      allJobs = data.jobs;
-      renderJobsList(allJobs);
+    if (data.clients) {
+      allClients = data.clients.map(normaliseDates);
+      localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify(allClients));
+      updateDueBadge();
     } else {
-      renderJobsList([]);
+      showJobsDoneToast('❌ Unexpected response. Check your Apps Script.', 'error');
     }
+    renderJobsDoneList();
   } catch(e) {
-    renderJobsList([]);
+    showJobsDoneToast('❌ Could not reach Google Sheets: ' + e.message, 'error');
+    renderJobsDoneList();
   } finally {
     if (btn) { btn.classList.remove('loading'); icon.textContent = '↻'; }
   }
 }
 
-function renderJobsList(jobs) {
-  const list = document.getElementById('jobsList');
+function clearJobsDoneSearch() {
+  const inp = document.getElementById('jobsDoneSearchInput');
+  if (inp) inp.value = '';
+  const clr = document.getElementById('jobsDoneSearchClear');
+  if (clr) clr.style.display = 'none';
+  renderJobsDoneList();
+}
+
+// Status badge for a Jobs Done card: a green ✓ for the first 7 days after a
+// service is logged done (toggle-able in Settings → Jobs Settings), then a
+// day-countdown to the Next Service date — green while comfortably up to
+// date, blue inside 30 days, orange inside 14 days or overdue. The blue and
+// orange glow animations are each individually toggle-able in Settings.
+function jobsDoneStatusBadge(c) {
+  const daysNext = daysUntil(c.nextService);
+
+  if (isJdTickOn() && c.serviceDone) {
+    const doneDate = parseDateAU(String(c.serviceDone).trim());
+    if (doneDate) {
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      doneDate.setHours(0, 0, 0, 0);
+      const daysSince = Math.floor((todayMidnight - doneDate) / 86400000);
+      if (daysSince >= 0 && daysSince <= 7) {
+        const title = daysSince === 0 ? 'Serviced today' : `Serviced ${daysSince}d ago`;
+        return `<span class="jd-status-badge green" title="${title}">✓</span>`;
+      }
+    }
+  }
+
+  if (daysNext === null) return '';
+
+  if (daysNext <= 14) {
+    const glow = isJdOrangeGlowOn() ? ' glow' : '';
+    const label = daysNext < 0 ? `${Math.abs(daysNext)}d over` : daysNext === 0 ? 'Today' : `${daysNext}d`;
+    const title = daysNext < 0 ? `Overdue by ${Math.abs(daysNext)}d` : daysNext === 0 ? 'Due today' : `Due in ${daysNext}d`;
+    return `<span class="jd-status-badge orange${glow}" title="${title}">${label}</span>`;
+  }
+  if (daysNext <= 30) {
+    const glow = isJdBlueGlowOn() ? ' glow' : '';
+    return `<span class="jd-status-badge blue${glow}" title="Due in ${daysNext}d">${daysNext}d</span>`;
+  }
+  return `<span class="jd-status-badge green" title="Up to date — due in ${daysNext}d">${daysNext}d</span>`;
+}
+
+function renderJobsDoneList() {
+  const list = document.getElementById('jobsDoneList');
   if (!list) return;
-  if (!jobs || jobs.length === 0) {
-    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">📋</div><div>No jobs scheduled today.</div><div style="font-size:10px;opacity:0.6;margin-top:6px;">Add jobs in the "Assigned Jobs" tab of your Google Sheet.</div></div>`;
+  const searchEl = document.getElementById('jobsDoneSearchInput');
+  const clearEl  = document.getElementById('jobsDoneSearchClear');
+  const searchQ  = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  if (clearEl) clearEl.style.display = searchQ ? 'block' : 'none';
+
+  let filtered = allClients;
+  if (searchQ) filtered = filtered.filter(c => (c.name || '').toLowerCase().includes(searchQ));
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="no-clients"><div class="no-clients-icon">${searchQ ? '🔍' : '✅'}</div><div>${searchQ ? `No clients found for "<strong>${searchQ}</strong>"` : 'No client data loaded yet.'}</div>${searchQ ? `<div style="font-size:10px;opacity:0.6;margin-top:6px;">Tap "Log Job Done" above to add them as a new client.</div>` : `<div style="font-size:10px;opacity:0.6;margin-top:6px;">Tap Refresh to load your client list from Google Sheets.</div>`}</div>`;
     return;
   }
-  // Sort by start time
-  jobs.sort((a,b) => (a.startTime||'').localeCompare(b.startTime||''));
-  list.innerHTML = jobs.map((job, i) => {
-    const addr = (job.address||'').trim();
-    const mapsUrl = addr ? 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(addr) : '#';
-    const timeStr = job.startTime || '—';
-    const timeParts = timeStr !== '—' ? timeStr.split(':') : null;
-    const timeDisplay = timeParts ? `${timeParts[0]}:${timeParts[1]}` : '—';
-    const ampm = timeParts ? (parseInt(timeParts[0]) >= 12 ? 'PM' : 'AM') : '';
+
+  // Always alphabetical by name, A→Z
+  filtered = filtered.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'', undefined, {sensitivity:'base'}));
+
+  list.innerHTML = filtered.map(c => {
+    const addr = (c.address||'').trim();
+    const statusBadge = jobsDoneStatusBadge(c);
     return `
-    <div class="job-card">
-      <div class="job-card-top">
-        <div class="job-time-badge">
-          <div>${timeDisplay}</div>
-          <div class="time-label">${ampm}</div>
+    <div class="jd-card">
+      <div class="jd-card-top">
+        <div style="min-width:0;">
+          <div class="jd-card-name">${c.name||'Unknown'}</div>
+          ${addr ? `<div class="jd-card-address">📍 ${addr}</div>` : ''}
         </div>
-        <div class="job-info">
-          <div class="job-name">${job.jobName || 'Unnamed Job'}</div>
-          <div class="job-address">📍 ${addr || 'No address provided'}</div>
-        </div>
+        ${statusBadge}
       </div>
-      ${addr ? `<button class="job-maps-btn" onclick="openMaps('${addr.replace(/'/g,"\\'")}')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-        Get Directions in Google Maps
-      </button>` : ''}
+      <div class="jd-card-dates">
+        <div class="jd-date-item">Last: <span>${formatDateDDMMYY(c.lastService)||'—'}</span></div>
+        <div class="jd-date-item">Done: <span>${formatDateDDMMYY(c.serviceDone)||'—'}</span></div>
+        <div class="jd-date-item">Next: <span>${formatDateDDMMYY(c.nextService)||'—'}</span></div>
+      </div>
+      <button class="jd-card-log-btn" onclick="openJobDoneModal(${c.rowIndex})">✓ Log Job Done</button>
     </div>`;
   }).join('');
+}
+
+function showJobsDoneToast(msg, type) {
+  const t = document.getElementById('jobsDoneToast');
+  if (!t) return;
+  t.innerHTML = msg; t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// ── ADD / LOG SERVICE MODAL ──
+function ymdToAU(ymd) {
+  if (!ymd) return '';
+  const parts = ymd.split('-');
+  if (parts.length !== 3) return '';
+  const [yyyy, mm, dd] = parts;
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function auToYmd(auStr) {
+  const d = parseDateAU(auStr);
+  if (!d || isNaN(d.getTime())) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function ymdToDate(ymd) {
+  const [y, m, d] = ymd.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function dateToYmd(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function todayYmd() { return dateToYmd(new Date()); }
+
+// Next Service interval quick-picker — computes Next Service as (Last
+// Service, or Service Done, or today if neither is set) + the chosen
+// interval, and drops it straight into the Next Service Date field. The
+// date field stays freely editable afterwards if an exact date is needed.
+function setJdInterval(btn, value, unit) {
+  const lastVal = document.getElementById('jdLastService').value;
+  const doneVal = document.getElementById('jdServiceDone').value;
+  const baseYmd = lastVal || doneVal || todayYmd();
+  const d = ymdToDate(baseYmd);
+  if (unit === 'w') d.setDate(d.getDate() + value * 7);
+  else               d.setMonth(d.getMonth() + value);
+  document.getElementById('jdNextService').value = dateToYmd(d);
+  document.querySelectorAll('.jd-interval-chip').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function openJobDoneModal(rowIndex) {
+  const client = (rowIndex !== undefined && rowIndex !== null) ? allClients.find(c => c.rowIndex === rowIndex) : null;
+  jobsDoneEditRowIndex = client ? client.rowIndex : null;
+
+  document.getElementById('jdModalTitle').textContent = client ? 'Log Job Done' : 'Add New Client';
+  document.getElementById('jdModalSub').textContent = client
+    ? `Updating service dates for ${client.name}.`
+    : `Can't find them in your search? Add their details and first service below.`;
+
+  document.getElementById('jdName').value = client ? (client.name||'') : '';
+  document.getElementById('jdAddress').value = client ? (client.address||'') : '';
+  document.getElementById('jdPhone').value = client ? (client.phone||'') : '';
+  document.getElementById('jdEmail').value = client ? (client.email||'') : '';
+  document.getElementById('jdLastService').value = client ? auToYmd(client.lastService) : '';
+  document.getElementById('jdServiceDone').value = client ? auToYmd(client.serviceDone) : '';
+  document.getElementById('jdNextService').value = client ? auToYmd(client.nextService) : '';
+  document.getElementById('jdNotes').value = client ? (client.notes||'') : '';
+  document.querySelectorAll('.jd-interval-chip').forEach(b => b.classList.remove('active'));
+
+  // "Already added from the Sheet but not from the app" notice — shown whenever
+  // the client we're about to edit already has service dates on file.
+  const hasExisting = !!(client && (client.lastService || client.serviceDone || client.nextService));
+  document.getElementById('jdExistingNotice').style.display = hasExisting ? 'block' : 'none';
+
+  document.getElementById('jdModalOverlay').classList.add('show');
+}
+
+function closeJobDoneModal() {
+  document.getElementById('jdModalOverlay').classList.remove('show');
+  jobsDoneEditRowIndex = null;
+}
+
+async function saveJobDone() {
+  const name = document.getElementById('jdName').value.trim();
+  if (!name) { showJobsDoneToast('⚠️ Client name is required.', 'warn'); return; }
+
+  const address     = document.getElementById('jdAddress').value.trim();
+  const phone       = document.getElementById('jdPhone').value.trim();
+  const email       = document.getElementById('jdEmail').value.trim();
+  const lastService = ymdToAU(document.getElementById('jdLastService').value);
+  const serviceDone = ymdToAU(document.getElementById('jdServiceDone').value);
+  const nextService = ymdToAU(document.getElementById('jdNextService').value);
+  const notes       = document.getElementById('jdNotes').value.trim();
+
+  const isUpdate = jobsDoneEditRowIndex !== null;
+  const existingClient = isUpdate ? allClients.find(c => c.rowIndex === jobsDoneEditRowIndex) : null;
+
+  // Conflict prompt: this client already has service data on file (e.g. it was
+  // entered straight into the Sheet, not through this "Jobs Done" screen) —
+  // confirm before overwriting it.
+  if (existingClient && (existingClient.lastService || existingClient.serviceDone || existingClient.nextService)) {
+    const summary = `Last: ${existingClient.lastService||'—'}   Done: ${existingClient.serviceDone||'—'}   Next: ${existingClient.nextService||'—'}`;
+    const ok = confirm(`${existingClient.name} already has service data on file:\n${summary}\n\nUpdate it with the new dates you entered?`);
+    if (!ok) return;
+  }
+
+  const url = getGsUrl();
+  if (!url) { showJobsDoneToast('⚠️ No Google Sheets URL connected.', 'warn'); return; }
+
+  const btn = document.getElementById('jdSaveBtn');
+  if (btn) { btn.classList.add('loading'); btn.textContent = 'Saving…'; }
+
+  const payload = {
+    action: isUpdate ? 'updateClient' : 'addClient',
+    name, address, phone, email, lastService, serviceDone, nextService, notes
+  };
+  if (isUpdate) payload.rowIndex = jobsDoneEditRowIndex;
+
+  try {
+    // text/plain avoids a CORS preflight that Apps Script web apps can't answer;
+    // doPost() on the Apps Script side still JSON.parses the body fine.
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (data.error) {
+      showJobsDoneToast('❌ ' + data.error, 'error');
+    } else {
+      closeJobDoneModal();
+      showJobsDoneToast(`✅ ${isUpdate ? 'Service updated for' : 'Added'} ${name}.`, 'success');
+      await refreshJobsDone();
+    }
+  } catch(e) {
+    showJobsDoneToast('❌ Could not save: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.classList.remove('loading'); btn.textContent = 'Save'; }
+  }
 }
 
 function openMaps(address) {
