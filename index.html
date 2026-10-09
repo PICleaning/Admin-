@@ -1055,6 +1055,12 @@
   .pr-attach-note.show { display:block; }
   .pr-attach-note.info { color:rgba(255,255,255,0.7); background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); }
   .pr-attach-note.warn { color:#ffcf7a; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.35); }
+  .pr-step2 { display:none; margin-top:14px; padding:14px; border-radius:10px; background:rgba(201,168,76,0.1); border:1px solid var(--gold); }
+  .pr-step2.show { display:block; }
+  .pr-step2-tag { font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:4px; }
+  .pr-step2-title { font-size:14px; font-weight:700; color:var(--white); margin-bottom:6px; }
+  .pr-step2-desc { font-size:11px; color:rgba(255,255,255,0.7); line-height:1.6; }
+  .pr-step2-skip { display:block; width:100%; margin-top:8px; padding:9px; background:none; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:var(--white-muted); font-family:'Montserrat',sans-serif; font-size:11px; cursor:pointer; }
   .pr-status { display:none; font-size:11px; line-height:1.6; margin-top:10px; padding:9px 12px; border-radius:8px; }
   .pr-status.show { display:block; }
   .pr-status.success { color:var(--success); background:rgba(29,185,84,0.1); border:1px solid rgba(29,185,84,0.3); }
@@ -1600,8 +1606,15 @@
     </div>
     <button class="send-btn" id="prSendBtn" onclick="sendPaymentReminder()">💳 Send Message</button>
     <div class="pr-status" id="prStatus"></div>
+    <div class="pr-step2" id="prStep2">
+      <div class="pr-step2-tag">Step 2 of 2</div>
+      <div class="pr-step2-title">Now send the invoice PDF</div>
+      <div class="pr-step2-desc" id="prStep2Desc">Your message chat is open with the text ready. Send it, come back here, then tap below — <strong style="color:var(--gold-light)" id="prStep2Who">the client</strong> will be first in the share sheet's suggestions row. Tap them and the PDF lands in the same chat.</div>
+      <button type="button" class="send-btn show" style="margin-top:12px;" onclick="prSharePdf()">📎 Send Invoice PDF</button>
+      <button type="button" class="pr-step2-skip" onclick="prFinishReminder()">Done — skip the PDF</button>
+    </div>
     <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-top:14px;">
-      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens your phone's Messages app pre-filled. With a PDF attached, your phone's share sheet opens instead — pick <strong style="color:var(--gold-light)">Messages</strong> and the text and invoice go together. The mobile number is copied for you, so just paste it into the "To" field. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
+      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens the chat with that number in your Messages app, with the text pre-filled. With a PDF attached, a <strong style="color:var(--gold-light)">Step 2</strong> button appears when you come back — it sends the invoice into the same chat. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
     </div>
   </div>
 
@@ -2999,7 +3012,7 @@ function prRenderPdf() {
     chip.classList.add('show'); btn.style.display = 'none';
     if (prCanShareFile(prPdfFile)) {
       note.className = 'pr-attach-note show info';
-      note.innerHTML = '📤 On Send, your share sheet opens — choose <strong style="color:var(--gold-light)">Messages</strong>. The mobile number is copied so you can paste it into "To".';
+      note.innerHTML = '📤 On Send, the client\'s chat opens with your text. Send it, come back, and tap <strong style="color:var(--gold-light)">Send Invoice PDF</strong> to drop the PDF into the same chat.';
     } else {
       note.className = 'pr-attach-note show warn';
       note.innerHTML = '⚠️ This browser can\'t share files. Sending will open Messages with the text only — attach the PDF from your Files there. Works best from the installed app on your phone.';
@@ -3017,6 +3030,7 @@ function prResetForm() {
   prPdfFile = null;
   prRenderPdf();
   prCheckReady();
+  const st2 = document.getElementById('prStep2'); if (st2) st2.classList.remove('show');
 }
 function prCopyText(text) {
   try {
@@ -3029,6 +3043,25 @@ function prCopyText(text) {
     return Promise.resolve(ok);
   } catch (e) { return Promise.resolve(false); }
 }
+// Australian mobiles → international format so Messages matches the contact reliably
+function prIntlPhone(p) {
+  const d = p.replace(/[^0-9+]/g, '');
+  if (d.startsWith('+')) return d;
+  if (/^04\d{8}$/.test(d)) return '+61' + d.slice(1);
+  if (/^614\d{8}$/.test(d)) return '+' + d;
+  return d;
+}
+function prIsIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+// iOS Messages expects "&body=", Android expects "?body="
+function prSmsUrl(phone, msg) {
+  return `sms:${prIntlPhone(phone)}${prIsIOS() ? '&' : '?'}body=${encodeURIComponent(msg)}`;
+}
+function prFinishReminder() {
+  document.getElementById('prStep2').classList.remove('show');
+  prResetForm();
+}
 function sendPaymentReminder() {
   const business = (document.getElementById('prBusiness').value || '').trim();
   const phone = prCleanPhone(document.getElementById('prPhone').value);
@@ -3036,37 +3069,39 @@ function sendPaymentReminder() {
   if (!business || !phone || !amount) { prCheckReady(); return; }
   const msg = prBuildMessage(business, amount, prGetClient());
 
-  // With a PDF: native share sheet carries the text + invoice together
-  if (prPdfFile && prCanShareFile(prPdfFile)) {
-    // Both calls start inside the tap so the browser allows them
-    const copied = prCopyText(phone);
-    navigator.share({ files: [prPdfFile], text: msg, title: 'Payment reminder — ' + business })
-      .then(() => {
-        prShowStatus('✅ Payment reminder + invoice shared for ' + business + '.', 'success');
-        setTimeout(prResetForm, 800);
-      })
-      .catch(err => {
-        if (err && err.name === 'AbortError') {
-          prShowStatus('Share cancelled — nothing was sent. Your details are still here.', 'warn');
-        } else {
-          prShowStatus('⚠️ Couldn\'t open the share sheet. Opening Messages with the text only — attach the PDF there.', 'warn');
-          window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
-        }
-      });
-    copied.then(ok => {
-      if (ok) prShowStatus('📋 Mobile number ' + phone + ' copied — paste it into the "To" field in Messages.', 'success');
-    });
-    return;
-  }
+  // Always open the chat with this number, text pre-filled
+  window.location.href = prSmsUrl(phone, msg);
 
-  // No PDF (or file sharing unsupported): open Messages pre-filled
-  window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
   if (prPdfFile) {
-    prShowStatus('📎 Messages opened with the text — attach the PDF from your Files before sending.', 'warn');
-    return; // keep the form so they can see what to attach
+    // Step 2: invoice goes into the same chat via the share sheet
+    document.getElementById('prStep2Who').textContent = prGetClient() || business;
+    const step2 = document.getElementById('prStep2');
+    step2.classList.add('show');
+    if (!prCanShareFile(prPdfFile)) {
+      document.getElementById('prStep2Desc').innerHTML = '⚠️ This browser can\'t share files. In the open chat, tap ＋ and attach <strong style="color:var(--gold-light)">' + prPdfFile.name.replace(/[<>&]/g, '') + '</strong> from your Files.';
+    }
+    setTimeout(() => step2.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    return; // keep the form until the PDF is sent
   }
   // Clear so the next reminder must be filled in fresh
   setTimeout(prResetForm, 800);
+}
+function prSharePdf() {
+  if (!prPdfFile) { prFinishReminder(); return; }
+  if (!prCanShareFile(prPdfFile)) {
+    prShowStatus('⚠️ This browser can\'t share files — attach the PDF from your Files in the open chat.', 'warn');
+    return;
+  }
+  const who = prGetClient() || (document.getElementById('prBusiness').value || '').trim();
+  navigator.share({ files: [prPdfFile], title: 'Invoice' })
+    .then(() => {
+      prShowStatus('✅ Invoice sent to ' + who + '.', 'success');
+      setTimeout(prFinishReminder, 600);
+    })
+    .catch(err => {
+      if (err && err.name === 'AbortError') prShowStatus('Share cancelled — tap Send Invoice PDF to try again.', 'warn');
+      else prShowStatus('⚠️ Couldn\'t open the share sheet — attach the PDF from your Files in the open chat.', 'warn');
+    });
 }
 
 function getDefaultReminderTemplate() {
