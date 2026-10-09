@@ -1013,6 +1013,36 @@
   }
   .settings-saved-msg.show { display: block; }
 
+  /* ════ BROADCAST FOLDER (Settings) ════ */
+  .bc-folder > summary, .bc-sub > summary { list-style:none; }
+  .bc-folder > summary::-webkit-details-marker, .bc-sub > summary::-webkit-details-marker { display:none; }
+  .bc-folder-head, .bc-sub-head {
+    display:flex; align-items:center; gap:12px; cursor:pointer;
+    padding:13px 14px; border-radius:10px;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.22);
+    transition:all 0.2s;
+  }
+  .bc-folder-head:hover, .bc-sub-head:hover { background:var(--gold-pale); border-color:rgba(201,168,76,0.4); }
+  .bc-folder[open] > .bc-folder-head { background:rgba(201,168,76,0.12); border-color:var(--gold); }
+  .bc-folder-icon { font-size:20px; flex-shrink:0; }
+  .bc-folder[open] .bc-folder-icon { filter:saturate(1.2); }
+  .bc-sub-icon { font-size:16px; flex-shrink:0; }
+  .bc-sub-text { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .bc-sub-title { font-size:12px; font-weight:600; color:var(--white); }
+  .bc-sub[open] .bc-sub-title { color:var(--gold-light); }
+  .bc-sub-desc { font-size:10px; color:var(--white-muted); }
+  .bc-chev { color:var(--gold); font-size:18px; transition:transform 0.2s; flex-shrink:0; }
+  details[open] > summary > .bc-chev { transform:rotate(90deg); }
+  .bc-folder-body { padding:10px 0 0 14px; margin-left:10px; border-left:1px solid rgba(201,168,76,0.2); display:flex; flex-direction:column; gap:8px; }
+  .bc-sub[open] > .bc-sub-head { border-color:var(--gold); }
+  .bc-sub-body { padding:12px 4px 6px; }
+
+  /* ════ PAYMENTS REMINDER PANEL ════ */
+  .pr-preview-wrap { display:none; margin-top:6px; }
+  .pr-preview-wrap.show { display:block; }
+  .pr-preview-label { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--white-muted); margin-bottom:6px; }
+  .pr-preview { white-space:pre-wrap; font-size:12px; line-height:1.6; color:var(--white); background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.2); border-radius:9px; padding:12px 14px; }
+
   /* ════ NEW FEATURES PANEL ════ */
   .new-feature-card {
     display: flex; gap: 14px; align-items: flex-start;
@@ -1129,6 +1159,14 @@
         <div class="nav-item-text">
           <div class="nav-item-label">Request Reviews</div>
           <div class="nav-item-sub">Send Google review links after jobs</div>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </button>
+      <button class="drawer-nav-item" id="tab-payreminder" onclick="switchDrawerTab('payreminder')">
+        <span class="nav-item-icon">💳</span>
+        <div class="nav-item-text">
+          <div class="nav-item-label">Payments Reminder</div>
+          <div class="nav-item-sub">Text a client about an outstanding payment</div>
         </div>
         <span class="nav-item-arrow">›</span>
       </button>
@@ -1505,6 +1543,33 @@
     <div class="toast" id="toast"></div>
   </div>
 
+  <!-- ── PANEL: PAYMENTS REMINDER ── -->
+  <div class="drawer-panel" id="panel-payreminder">
+    <div class="section-tag">Outstanding Payments</div>
+    <div class="section-heading">Send a payment<br>reminder by text</div>
+    <div class="divider"></div>
+    <div class="field-group">
+      <label class="field-label">Business or Shop Name</label>
+      <input class="field-input" type="text" id="prBusiness" placeholder="e.g. Smith &amp; Co Bakery" autocomplete="off" oninput="prCheckReady()" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Mobile Number</label>
+      <input class="field-input" type="tel" id="prPhone" placeholder="04xx xxx xxx" autocomplete="off" oninput="prCheckReady()" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Amount Owing ($)</label>
+      <input class="field-input" type="text" inputmode="decimal" id="prAmount" placeholder="e.g. 250.00" autocomplete="off" oninput="prCheckReady()" />
+    </div>
+    <div class="pr-preview-wrap" id="prPreviewWrap">
+      <div class="pr-preview-label">Message preview</div>
+      <div class="pr-preview" id="prPreview"></div>
+    </div>
+    <button class="send-btn" id="prSendBtn" onclick="sendPaymentReminder()">💳 Send Message</button>
+    <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-top:14px;">
+      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens your phone's Messages app pre-filled. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
+    </div>
+  </div>
+
   <!-- ── PANEL 2: CLIENTS & REMINDERS (combined) ── -->
   <div class="drawer-panel" id="panel-clients-reminders">
     <!-- Sub-tab switcher inside the panel -->
@@ -1781,43 +1846,29 @@
 
     <div class="divider" style="margin:20px 0;"></div>
 
-    <!-- Review Request Text Template -->
-    <div class="settings-section">
-      <div class="settings-section-title">⭐ Review Request Message</div>
-      <div class="settings-section-desc">Customise the SMS sent to clients asking for a Google review. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name. The review link is automatically included — use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">Click here to review us ⭐</code> as the placeholder where the link appears.</div>
-      <textarea class="reminder-msg-area" id="reviewTemplateText" style="margin-top:12px;min-height:160px;" placeholder="Hi {name}, thank you for choosing Pi Cleaning Services!..."></textarea>
+    <!-- Broadcast folder: all SMS message templates -->
+    <details class="settings-section bc-folder" id="broadcastFolder">
+      <summary class="bc-folder-head">
+        <span class="bc-folder-icon">📁</span>
+        <span class="bc-sub-text"><span class="settings-section-title" style="margin:0;">Broadcast</span><span class="bc-sub-desc">Message templates — Payment Reminder, Marketing, Reviews &amp; Reminders</span></span>
+        <span class="bc-chev">›</span>
+      </summary>
+      <div class="bc-folder-body">
+        <details class="bc-sub">
+          <summary class="bc-sub-head"><span class="bc-sub-icon">💳</span><span class="bc-sub-text"><span class="bc-sub-title">Payment Reminder</span><span class="bc-sub-desc">Outstanding payment text</span></span><span class="bc-chev">›</span></summary>
+          <div class="bc-sub-body">
+      <div class="settings-section-desc">Customise the SMS sent from <strong style="color:var(--gold-light)">Payments Reminder</strong>. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{business}</code> for the business or shop name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{amount}</code> for the amount owing (the $ sign is added automatically).</div>
+      <textarea class="reminder-msg-area" id="paymentReminderText" style="margin-top:12px;min-height:160px;" placeholder="Hi {business}, this is a friendly reminder..."></textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReviewTemplate()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="saveReviewTemplate()">Save Review Text</button>
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetPaymentReminderTemplate()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="savePaymentReminderTemplate()">Save Payment Text</button>
       </div>
-      <div class="settings-saved-msg" id="reviewTemplateSaved">✅ Review text saved!</div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        💡 The review link is hardcoded and hidden — clients receive a clean "Click here to review us ⭐" link that opens Google Reviews with 5 stars pre-selected.
-      </div>
-    </div>
-
-    <div class="divider" style="margin:20px 0;"></div>
-
-    <!-- Amend Reminder Text -->
-    <div class="settings-section">
-      <div class="settings-section-title">✉️ Amend Reminder Text</div>
-      <div class="settings-section-desc">Customise the SMS reminder message sent to clients when their service is due. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
-      <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
-      </div>
-      <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
-      </div>
-    </div>
-
-    <div class="divider" style="margin:20px 0;"></div>
-
-    <!-- Marketing SMS Template -->
-    <div class="settings-section">
-      <div class="settings-section-title">📣 Marketing SMS Template</div>
+      <div class="settings-saved-msg" id="paymentReminderSaved">✅ Payment reminder text saved!</div>
+          </div>
+        </details>
+        <details class="bc-sub">
+          <summary class="bc-sub-head"><span class="bc-sub-icon">📣</span><span class="bc-sub-text"><span class="bc-sub-title">Marketing Template</span><span class="bc-sub-desc">Bulk SMS to prospects</span></span><span class="bc-chev">›</span></summary>
+          <div class="bc-sub-body">
       <div class="settings-section-desc">Customise the bulk SMS message sent to prospects. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the prospect's first name.</div>
       <textarea class="reminder-msg-area" id="marketingSmsText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
@@ -1828,7 +1879,40 @@
       <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
         💡 This message pre-fills automatically when you send bulk SMS to prospects in the Prospects section.
       </div>
-    </div>
+          </div>
+        </details>
+        <details class="bc-sub">
+          <summary class="bc-sub-head"><span class="bc-sub-icon">⭐</span><span class="bc-sub-text"><span class="bc-sub-title">Request Reviews</span><span class="bc-sub-desc">Google review request text</span></span><span class="bc-chev">›</span></summary>
+          <div class="bc-sub-body">
+      <div class="settings-section-desc">Customise the SMS sent to clients asking for a Google review. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name. The review link is automatically included — use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">Click here to review us ⭐</code> as the placeholder where the link appears.</div>
+      <textarea class="reminder-msg-area" id="reviewTemplateText" style="margin-top:12px;min-height:160px;" placeholder="Hi {name}, thank you for choosing Pi Cleaning Services!..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReviewTemplate()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveReviewTemplate()">Save Review Text</button>
+      </div>
+      <div class="settings-saved-msg" id="reviewTemplateSaved">✅ Review text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 The review link is hardcoded and hidden — clients receive a clean "Click here to review us ⭐" link that opens Google Reviews with 5 stars pre-selected.
+      </div>
+          </div>
+        </details>
+        <details class="bc-sub">
+          <summary class="bc-sub-head"><span class="bc-sub-icon">✉️</span><span class="bc-sub-text"><span class="bc-sub-title">Reminder Text</span><span class="bc-sub-desc">Service-due reminder text</span></span><span class="bc-chev">›</span></summary>
+          <div class="bc-sub-body">
+      <div class="settings-section-desc">Customise the SMS reminder message sent to clients when their service is due. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
+      <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
+        <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
+      </div>
+      <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
+      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+        💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
+      </div>
+          </div>
+        </details>
+      </div>
+    </details>
 
     <div class="divider" style="margin:20px 0;"></div>
 
@@ -2020,7 +2104,7 @@
     </div>
 
     <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-      💡 Edit your marketing message anytime under <strong style="color:var(--gold-light)">Settings → Marketing SMS Template</strong>.
+      💡 Edit your marketing message anytime under <strong style="color:var(--gold-light)">Settings → Broadcast → Marketing Template</strong>.
     </div>
   </div>
 
@@ -2604,6 +2688,9 @@ function loadSettingsUI() {
   // Review template
   const rta = document.getElementById('reviewTemplateText');
   if (rta) rta.value = getSavedReviewTemplate('{name}');
+  // Payment reminder template
+  const pta = document.getElementById('paymentReminderText');
+  if (pta) pta.value = getSavedPaymentReminderTemplate();
   // Due-30 glow toggle
   const glow = localStorage.getItem('pi_due30_glow') !== 'off';
   const tog = document.getElementById('due30GlowToggle');
@@ -2750,6 +2837,71 @@ function resetReviewTemplate() {
   if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Review text saved!'; }, 2500); }
 }
 
+// ── PAYMENTS REMINDER ──
+const PAYMENT_REMINDER_KEY = 'pi_payment_reminder_template';
+function getDefaultPaymentReminderTemplate() {
+  return 'Hi {business},\n\nThis is a friendly reminder from Pi Cleaning Services that a payment of {amount} is currently outstanding for our cleaning services.\n\nIf you have already paid, please disregard this message. Otherwise, we would appreciate payment at your earliest convenience.\n\nThank you for your business!\nWarm regards,\nThe Pi Cleaning Services Team';
+}
+function getSavedPaymentReminderTemplate() {
+  const saved = localStorage.getItem(PAYMENT_REMINDER_KEY);
+  return (saved && saved.trim()) ? saved.trim() : getDefaultPaymentReminderTemplate();
+}
+function savePaymentReminderTemplate() {
+  const ta = document.getElementById('paymentReminderText');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (text) { localStorage.setItem(PAYMENT_REMINDER_KEY, text); }
+  else { localStorage.removeItem(PAYMENT_REMINDER_KEY); }
+  const saved = document.getElementById('paymentReminderSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
+}
+function resetPaymentReminderTemplate() {
+  const ta = document.getElementById('paymentReminderText');
+  if (ta) ta.value = getDefaultPaymentReminderTemplate();
+  localStorage.removeItem(PAYMENT_REMINDER_KEY);
+  const saved = document.getElementById('paymentReminderSaved');
+  if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Payment reminder text saved!'; }, 2500); }
+}
+function prFormatAmount(raw) {
+  const n = parseFloat(String(raw).replace(/[^0-9.]/g, ''));
+  if (!isFinite(n) || n <= 0) return null;
+  return '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function prCleanPhone(raw) {
+  const p = String(raw || '').replace(/[^0-9+]/g, '');
+  return p.replace(/\D/g, '').length >= 8 ? p : null;
+}
+function prBuildMessage(business, amountStr) {
+  return getSavedPaymentReminderTemplate()
+    .replace(/{business}/g, business)
+    .replace(/{amount}/g, amountStr);
+}
+function prCheckReady() {
+  const business = (document.getElementById('prBusiness').value || '').trim();
+  const phone = prCleanPhone(document.getElementById('prPhone').value);
+  const amount = prFormatAmount(document.getElementById('prAmount').value);
+  const ready = !!(business && phone && amount);
+  document.getElementById('prSendBtn').classList.toggle('show', ready);
+  const wrap = document.getElementById('prPreviewWrap');
+  wrap.classList.toggle('show', ready);
+  if (ready) document.getElementById('prPreview').textContent = prBuildMessage(business, amount);
+}
+// Every visit starts blank — mobile, amount and business must be entered each time
+function prResetForm() {
+  ['prBusiness','prPhone','prAmount'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  prCheckReady();
+}
+function sendPaymentReminder() {
+  const business = (document.getElementById('prBusiness').value || '').trim();
+  const phone = prCleanPhone(document.getElementById('prPhone').value);
+  const amount = prFormatAmount(document.getElementById('prAmount').value);
+  if (!business || !phone || !amount) { prCheckReady(); return; }
+  const body = encodeURIComponent(prBuildMessage(business, amount));
+  window.location.href = `sms:${phone}?body=${body}`;
+  // Clear so the next reminder must be filled in fresh
+  setTimeout(prResetForm, 800);
+}
+
 function getDefaultReminderTemplate() {
   return 'Hi {name},\nThis is Pi Cleaning Services. Your scheduled service is coming up soon.\nPlease give us a call or reply to book in your next clean!\nWarm regards,\nThe Pi Cleaning Services Team';
 }
@@ -2777,13 +2929,14 @@ function resetReminderText() {
 }
 function switchDrawerTab(tab) {
   currentDrawerTab = tab;
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
+  const allPanelIds = ['menu','review','payreminder','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === tab);
   });
   const titles = {
     review: '⭐ Request a Review',
+    payreminder: '💳 Payments Reminder',
     'clients-reminders': '👥 Clients & Reminders',
     jobs: '✅ Jobs Done',
     settings: '⚙️ Settings',
@@ -2801,6 +2954,7 @@ function switchDrawerTab(tab) {
   if (tab === 'clients-reminders') { renderClients(); renderReminders(); }
   if (tab === 'jobs') refreshJobsDone();
   if (tab === 'settings') loadSettingsUI();
+  if (tab === 'payreminder') prResetForm();
   if (tab === 'prospects') loadProspectsUrlUI();
   if (tab === 'paycalc') initPayCalc();
   if (tab === 'accesscodes') initAccessCodes();
@@ -2808,7 +2962,7 @@ function switchDrawerTab(tab) {
 
 function showDrawerMenu() {
   currentDrawerTab = 'menu';
-  const allPanelIds = ['menu','review','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
+  const allPanelIds = ['menu','review','payreminder','clients-reminders','jobs','settings','newfeatures','prospects','documents','paycalc','quotecalc','accesscodes'];
   allPanelIds.forEach(t => {
     const el = document.getElementById('panel-' + t);
     if (el) el.classList.toggle('active', t === 'menu');
