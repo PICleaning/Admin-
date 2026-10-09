@@ -1567,6 +1567,11 @@
     <div class="section-heading">Send a payment<br>reminder by text</div>
     <div class="divider"></div>
     <div class="field-group">
+      <label class="field-label">Client Name <span style="text-transform:none;letter-spacing:0;color:var(--white-muted);font-weight:500;">— optional</span></label>
+      <input class="field-input" type="text" id="prClient" placeholder="e.g. Brett" autocomplete="off" oninput="prCheckReady()" />
+      <div style="font-size:10px;color:var(--white-muted);margin-top:5px;line-height:1.5;">Leave blank to address the message to "Team" at the business.</div>
+    </div>
+    <div class="field-group">
       <label class="field-label">Business or Shop Name</label>
       <input class="field-input" type="text" id="prBusiness" placeholder="e.g. Smith &amp; Co Bakery" autocomplete="off" oninput="prCheckReady()" />
     </div>
@@ -1887,8 +1892,13 @@
         <details class="bc-sub">
           <summary class="bc-sub-head"><span class="bc-sub-icon">💳</span><span class="bc-sub-text"><span class="bc-sub-title">Payment Reminder</span><span class="bc-sub-desc">Outstanding payment text</span></span><span class="bc-chev">›</span></summary>
           <div class="bc-sub-body">
-      <div class="settings-section-desc">Customise the SMS sent from <strong style="color:var(--gold-light)">Payments Reminder</strong>. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{business}</code> for the business or shop name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{amount}</code> for the amount owing (the $ sign is added automatically).</div>
-      <textarea class="reminder-msg-area" id="paymentReminderText" style="margin-top:12px;min-height:160px;" placeholder="Hi {business}, this is a friendly reminder..."></textarea>
+      <div class="settings-section-desc">Customise the SMS sent from <strong style="color:var(--gold-light)">Payments Reminder</strong>. The message opens with one of the two greetings below, then the main text follows. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{client}</code> for the client's name, <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{business}</code> for the business or shop name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{amount}</code> for the amount owing (the $ sign is added automatically).</div>
+      <label class="field-label" style="margin-top:12px;display:block;">Greeting — when a client name is entered</label>
+      <textarea class="reminder-msg-area" id="paymentGreetNamed" style="margin-top:6px;min-height:70px;" placeholder="Hi {client},..."></textarea>
+      <label class="field-label" style="margin-top:12px;display:block;">Greeting — when no client name is entered</label>
+      <textarea class="reminder-msg-area" id="paymentGreetTeam" style="margin-top:6px;min-height:50px;" placeholder="Hi Team {business},"></textarea>
+      <label class="field-label" style="margin-top:12px;display:block;">Main message</label>
+      <textarea class="reminder-msg-area" id="paymentReminderText" style="margin-top:6px;min-height:160px;" placeholder="Our records show a payment of {amount}..."></textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetPaymentReminderTemplate()">Reset to Default</button>
         <button class="reminder-sms-btn" onclick="savePaymentReminderTemplate()">Save Payment Text</button>
@@ -2721,6 +2731,10 @@ function loadSettingsUI() {
   // Payment reminder template
   const pta = document.getElementById('paymentReminderText');
   if (pta) pta.value = getSavedPaymentReminderTemplate();
+  const pgn = document.getElementById('paymentGreetNamed');
+  if (pgn) pgn.value = getSavedPaymentGreeting('named');
+  const pgt = document.getElementById('paymentGreetTeam');
+  if (pgt) pgt.value = getSavedPaymentGreeting('team');
   // Due-30 glow toggle
   const glow = localStorage.getItem('pi_due30_glow') !== 'off';
   const tog = document.getElementById('due30GlowToggle');
@@ -2869,12 +2883,25 @@ function resetReviewTemplate() {
 
 // ── PAYMENTS REMINDER ──
 const PAYMENT_REMINDER_KEY = 'pi_payment_reminder_template';
+const PAYMENT_GREET_KEYS = { named: 'pi_payment_greet_named', team: 'pi_payment_greet_team' };
+function getDefaultPaymentGreeting(kind) {
+  return kind === 'named'
+    ? 'Hi {client},\n\nJust reaching out to you regarding the overdue payment we have with {business}.'
+    : 'Hi Team {business},';
+}
+function getSavedPaymentGreeting(kind) {
+  const saved = localStorage.getItem(PAYMENT_GREET_KEYS[kind]);
+  return (saved && saved.trim()) ? saved.trim() : getDefaultPaymentGreeting(kind);
+}
 function getDefaultPaymentReminderTemplate() {
-  return 'Hi {business},\n\nThis is a friendly reminder from Pi Cleaning Services that a payment of {amount} is currently outstanding for our cleaning services.\n\nIf you have already paid, please disregard this message. Otherwise, we would appreciate payment at your earliest convenience.\n\nThank you for your business!\nWarm regards,\nThe Pi Cleaning Services Team';
+  return 'Our records show a payment of {amount} is currently outstanding for cleaning services provided by Pi Cleaning Services.\n\nIf you have already paid, please disregard this message. Otherwise, we would appreciate payment at your earliest convenience.\n\nThank you for your business!\nWarm regards,\nThe Pi Cleaning Services Team';
 }
 function getSavedPaymentReminderTemplate() {
   const saved = localStorage.getItem(PAYMENT_REMINDER_KEY);
-  return (saved && saved.trim()) ? saved.trim() : getDefaultPaymentReminderTemplate();
+  let tpl = (saved && saved.trim()) ? saved.trim() : getDefaultPaymentReminderTemplate();
+  // Older saved text began with its own "Hi {business}," line — the greeting now handles that
+  tpl = tpl.replace(/^Hi \{business\},?[ \t]*\n+/, '');
+  return tpl;
 }
 function savePaymentReminderTemplate() {
   const ta = document.getElementById('paymentReminderText');
@@ -2882,6 +2909,12 @@ function savePaymentReminderTemplate() {
   const text = ta.value.trim();
   if (text) { localStorage.setItem(PAYMENT_REMINDER_KEY, text); }
   else { localStorage.removeItem(PAYMENT_REMINDER_KEY); }
+  ['named','team'].forEach(k => {
+    const el = document.getElementById(k === 'named' ? 'paymentGreetNamed' : 'paymentGreetTeam');
+    if (!el) return;
+    const v = el.value.trim();
+    if (v) localStorage.setItem(PAYMENT_GREET_KEYS[k], v); else localStorage.removeItem(PAYMENT_GREET_KEYS[k]);
+  });
   const saved = document.getElementById('paymentReminderSaved');
   if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2500); }
 }
@@ -2889,6 +2922,12 @@ function resetPaymentReminderTemplate() {
   const ta = document.getElementById('paymentReminderText');
   if (ta) ta.value = getDefaultPaymentReminderTemplate();
   localStorage.removeItem(PAYMENT_REMINDER_KEY);
+  const gn = document.getElementById('paymentGreetNamed');
+  if (gn) gn.value = getDefaultPaymentGreeting('named');
+  const gt = document.getElementById('paymentGreetTeam');
+  if (gt) gt.value = getDefaultPaymentGreeting('team');
+  localStorage.removeItem(PAYMENT_GREET_KEYS.named);
+  localStorage.removeItem(PAYMENT_GREET_KEYS.team);
   const saved = document.getElementById('paymentReminderSaved');
   if (saved) { saved.textContent = '✅ Reset to default!'; saved.classList.add('show'); setTimeout(() => { saved.classList.remove('show'); saved.textContent = '✅ Payment reminder text saved!'; }, 2500); }
 }
@@ -2901,10 +2940,17 @@ function prCleanPhone(raw) {
   const p = String(raw || '').replace(/[^0-9+]/g, '');
   return p.replace(/\D/g, '').length >= 8 ? p : null;
 }
-function prBuildMessage(business, amountStr) {
-  return getSavedPaymentReminderTemplate()
+function prBuildMessage(business, amountStr, client) {
+  client = (client || '').trim();
+  const greeting = getSavedPaymentGreeting(client ? 'named' : 'team');
+  return (greeting + '\n\n' + getSavedPaymentReminderTemplate())
+    .replace(/{client}/g, client)
     .replace(/{business}/g, business)
     .replace(/{amount}/g, amountStr);
+}
+function prGetClient() {
+  const el = document.getElementById('prClient');
+  return el ? el.value.trim() : '';
 }
 function prCheckReady() {
   const business = (document.getElementById('prBusiness').value || '').trim();
@@ -2914,7 +2960,7 @@ function prCheckReady() {
   document.getElementById('prSendBtn').classList.toggle('show', ready);
   const wrap = document.getElementById('prPreviewWrap');
   wrap.classList.toggle('show', ready);
-  if (ready) document.getElementById('prPreview').textContent = prBuildMessage(business, amount);
+  if (ready) document.getElementById('prPreview').textContent = prBuildMessage(business, amount, prGetClient());
 }
 // ── Optional PDF invoice attachment ──
 let prPdfFile = null;
@@ -2967,7 +3013,7 @@ function prRenderPdf() {
 }
 // Every visit starts blank — mobile, amount and business must be entered each time
 function prResetForm() {
-  ['prBusiness','prPhone','prAmount'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['prClient','prBusiness','prPhone','prAmount'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   prPdfFile = null;
   prRenderPdf();
   prCheckReady();
@@ -2988,7 +3034,7 @@ function sendPaymentReminder() {
   const phone = prCleanPhone(document.getElementById('prPhone').value);
   const amount = prFormatAmount(document.getElementById('prAmount').value);
   if (!business || !phone || !amount) { prCheckReady(); return; }
-  const msg = prBuildMessage(business, amount);
+  const msg = prBuildMessage(business, amount, prGetClient());
 
   // With a PDF: native share sheet carries the text + invoice together
   if (prPdfFile && prCanShareFile(prPdfFile)) {
