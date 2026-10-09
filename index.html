@@ -1041,6 +1041,24 @@
   .pr-preview-wrap { display:none; margin-top:6px; }
   .pr-preview-wrap.show { display:block; }
   .pr-preview-label { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--white-muted); margin-bottom:6px; }
+  .pr-attach-btn { width:100%; padding:11px 13px; background:rgba(255,255,255,0.03); border:1px dashed rgba(201,168,76,0.45); border-radius:8px; color:var(--gold-light); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .pr-attach-btn:hover { background:var(--gold-pale); border-color:var(--gold); }
+  .pr-file-chip { display:none; align-items:center; gap:10px; padding:10px 12px; background:rgba(201,168,76,0.1); border:1px solid var(--gold); border-radius:8px; }
+  .pr-file-chip.show { display:flex; }
+  .pr-file-icon { font-size:18px; flex-shrink:0; }
+  .pr-file-meta { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .pr-file-name { font-size:12px; font-weight:600; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pr-file-size { font-size:10px; color:var(--white-muted); }
+  .pr-file-remove { background:none; border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:var(--white-muted); width:28px; height:28px; cursor:pointer; flex-shrink:0; font-size:12px; }
+  .pr-file-remove:hover { border-color:var(--danger); color:var(--danger); }
+  .pr-attach-note { display:none; font-size:11px; line-height:1.6; margin-top:8px; padding:9px 12px; border-radius:8px; }
+  .pr-attach-note.show { display:block; }
+  .pr-attach-note.info { color:rgba(255,255,255,0.7); background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); }
+  .pr-attach-note.warn { color:#ffcf7a; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.35); }
+  .pr-status { display:none; font-size:11px; line-height:1.6; margin-top:10px; padding:9px 12px; border-radius:8px; }
+  .pr-status.show { display:block; }
+  .pr-status.success { color:var(--success); background:rgba(29,185,84,0.1); border:1px solid rgba(29,185,84,0.3); }
+  .pr-status.warn { color:#ffcf7a; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.35); }
   .pr-preview { white-space:pre-wrap; font-size:12px; line-height:1.6; color:var(--white); background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.2); border-radius:9px; padding:12px 14px; }
 
   /* ════ NEW FEATURES PANEL ════ */
@@ -1560,13 +1578,25 @@
       <label class="field-label">Amount Owing ($)</label>
       <input class="field-input" type="text" inputmode="decimal" id="prAmount" placeholder="e.g. 250.00" autocomplete="off" oninput="prCheckReady()" />
     </div>
+    <div class="field-group">
+      <label class="field-label">Attach Invoice (PDF) <span style="text-transform:none;letter-spacing:0;color:var(--white-muted);font-weight:500;">— optional</span></label>
+      <input type="file" id="prPdf" accept="application/pdf,.pdf" style="display:none;" onchange="prOnPdfChosen(this)" />
+      <button type="button" class="pr-attach-btn" id="prAttachBtn" onclick="document.getElementById('prPdf').click()">📎 Choose PDF invoice</button>
+      <div class="pr-file-chip" id="prFileChip">
+        <span class="pr-file-icon">📄</span>
+        <span class="pr-file-meta"><span class="pr-file-name" id="prFileName"></span><span class="pr-file-size" id="prFileSize"></span></span>
+        <button type="button" class="pr-file-remove" onclick="prRemovePdf()" aria-label="Remove PDF">✕</button>
+      </div>
+      <div class="pr-attach-note" id="prAttachNote"></div>
+    </div>
     <div class="pr-preview-wrap" id="prPreviewWrap">
       <div class="pr-preview-label">Message preview</div>
       <div class="pr-preview" id="prPreview"></div>
     </div>
     <button class="send-btn" id="prSendBtn" onclick="sendPaymentReminder()">💳 Send Message</button>
+    <div class="pr-status" id="prStatus"></div>
     <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-top:14px;">
-      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens your phone's Messages app pre-filled. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
+      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens your phone's Messages app pre-filled. With a PDF attached, your phone's share sheet opens instead — pick <strong style="color:var(--gold-light)">Messages</strong> and the text and invoice go together. The mobile number is copied for you, so just paste it into the "To" field. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
     </div>
   </div>
 
@@ -2886,18 +2916,109 @@ function prCheckReady() {
   wrap.classList.toggle('show', ready);
   if (ready) document.getElementById('prPreview').textContent = prBuildMessage(business, amount);
 }
+// ── Optional PDF invoice attachment ──
+let prPdfFile = null;
+function prCanShareFile(file) {
+  try { return !!(file && navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); }
+  catch (e) { return false; }
+}
+function prFmtSize(bytes) {
+  return bytes < 1024 * 1024 ? Math.max(1, Math.round(bytes / 1024)) + ' KB' : (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+function prShowStatus(msg, type) {
+  const el = document.getElementById('prStatus');
+  if (!el) return;
+  el.innerHTML = msg; el.className = 'pr-status show ' + (type || 'success');
+  clearTimeout(prShowStatus._t);
+  prShowStatus._t = setTimeout(() => el.classList.remove('show'), 7000);
+}
+function prOnPdfChosen(input) {
+  const f = input.files && input.files[0];
+  input.value = ''; // allow re-choosing the same file later
+  if (!f) return;
+  const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+  if (!isPdf) { prShowStatus('⚠️ Please choose a PDF file.', 'warn'); return; }
+  prPdfFile = f;
+  prRenderPdf();
+}
+function prRemovePdf() { prPdfFile = null; prRenderPdf(); }
+function prRenderPdf() {
+  const chip = document.getElementById('prFileChip');
+  const btn = document.getElementById('prAttachBtn');
+  const note = document.getElementById('prAttachNote');
+  const sendBtn = document.getElementById('prSendBtn');
+  if (prPdfFile) {
+    document.getElementById('prFileName').textContent = prPdfFile.name;
+    document.getElementById('prFileSize').textContent = 'PDF · ' + prFmtSize(prPdfFile.size);
+    chip.classList.add('show'); btn.style.display = 'none';
+    if (prCanShareFile(prPdfFile)) {
+      note.className = 'pr-attach-note show info';
+      note.innerHTML = '📤 On Send, your share sheet opens — choose <strong style="color:var(--gold-light)">Messages</strong>. The mobile number is copied so you can paste it into "To".';
+    } else {
+      note.className = 'pr-attach-note show warn';
+      note.innerHTML = '⚠️ This browser can\'t share files. Sending will open Messages with the text only — attach the PDF from your Files there. Works best from the installed app on your phone.';
+    }
+    sendBtn.textContent = '💳 Send Message + PDF';
+  } else {
+    chip.classList.remove('show'); btn.style.display = '';
+    note.className = 'pr-attach-note';
+    sendBtn.textContent = '💳 Send Message';
+  }
+}
 // Every visit starts blank — mobile, amount and business must be entered each time
 function prResetForm() {
   ['prBusiness','prPhone','prAmount'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  prPdfFile = null;
+  prRenderPdf();
   prCheckReady();
+}
+function prCopyText(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(() => true, () => false);
+  } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove();
+    return Promise.resolve(ok);
+  } catch (e) { return Promise.resolve(false); }
 }
 function sendPaymentReminder() {
   const business = (document.getElementById('prBusiness').value || '').trim();
   const phone = prCleanPhone(document.getElementById('prPhone').value);
   const amount = prFormatAmount(document.getElementById('prAmount').value);
   if (!business || !phone || !amount) { prCheckReady(); return; }
-  const body = encodeURIComponent(prBuildMessage(business, amount));
-  window.location.href = `sms:${phone}?body=${body}`;
+  const msg = prBuildMessage(business, amount);
+
+  // With a PDF: native share sheet carries the text + invoice together
+  if (prPdfFile && prCanShareFile(prPdfFile)) {
+    // Both calls start inside the tap so the browser allows them
+    const copied = prCopyText(phone);
+    navigator.share({ files: [prPdfFile], text: msg, title: 'Payment reminder — ' + business })
+      .then(() => {
+        prShowStatus('✅ Payment reminder + invoice shared for ' + business + '.', 'success');
+        setTimeout(prResetForm, 800);
+      })
+      .catch(err => {
+        if (err && err.name === 'AbortError') {
+          prShowStatus('Share cancelled — nothing was sent. Your details are still here.', 'warn');
+        } else {
+          prShowStatus('⚠️ Couldn\'t open the share sheet. Opening Messages with the text only — attach the PDF there.', 'warn');
+          window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+        }
+      });
+    copied.then(ok => {
+      if (ok) prShowStatus('📋 Mobile number ' + phone + ' copied — paste it into the "To" field in Messages.', 'success');
+    });
+    return;
+  }
+
+  // No PDF (or file sharing unsupported): open Messages pre-filled
+  window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+  if (prPdfFile) {
+    prShowStatus('📎 Messages opened with the text — attach the PDF from your Files before sending.', 'warn');
+    return; // keep the form so they can see what to attach
+  }
   // Clear so the next reminder must be filled in fresh
   setTimeout(prResetForm, 800);
 }
