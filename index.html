@@ -3,6 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Device access gate (v2.0.8) — must stay first in <head> -->
+<style id="piGateStyle">
+  html.pi-gate, html.pi-gate body { background:#0b1424 !important; overflow:hidden !important; height:100%; }
+  html.pi-gate body > *:not(#piGate) { display:none !important; }
+  #piGate { position:fixed; inset:0; z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:24px 16px;
+    background:radial-gradient(ellipse at 50% 35%, #15243f 0%, #0b1424 70%); font-family:'Montserrat',system-ui,-apple-system,sans-serif; color:#fff; }
+  #piGate .pg-card { width:100%; max-width:360px; text-align:center; }
+  #piGate .pg-emblem { width:76px; height:76px; margin:0 auto 18px; border-radius:50%; border:1.5px solid #c9a84c; display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',Georgia,serif; font-size:32px; font-weight:700; color:#e2c97e; box-shadow:0 0 40px rgba(201,168,76,0.18); }
+  #piGate .pg-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; font-weight:700; color:#e2c97e; letter-spacing:0.04em; }
+  #piGate .pg-sub { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-top:6px; }
+  #piGate .pg-boxes { display:flex; gap:8px; justify-content:center; margin:28px 0 14px; position:relative; }
+  #piGate .pg-box { width:44px; height:54px; border-radius:10px; border:1px solid rgba(201,168,76,0.3); background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:center; font-size:22px; color:#e2c97e; transition:border-color .15s, background .15s; }
+  #piGate .pg-box.filled { border-color:#c9a84c; background:rgba(201,168,76,0.1); }
+  #piGate .pg-box.cur { border-color:#e2c97e; box-shadow:0 0 0 2px rgba(201,168,76,0.25); }
+  #piGate .pg-input { position:absolute; inset:0; width:100%; height:100%; opacity:0; font-size:16px; border:0; background:transparent; color:transparent; caret-color:transparent; }
+  #piGate .pg-msg { min-height:20px; font-size:12px; line-height:1.6; color:rgba(255,255,255,0.55); }
+  #piGate .pg-msg.err { color:#ff8a89; }
+  #piGate .pg-btn { width:100%; margin-top:16px; padding:13px; border:0; border-radius:10px; background:#c9a84c; color:#0b1424; font-family:inherit;
+    font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; }
+  #piGate .pg-btn:disabled { opacity:0.4; cursor:default; }
+  #piGate.locked .pg-boxes, #piGate.locked .pg-btn { display:none; }
+  #piGate .pg-lock { display:none; margin-top:26px; padding:16px; border-radius:12px; border:1px solid rgba(226,75,74,0.4); background:rgba(226,75,74,0.08);
+    font-size:12px; line-height:1.7; color:rgba(255,255,255,0.75); }
+  #piGate.locked .pg-lock { display:block; }
+  #piGate .pg-lock strong { color:#ff8a89; display:block; font-size:14px; margin-bottom:4px; }
+  @keyframes pgShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  #piGate .pg-boxes.shake { animation:pgShake .4s; }
+</style>
+<script>
+(function () {
+  // SHA-256 (sync, no dependencies) — the code itself is never stored, only its hash
+  function sha256(ascii) {
+    function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+    var mp = Math.pow, mw = mp(2, 32), i, j, result = '', words = [], blen = ascii.length * 8;
+    var hash = [], k = [], pc = 0, isC = {};
+    for (var c = 2; pc < 64; c++) { if (!isC[c]) { for (i = 0; i < 313; i += c) isC[i] = c;
+      hash[pc] = (mp(c, .5) * mw) | 0; k[pc++] = (mp(c, 1 / 3) * mw) | 0; } }
+    hash = hash.slice(0, 8);
+    ascii += '\x80'; while (ascii.length % 64 - 56) ascii += '\x00';
+    for (i = 0; i < ascii.length; i++) { j = ascii.charCodeAt(i); if (j >> 8) return ''; words[i >> 2] |= j << ((3 - i) % 4) * 8; }
+    words[words.length] = ((blen / mw) | 0); words[words.length] = (blen);
+    for (j = 0; j < words.length;) {
+      var w = words.slice(j, j += 16), oh = hash; hash = hash.slice(0, 8);
+      for (i = 0; i < 64; i++) {
+        var w15 = w[i - 15], w2 = w[i - 2], a = hash[0], e = hash[4];
+        var t1 = hash[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & hash[5]) ^ ((~e) & hash[6])) + k[i]
+          + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+        var t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(t1 + t2) | 0].concat(hash); hash[4] = (hash[4] + t1) | 0;
+      }
+      for (i = 0; i < 8; i++) hash[i] = (hash[i] + oh[i]) | 0;
+    }
+    for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) { var b = (hash[i] >> (j * 8)) & 255; result += ((b < 16) ? 0 : '') + b.toString(16); }
+    return result;
+  }
+  var H = '2d708edc35fda3ffbcb4e70a79f0f9105386efd811baf2a88e34b5dfa4bd3ebe';
+  var K_OK = 'pi_dv_k', K_ATT = 'pi_dv_a', K_UNTIL = 'pi_dv_u';
+  var MAX = 3, LOCK_MS = 7 * 24 * 60 * 60 * 1000;
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  if (get(K_OK) === H) return; // this device is already verified — app runs normally
+
+  var root = document.documentElement;
+  root.classList.add('pi-gate');
+
+  // Until verified, nothing leaves or enters the app over the network
+  var blocked = function () { return Promise.reject(new Error('locked')); };
+  try { window.fetch = blocked; } catch (e) {}
+  try { XMLHttpRequest.prototype.send = function () { throw new Error('locked'); }; } catch (e) {}
+  try { if (navigator.sendBeacon) navigator.sendBeacon = function () { return false; }; } catch (e) {}
+
+  function lockedUntil() { var u = parseInt(get(K_UNTIL) || '0', 10); return u > Date.now() ? u : 0; }
+  function attemptsUsed() {
+    var u = parseInt(get(K_UNTIL) || '0', 10);
+    if (u && u <= Date.now()) { del(K_UNTIL); del(K_ATT); } // lock period over — fresh attempts
+    return parseInt(get(K_ATT) || '0', 10) || 0;
+  }
+  function fmtLeft(ms) {
+    var d = Math.floor(ms / 86400000), h = Math.floor(ms % 86400000 / 3600000), m = Math.ceil(ms % 3600000 / 60000);
+    if (d > 0) return d + ' day' + (d > 1 ? 's' : '') + (h ? ' ' + h + ' hr' + (h > 1 ? 's' : '') : '');
+    if (h > 0) return h + ' hr' + (h > 1 ? 's' : '') + ' ' + m + ' min';
+    return Math.max(1, m) + ' min';
+  }
+
+  function build() {
+    if (document.getElementById('piGate')) return;
+    var g = document.createElement('div');
+    g.id = 'piGate';
+    g.innerHTML =
+      '<div class="pg-card">' +
+        '<div class="pg-emblem">Pi</div>' +
+        '<div class="pg-title">PI ADMIN</div>' +
+        '<div class="pg-sub">Enter access code</div>' +
+        '<div class="pg-boxes" id="pgBoxes">' +
+          '<div class="pg-box"></div><div class="pg-box"></div><div class="pg-box"></div>' +
+          '<div class="pg-box"></div><div class="pg-box"></div><div class="pg-box"></div>' +
+          '<input class="pg-input" id="pgInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Access code" />' +
+        '</div>' +
+        '<div class="pg-msg" id="pgMsg"></div>' +
+        '<button class="pg-btn" id="pgBtn" disabled>Unlock</button>' +
+        '<div class="pg-lock" id="pgLock"></div>' +
+      '</div>';
+    document.body.insertBefore(g, document.body.firstChild);
+
+    var inp = document.getElementById('pgInput'), boxes = g.querySelectorAll('.pg-box');
+    var msg = document.getElementById('pgMsg'), btn = document.getElementById('pgBtn'), lockEl = document.getElementById('pgLock');
+    var busy = false;
+
+    function paint() {
+      var v = inp.value;
+      for (var i = 0; i < 6; i++) {
+        boxes[i].textContent = i < v.length ? '•' : '';
+        boxes[i].className = 'pg-box' + (i < v.length ? ' filled' : '') + (i === v.length && document.activeElement === inp ? ' cur' : '');
+      }
+      btn.disabled = v.length !== 6;
+    }
+    function showLock() {
+      var until = lockedUntil();
+      if (!until) { g.classList.remove('locked'); return false; }
+      g.classList.add('locked');
+      msg.textContent = ''; msg.className = 'pg-msg';
+      lockEl.innerHTML = '<strong>🔒 Access locked</strong>Too many incorrect attempts. Try again in ' + fmtLeft(until - Date.now()) + '.';
+      inp.blur();
+      return true;
+    }
+    function submit() {
+      if (busy || showLock()) return;
+      var v = inp.value.replace(/\D/g, '');
+      if (v.length !== 6) return;
+      busy = true;
+      if (sha256('pi-cmd-centre-v1::' + v) === H) {
+        set(K_OK, H); del(K_ATT); del(K_UNTIL);
+        msg.className = 'pg-msg'; msg.textContent = '✓ Verified';
+        setTimeout(function () { location.reload(); }, 250);
+        return;
+      }
+      var used = attemptsUsed() + 1;
+      inp.value = ''; paint();
+      var bx = document.getElementById('pgBoxes');
+      bx.classList.remove('shake'); void bx.offsetWidth; bx.classList.add('shake');
+      if (used >= MAX) {
+        set(K_UNTIL, String(Date.now() + LOCK_MS)); del(K_ATT);
+        showLock();
+      } else {
+        set(K_ATT, String(used));
+        var left = MAX - used;
+        msg.className = 'pg-msg err';
+        msg.textContent = 'Incorrect code. ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining.';
+        setTimeout(function () { inp.focus(); }, 50);
+      }
+      busy = false;
+    }
+
+    inp.addEventListener('input', function () {
+      inp.value = inp.value.replace(/\D/g, '').slice(0, 6);
+      if (msg.classList.contains('err') && inp.value.length) { msg.textContent = ''; msg.className = 'pg-msg'; }
+      paint();
+      if (inp.value.length === 6) submit();
+    });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+    inp.addEventListener('focus', paint); inp.addEventListener('blur', paint);
+    btn.addEventListener('click', submit);
+    g.addEventListener('click', function (e) { if (!lockedUntil() && e.target !== btn) inp.focus(); });
+
+    if (!showLock()) {
+      var used = attemptsUsed();
+      if (used > 0) { msg.className = 'pg-msg err'; msg.textContent = (MAX - used) + ' attempt' + (MAX - used > 1 ? 's' : '') + ' remaining.'; }
+      setTimeout(function () { inp.focus(); }, 100);
+    }
+    setInterval(function () { if (g.classList.contains('locked') && !showLock()) { attemptsUsed(); msg.textContent = ''; } }, 30000);
+    paint();
+  }
+  if (document.body) build(); else document.addEventListener('DOMContentLoaded', build);
+})();
+</script>
 <title>Pi Admin — Command Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -1141,7 +1320,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.0.7</div>
+  <div class="splash-version">v2.0.8</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1222,7 +1401,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.0.7</div>
+          <div class="nav-item-sub">What's new in v2.0.8</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1259,7 +1438,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.7 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.8 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -2164,7 +2343,21 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.0.7</div>
+    <div class="section-heading">What's New<br>in v2.0.8</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">💳</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Payments Reminder — v2.0.8</div>
+        <div class="nf-desc">Text a client about an outstanding payment straight from the menu. Enter the client name (optional), business, mobile and amount — the chat opens pre-filled, and you can send the invoice PDF into the same chat.</div>
+      </div>
+    </div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">📁</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Broadcast Folder — v2.0.8</div>
+        <div class="nf-desc">All message templates now live together in Settings → Broadcast: Payment Reminder, Marketing Template, Request Reviews and Reminder Text.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon">🗓️</div>
       <div class="nf-content">
@@ -5631,7 +5824,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.0.7 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.0.8 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
