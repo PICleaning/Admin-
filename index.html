@@ -1320,7 +1320,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.0.8</div>
+  <div class="splash-version">v2.1.0</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1401,7 +1401,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.0.8</div>
+          <div class="nav-item-sub">What's new in v2.1.0</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1438,7 +1438,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.0.8 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.0 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -1957,6 +1957,7 @@
           <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,6,'w')">6 Weeks</button>
           <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,8,'w')">8 Weeks</button>
           <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,6,'m')">6 Months</button>
+          <button type="button" class="jd-interval-chip" onclick="setJdInterval(this,12,'m')">12 Months</button>
         </div>
       </div>
       <div class="jd-field-group">
@@ -2343,7 +2344,14 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.0.8</div>
+    <div class="section-heading">What's New<br>in v2.1.0</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">📆</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">12-Month Service Interval — v2.1.0</div>
+        <div class="nf-desc">Jobs Done now has a 12 Months option alongside 2, 4, 6 and 8 Weeks and 6 Months — one tap sets the next service date a year after the last service.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon">💳</div>
       <div class="nf-content">
@@ -5824,7 +5832,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.0.8 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.0 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
