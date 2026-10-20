@@ -3667,17 +3667,32 @@ async function saveJobDone() {
     action: isUpdate ? 'updateClient' : 'addClient',
     name, address, phone, email, lastService, serviceDone, nextService, notes
   };
-  if (isUpdate) payload.rowIndex = jobsDoneEditRowIndex;
+  if (isUpdate) {
+    payload.rowIndex = jobsDoneEditRowIndex;
+    // Lets the script find the right row even if the sheet was re-sorted since the last refresh
+    payload.originalName = existingClient ? (existingClient.name || '') : '';
+  }
 
   try {
-    // text/plain avoids a CORS preflight that Apps Script web apps can't answer;
-    // doPost() on the Apps Script side still JSON.parses the body fine.
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-    const data = await resp.json();
+    // Saves go through GET — the same route "Refresh" uses, which is still working.
+    // Google's POST redirect to googleusercontent.com started failing in the browser
+    // ("Failed to fetch"), so POST is now only a fallback.
+    const qs = Object.keys(payload)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(payload[k] == null ? '' : payload[k]))
+      .join('&');
+    let data;
+    try {
+      const resp = await fetch(url + '?' + qs + '&_ts=' + Date.now(), { method: 'GET', redirect: 'follow' });
+      data = await resp.json();
+    } catch (getErr) {
+      const resp = await fetch(url, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      data = await resp.json();
+    }
     if (data.error) {
       showJobsDoneToast('❌ ' + data.error, 'error');
     } else {
