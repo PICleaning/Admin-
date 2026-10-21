@@ -61,8 +61,9 @@
     return result;
   }
   var H = '2d708edc35fda3ffbcb4e70a79f0f9105386efd811baf2a88e34b5dfa4bd3ebe';
-  var K_OK = 'pi_dv_k', K_ATT = 'pi_dv_a', K_UNTIL = 'pi_dv_u';
-  var MAX = 3, LOCK_MS = 7 * 24 * 60 * 60 * 1000;
+  var K_OK = 'pi_dv_k', K_ATT = 'pi_dv_a', K_UNTIL = 'pi_dv_u', K_LVL = 'pi_dv_l';
+  var DAY = 24 * 60 * 60 * 1000;
+  var TIERS = [ { tries: 3, lock: 7 * DAY }, { tries: 2, lock: 30 * DAY }, { tries: 1, lock: 365 * DAY } ];
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function del(k) { try { localStorage.removeItem(k); } catch (e) {} }
@@ -78,6 +79,8 @@
   try { XMLHttpRequest.prototype.send = function () { throw new Error('locked'); }; } catch (e) {}
   try { if (navigator.sendBeacon) navigator.sendBeacon = function () { return false; }; } catch (e) {}
 
+  function tier() { var l = parseInt(get(K_LVL) || '0', 10) || 0; return (l >= 0 && l < TIERS.length) ? l : 0; }
+  function maxTries() { return TIERS[tier()].tries; }
   function lockedUntil() { var u = parseInt(get(K_UNTIL) || '0', 10); return u > Date.now() ? u : 0; }
   function attemptsUsed() {
     var u = parseInt(get(K_UNTIL) || '0', 10);
@@ -138,7 +141,7 @@
       if (v.length !== 6) return;
       busy = true;
       if (sha256('pi-cmd-centre-v1::' + v) === H) {
-        set(K_OK, H); del(K_ATT); del(K_UNTIL);
+        set(K_OK, H); del(K_ATT); del(K_UNTIL); del(K_LVL);
         msg.className = 'pg-msg'; msg.textContent = '✓ Verified';
         setTimeout(function () { location.reload(); }, 250);
         return;
@@ -147,12 +150,14 @@
       inp.value = ''; paint();
       var bx = document.getElementById('pgBoxes');
       bx.classList.remove('shake'); void bx.offsetWidth; bx.classList.add('shake');
-      if (used >= MAX) {
-        set(K_UNTIL, String(Date.now() + LOCK_MS)); del(K_ATT);
+      if (used >= maxTries()) {
+        var t = tier();
+        set(K_UNTIL, String(Date.now() + TIERS[t].lock)); del(K_ATT);
+        set(K_LVL, String((t + 1) % TIERS.length));
         showLock();
       } else {
         set(K_ATT, String(used));
-        var left = MAX - used;
+        var left = maxTries() - used;
         msg.className = 'pg-msg err';
         msg.textContent = 'Incorrect code. ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining.';
         setTimeout(function () { inp.focus(); }, 50);
@@ -173,7 +178,7 @@
 
     if (!showLock()) {
       var used = attemptsUsed();
-      if (used > 0) { msg.className = 'pg-msg err'; msg.textContent = (MAX - used) + ' attempt' + (MAX - used > 1 ? 's' : '') + ' remaining.'; }
+      if (used > 0) { msg.className = 'pg-msg err'; msg.textContent = (maxTries() - used) + ' attempt' + (maxTries() - used > 1 ? 's' : '') + ' remaining.'; }
       setTimeout(function () { inp.focus(); }, 100);
     }
     setInterval(function () { if (g.classList.contains('locked') && !showLock()) { attemptsUsed(); msg.textContent = ''; } }, 30000);
@@ -1358,7 +1363,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.1.2</div>
+  <div class="splash-version">v2.1.3</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1439,7 +1444,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.1.2</div>
+          <div class="nav-item-sub">What's new in v2.1.3</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1476,7 +1481,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.2 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.3 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -2425,7 +2430,14 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.1.2</div>
+    <div class="section-heading">What's New<br>in v2.1.3</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">🛡️</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Security Update — v2.1.3</div>
+        <div class="nf-desc">We've tightened up the security of Pi Admin.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon">💬</div>
       <div class="nf-content">
@@ -6028,7 +6040,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.2 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.3 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
