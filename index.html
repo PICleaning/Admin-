@@ -1358,7 +1358,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.1.1</div>
+  <div class="splash-version">v2.1.2</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1439,7 +1439,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.1.1</div>
+          <div class="nav-item-sub">What's new in v2.1.2</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1476,7 +1476,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.1 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.2 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -1831,7 +1831,7 @@
       <button type="button" class="pr-step2-skip" onclick="prFinishReminder()">Done — skip the PDF</button>
     </div>
     <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;margin-top:14px;">
-      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens the chat with that number in your Messages app, with the text pre-filled. With a PDF attached, a <strong style="color:var(--gold-light)">Step 2</strong> button appears when you come back — it sends the invoice into the same chat. Edit the wording in <strong style="color:var(--gold-light)">Settings → Broadcast → Payment Reminder</strong>.
+      📱 Fill in all three fields and the <strong style="color:var(--gold-light)">Send Message</strong> button appears. Tapping it opens the chat with that number in your Messages app, with the text pre-filled. With a PDF attached, a <strong style="color:var(--gold-light)">Step 2</strong> button appears when you come back — it sends the invoice into the same chat. Edit the wording in <strong style="color:var(--gold-light)">Settings → Communication → Broadcast → Payment Reminder</strong>.
     </div>
   </div>
 
@@ -2133,99 +2133,102 @@
 
     <div class="divider" style="margin:20px 0;"></div>
 
-    <!-- Broadcast folder: all SMS message templates -->
-    <details class="settings-section bc-folder" id="broadcastFolder">
+    <!-- Communication folder (v2.1.2): send-via toggle + Broadcast templates -->
+    <details class="settings-section bc-folder" id="communicationFolder">
       <summary class="bc-folder-head">
-        <span class="bc-folder-icon">📁</span>
-        <span class="bc-sub-text"><span class="settings-section-title" style="margin:0;">Broadcast</span><span class="bc-sub-desc">Message templates — Payment Reminder, Marketing, Reviews &amp; Reminders</span></span>
+        <span class="bc-folder-icon">💬</span>
+        <span class="bc-sub-text"><span class="settings-section-title" style="margin:0;">Communication</span><span class="bc-sub-desc">WhatsApp / WA Business option &amp; Broadcast message templates</span></span>
         <span class="bc-chev">›</span>
       </summary>
       <div class="bc-folder-body">
-        <details class="bc-sub">
-          <summary class="bc-sub-head"><span class="bc-sub-icon">💳</span><span class="bc-sub-text"><span class="bc-sub-title">Payment Reminder</span><span class="bc-sub-desc">Outstanding payment text</span></span><span class="bc-chev">›</span></summary>
-          <div class="bc-sub-body">
-      <div class="settings-section-desc">Customise the SMS sent from <strong style="color:var(--gold-light)">Payments Reminder</strong>. The message opens with one of the two greetings below, then the main text follows. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{client}</code> for the client's name, <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{business}</code> for the business or shop name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{amount}</code> for the amount owing (the $ sign is added automatically).</div>
-      <label class="field-label" style="margin-top:12px;display:block;">Greeting — when a client name is entered</label>
-      <textarea class="reminder-msg-area" id="paymentGreetNamed" style="margin-top:6px;min-height:70px;" placeholder="Hi {client},..."></textarea>
-      <label class="field-label" style="margin-top:12px;display:block;">Greeting — when no client name is entered</label>
-      <textarea class="reminder-msg-area" id="paymentGreetTeam" style="margin-top:6px;min-height:50px;" placeholder="Hi Team {business},"></textarea>
-      <label class="field-label" style="margin-top:12px;display:block;">Main message</label>
-      <textarea class="reminder-msg-area" id="paymentReminderText" style="margin-top:6px;min-height:160px;" placeholder="Our records show a payment of {amount}..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetPaymentReminderTemplate()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="savePaymentReminderTemplate()">Save Payment Text</button>
-      </div>
-      <div class="settings-saved-msg" id="paymentReminderSaved">✅ Payment reminder text saved!</div>
+        <div class="settings-section-desc" style="margin:4px 0 2px;">Choose how <strong style="color:var(--gold-light)">Payment Reminders</strong> and <strong style="color:var(--gold-light)">Service Reminders</strong> are sent. When ON, tapping send asks whether to use WA Business, WhatsApp or a normal text message — all three use the same Broadcast templates below. When OFF, your phone's Messages app opens straight away.</div>
+        <label class="settings-toggle-row" onclick="toggleWaChoice(event)">
+          <div>
+            <div class="settings-toggle-label">Use WhatsApp / WA Business</div>
+            <div class="settings-toggle-sub" id="waChoiceSub">Off — reminders open your phone's Messages app</div>
           </div>
-        </details>
-        <details class="bc-sub">
-          <summary class="bc-sub-head"><span class="bc-sub-icon">📣</span><span class="bc-sub-text"><span class="bc-sub-title">Marketing Template</span><span class="bc-sub-desc">Bulk SMS to prospects</span></span><span class="bc-chev">›</span></summary>
-          <div class="bc-sub-body">
-      <div class="settings-section-desc">Customise the bulk SMS message sent to prospects. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the prospect's first name.</div>
-      <textarea class="reminder-msg-area" id="marketingSmsText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetMarketingText()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="saveMarketingText()">Save Marketing Text</button>
-      </div>
-      <div class="settings-saved-msg" id="marketingTextSaved">✅ Marketing text saved!</div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        💡 This message pre-fills automatically when you send bulk SMS to prospects in the Prospects section.
-      </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="waChoiceToggle" />
+            <div class="toggle-track"></div>
           </div>
-        </details>
-        <details class="bc-sub">
-          <summary class="bc-sub-head"><span class="bc-sub-icon">⭐</span><span class="bc-sub-text"><span class="bc-sub-title">Request Reviews</span><span class="bc-sub-desc">Google review request text</span></span><span class="bc-chev">›</span></summary>
-          <div class="bc-sub-body">
-      <div class="settings-section-desc">Customise the SMS sent to clients asking for a Google review. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name. The review link is automatically included — use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">Click here to review us ⭐</code> as the placeholder where the link appears.</div>
-      <textarea class="reminder-msg-area" id="reviewTemplateText" style="margin-top:12px;min-height:160px;" placeholder="Hi {name}, thank you for choosing Pi Cleaning Services!..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReviewTemplate()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="saveReviewTemplate()">Save Review Text</button>
-      </div>
-      <div class="settings-saved-msg" id="reviewTemplateSaved">✅ Review text saved!</div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        💡 The review link is hardcoded and hidden — clients receive a clean "Click here to review us ⭐" link that opens Google Reviews with 5 stars pre-selected.
-      </div>
-          </div>
-        </details>
-        <details class="bc-sub">
-          <summary class="bc-sub-head"><span class="bc-sub-icon">✉️</span><span class="bc-sub-text"><span class="bc-sub-title">Reminder Text</span><span class="bc-sub-desc">Service-due reminder text</span></span><span class="bc-chev">›</span></summary>
-          <div class="bc-sub-body">
-      <div class="settings-section-desc">Customise the SMS reminder message sent to clients when their service is due. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
-      <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
-        <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
-      </div>
-      <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
-      <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
-      </div>
-          </div>
-        </details>
+        </label>
+        <div class="settings-saved-msg" id="waChoiceSaved">✅ Setting saved!</div>
+          <details class="settings-section bc-folder" id="broadcastFolder">
+            <summary class="bc-folder-head">
+              <span class="bc-folder-icon">📁</span>
+              <span class="bc-sub-text"><span class="settings-section-title" style="margin:0;">Broadcast</span><span class="bc-sub-desc">Message templates — Payment Reminder, Marketing, Reviews &amp; Reminders</span></span>
+              <span class="bc-chev">›</span>
+            </summary>
+            <div class="bc-folder-body">
+              <details class="bc-sub">
+                <summary class="bc-sub-head"><span class="bc-sub-icon">💳</span><span class="bc-sub-text"><span class="bc-sub-title">Payment Reminder</span><span class="bc-sub-desc">Outstanding payment message</span></span><span class="bc-chev">›</span></summary>
+                <div class="bc-sub-body">
+            <div class="settings-section-desc">Customise the message sent from <strong style="color:var(--gold-light)">Payments Reminder</strong> — the same text is used for Text Message, WhatsApp and WA Business. The message opens with one of the two greetings below, then the main text follows. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{client}</code> for the client's name, <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{business}</code> for the business or shop name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{amount}</code> for the amount owing (the $ sign is added automatically).</div>
+            <label class="field-label" style="margin-top:12px;display:block;">Greeting — when a client name is entered</label>
+            <textarea class="reminder-msg-area" id="paymentGreetNamed" style="margin-top:6px;min-height:70px;" placeholder="Hi {client},..."></textarea>
+            <label class="field-label" style="margin-top:12px;display:block;">Greeting — when no client name is entered</label>
+            <textarea class="reminder-msg-area" id="paymentGreetTeam" style="margin-top:6px;min-height:50px;" placeholder="Hi Team {business},"></textarea>
+            <label class="field-label" style="margin-top:12px;display:block;">Main message</label>
+            <textarea class="reminder-msg-area" id="paymentReminderText" style="margin-top:6px;min-height:160px;" placeholder="Our records show a payment of {amount}..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetPaymentReminderTemplate()">Reset to Default</button>
+              <button class="reminder-sms-btn" onclick="savePaymentReminderTemplate()">Save Payment Text</button>
+            </div>
+            <div class="settings-saved-msg" id="paymentReminderSaved">✅ Payment reminder text saved!</div>
+                </div>
+              </details>
+              <details class="bc-sub">
+                <summary class="bc-sub-head"><span class="bc-sub-icon">📣</span><span class="bc-sub-text"><span class="bc-sub-title">Marketing Template</span><span class="bc-sub-desc">Bulk SMS to prospects</span></span><span class="bc-chev">›</span></summary>
+                <div class="bc-sub-body">
+            <div class="settings-section-desc">Customise the bulk SMS message sent to prospects. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the prospect's first name.</div>
+            <textarea class="reminder-msg-area" id="marketingSmsText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetMarketingText()">Reset to Default</button>
+              <button class="reminder-sms-btn" onclick="saveMarketingText()">Save Marketing Text</button>
+            </div>
+            <div class="settings-saved-msg" id="marketingTextSaved">✅ Marketing text saved!</div>
+            <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+              💡 This message pre-fills automatically when you send bulk SMS to prospects in the Prospects section.
+            </div>
+                </div>
+              </details>
+              <details class="bc-sub">
+                <summary class="bc-sub-head"><span class="bc-sub-icon">⭐</span><span class="bc-sub-text"><span class="bc-sub-title">Request Reviews</span><span class="bc-sub-desc">Google review request text</span></span><span class="bc-chev">›</span></summary>
+                <div class="bc-sub-body">
+            <div class="settings-section-desc">Customise the SMS sent to clients asking for a Google review. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name. The review link is automatically included — use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">Click here to review us ⭐</code> as the placeholder where the link appears.</div>
+            <textarea class="reminder-msg-area" id="reviewTemplateText" style="margin-top:12px;min-height:160px;" placeholder="Hi {name}, thank you for choosing Pi Cleaning Services!..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReviewTemplate()">Reset to Default</button>
+              <button class="reminder-sms-btn" onclick="saveReviewTemplate()">Save Review Text</button>
+            </div>
+            <div class="settings-saved-msg" id="reviewTemplateSaved">✅ Review text saved!</div>
+            <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+              💡 The review link is hardcoded and hidden — clients receive a clean "Click here to review us ⭐" link that opens Google Reviews with 5 stars pre-selected.
+            </div>
+                </div>
+              </details>
+              <details class="bc-sub">
+                <summary class="bc-sub-head"><span class="bc-sub-icon">✉️</span><span class="bc-sub-text"><span class="bc-sub-title">Reminder Text</span><span class="bc-sub-desc">Service-due reminder message</span></span><span class="bc-chev">›</span></summary>
+                <div class="bc-sub-body">
+            <div class="settings-section-desc">Customise the reminder message sent to clients when their service is due — the same text is used for Text Message, WhatsApp and WA Business. Use <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{name}</code> for the client's first name and <code style="background:rgba(201,168,76,0.15);padding:1px 5px;border-radius:4px;color:var(--gold-light);">{days}</code> for days until service.</div>
+            <textarea class="reminder-msg-area" id="customReminderText" style="margin-top:12px;min-height:140px;" placeholder="Hi {name}, this is Pi Cleaning Services..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="reminder-sms-btn" style="background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold);" onclick="resetReminderText()">Reset to Default</button>
+              <button class="reminder-sms-btn" onclick="saveReminderText()">Save Reminder Text</button>
+            </div>
+            <div class="settings-saved-msg" id="reminderTextSaved">✅ Reminder text saved!</div>
+            <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:12px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
+              💡 This text will automatically appear pre-filled when you tap "Send SMS" on any service reminder.
+            </div>
+                </div>
+              </details>
+            </div>
+          </details>
       </div>
     </details>
 
     <div class="divider" style="margin:20px 0;"></div>
 
-    <!-- Communication: WhatsApp / WA Business option (v2.1.1) -->
-    <div class="settings-section">
-      <div class="settings-section-title">💬 Communication</div>
-      <div class="settings-section-desc">Choose how <strong style="color:var(--gold-light)">Payment Reminders</strong> and <strong style="color:var(--gold-light)">Service Reminders</strong> are sent. When this is ON, tapping send asks whether to use WA Business, WhatsApp or a normal text message. When OFF, your phone's Messages app opens straight away.</div>
-      <label class="settings-toggle-row" onclick="toggleWaChoice(event)">
-        <div>
-          <div class="settings-toggle-label">Use WhatsApp / WA Business</div>
-          <div class="settings-toggle-sub" id="waChoiceSub">Off — reminders open your phone's Messages app</div>
-        </div>
-        <div class="toggle-switch">
-          <input type="checkbox" id="waChoiceToggle" />
-          <div class="toggle-track"></div>
-        </div>
-      </label>
-      <div class="settings-saved-msg" id="waChoiceSaved">✅ Setting saved!</div>
-    </div>
-
-    <div class="divider" style="margin:20px 0;"></div>
 
     <!-- Prospect Resend Protection Toggle -->
     <div class="settings-section">
@@ -2415,14 +2418,21 @@
     </div>
 
     <div style="background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:9px;padding:12px;margin-top:14px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.7;">
-      💡 Edit your marketing message anytime under <strong style="color:var(--gold-light)">Settings → Broadcast → Marketing Template</strong>.
+      💡 Edit your marketing message anytime under <strong style="color:var(--gold-light)">Settings → Communication → Broadcast → Marketing Template</strong>.
     </div>
   </div>
 
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.1.1</div>
+    <div class="section-heading">What's New<br>in v2.1.2</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon">💬</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Communication Folder — v2.1.2</div>
+        <div class="nf-desc">Settings now has a Communication folder holding the WhatsApp / WA Business switch and the Broadcast templates. WA Business and WhatsApp send exactly the same Payment Reminder and Reminder Text messages as a normal text message.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(37,211,102,0.5);background:rgba(37,211,102,0.07);">
       <div class="nf-icon">💬</div>
       <div class="nf-content">
@@ -3213,6 +3223,8 @@ function openWhatsApp(phone, msg, app) {
 
 let _svPending = null;
 // Main entry: sends a reminder using the Communication setting.
+// The SAME message text (built from the Broadcast templates) is passed to every
+// channel — Text Message, WhatsApp and WA Business — so wording never differs.
 // onSent(channel) runs once the chosen app has been opened.
 function sendReminderVia(phone, msg, onSent, who) {
   if (!isWaChoiceOn()) {
@@ -6016,7 +6028,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.1 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.2 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
