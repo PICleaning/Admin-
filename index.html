@@ -1246,6 +1246,44 @@
   .pr-status.warn { color:#ffcf7a; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.35); }
   .pr-preview { white-space:pre-wrap; font-size:12px; line-height:1.6; color:var(--white); background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.2); border-radius:9px; padding:12px 14px; }
 
+  /* ════ SEND-VIA CHOOSER (v2.1.1) ════ */
+  .sv-overlay {
+    display:none; position:fixed; inset:0; z-index:2100;
+    background:rgba(5,10,20,0.72); backdrop-filter:blur(3px);
+    align-items:flex-end; justify-content:center;
+  }
+  .sv-overlay.show { display:flex; }
+  .sv-box {
+    width:100%; max-width:440px; background:var(--navy-mid);
+    border:1px solid rgba(201,168,76,0.3); border-radius:18px 18px 0 0;
+    padding:22px 18px calc(20px + env(safe-area-inset-bottom));
+    animation:jdSlideUp 0.25s ease;
+  }
+  @media (min-width:560px) { .sv-overlay { align-items:center; } .sv-box { border-radius:16px; } }
+  .sv-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--gold); margin-bottom:2px; }
+  .sv-sub { font-size:11px; color:var(--white-muted); margin-bottom:16px; line-height:1.6; }
+  .sv-option {
+    width:100%; display:flex; align-items:center; gap:13px; text-align:left;
+    padding:13px 14px; margin-bottom:8px; border-radius:11px; cursor:pointer;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.2);
+    font-family:'Montserrat',sans-serif; color:var(--white); transition:all 0.2s;
+  }
+  .sv-option:hover, .sv-option:active { background:var(--gold-pale); border-color:var(--gold); }
+  .sv-option-icon {
+    width:38px; height:38px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700;
+  }
+  .sv-option-icon.wab { background:#128C7E; color:#fff; font-size:14px; }
+  .sv-option-icon.wa  { background:#25D366; color:#fff; }
+  .sv-option-icon.sms { background:rgba(201,168,76,0.18); border:1px solid rgba(201,168,76,0.4); }
+  .sv-option-label { font-size:13px; font-weight:700; }
+  .sv-option-desc { font-size:10px; color:var(--white-muted); margin-top:2px; }
+  .sv-cancel {
+    width:100%; margin-top:4px; padding:11px; border-radius:9px; cursor:pointer;
+    background:transparent; border:1px solid rgba(255,255,255,0.15);
+    color:var(--white-muted); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600;
+  }
+
   /* ════ NEW FEATURES PANEL ════ */
   .new-feature-card {
     display: flex; gap: 14px; align-items: flex-start;
@@ -1320,7 +1358,7 @@
   <div class="splash-title">PI ADMIN</div>
   <div class="splash-sub">Pi Cleaning Services</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-  <div class="splash-version">v2.1.0</div>
+  <div class="splash-version">v2.1.1</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1401,7 +1439,7 @@
         <span class="nav-item-icon">🚀</span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v2.1.0</div>
+          <div class="nav-item-sub">What's new in v2.1.1</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1438,7 +1476,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.0 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 2.1.1 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -1980,6 +2018,27 @@
     </div>
   </div>
 
+  <!-- ── SEND-VIA CHOOSER (v2.1.1) ── -->
+  <div class="sv-overlay" id="svOverlay" onclick="if(event.target===this) closeSendVia()">
+    <div class="sv-box">
+      <div class="sv-title">Send message via…</div>
+      <div class="sv-sub" id="svSub">Choose how to send this message.</div>
+      <button class="sv-option" onclick="chooseSendVia('wab')">
+        <span class="sv-option-icon wab">B</span>
+        <span><div class="sv-option-label">WA Business</div><div class="sv-option-desc">Send from your WhatsApp Business account</div></span>
+      </button>
+      <button class="sv-option" onclick="chooseSendVia('wa')">
+        <span class="sv-option-icon wa">✆</span>
+        <span><div class="sv-option-label">WhatsApp</div><div class="sv-option-desc">Send from your personal WhatsApp</div></span>
+      </button>
+      <button class="sv-option" onclick="chooseSendVia('sms')">
+        <span class="sv-option-icon sms">💬</span>
+        <span><div class="sv-option-label">Text Message</div><div class="sv-option-desc">Phone's native messaging app</div></span>
+      </button>
+      <button class="sv-cancel" onclick="closeSendVia()">Cancel</button>
+    </div>
+  </div>
+
   <!-- ── PANEL: SETTINGS ── -->
   <div class="drawer-panel" id="panel-settings">
     <div class="section-tag">App Preferences</div>
@@ -2146,6 +2205,25 @@
         </details>
       </div>
     </details>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
+    <!-- Communication: WhatsApp / WA Business option (v2.1.1) -->
+    <div class="settings-section">
+      <div class="settings-section-title">💬 Communication</div>
+      <div class="settings-section-desc">Choose how <strong style="color:var(--gold-light)">Payment Reminders</strong> and <strong style="color:var(--gold-light)">Service Reminders</strong> are sent. When this is ON, tapping send asks whether to use WA Business, WhatsApp or a normal text message. When OFF, your phone's Messages app opens straight away.</div>
+      <label class="settings-toggle-row" onclick="toggleWaChoice(event)">
+        <div>
+          <div class="settings-toggle-label">Use WhatsApp / WA Business</div>
+          <div class="settings-toggle-sub" id="waChoiceSub">Off — reminders open your phone's Messages app</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="waChoiceToggle" />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+      <div class="settings-saved-msg" id="waChoiceSaved">✅ Setting saved!</div>
+    </div>
 
     <div class="divider" style="margin:20px 0;"></div>
 
@@ -2344,7 +2422,14 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New<br>in v2.1.0</div>
+    <div class="section-heading">What's New<br>in v2.1.1</div>
+    <div class="new-feature-card" style="border-color:rgba(37,211,102,0.5);background:rgba(37,211,102,0.07);">
+      <div class="nf-icon">💬</div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:#3ddc6f;">Send via WhatsApp or WA Business — v2.1.1</div>
+        <div class="nf-desc">Turn on Settings → Communication and payment &amp; service reminders let you pick WA Business, WhatsApp or a normal text message each time you send. Leave it off and they open your phone's Messages app as before. Saving jobs to Google Sheets is also fixed.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon">📆</div>
       <div class="nf-content">
@@ -2972,6 +3057,8 @@ function loadSettingsUI() {
     b.classList.remove('active');
     if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${payMethod}'`)) b.classList.add('active');
   });
+  // Communication (WhatsApp / WA Business) toggle
+  syncWaChoiceUI();
   // Menu lock toggle
   initMenuLock();
   // Prospect resend-protection override toggle
@@ -3066,6 +3153,89 @@ function toggleProspectResendOverride() {
     recalcProspectLocks();
     renderProspectsList();
   }
+}
+
+// ══════════════════════════════════════════
+//  COMMUNICATION — WhatsApp / WA Business / SMS chooser (v2.1.1)
+//  Used by Payment Reminders and Service Reminders.
+// ══════════════════════════════════════════
+const WA_CHOICE_KEY = 'pi_wa_choice'; // 'on' | 'off' (default off)
+function isWaChoiceOn() { return localStorage.getItem(WA_CHOICE_KEY) === 'on'; }
+
+function syncWaChoiceUI() {
+  const on = isWaChoiceOn();
+  const tog = document.getElementById('waChoiceToggle');
+  const sub = document.getElementById('waChoiceSub');
+  if (tog) tog.checked = on;
+  if (sub) sub.innerHTML = on
+    ? '<strong style="color:var(--success)">On</strong> — you\'ll pick WA Business, WhatsApp or Text each time'
+    : 'Off — reminders open your phone\'s Messages app';
+}
+function toggleWaChoice(e) {
+  if (e) e.preventDefault(); // stop the label double-firing the checkbox
+  localStorage.setItem(WA_CHOICE_KEY, isWaChoiceOn() ? 'off' : 'on');
+  syncWaChoiceUI();
+  const saved = document.getElementById('waChoiceSaved');
+  if (saved) { saved.classList.add('show'); setTimeout(() => saved.classList.remove('show'), 2000); }
+}
+
+function isAndroid() { return /Android/i.test(navigator.userAgent); }
+
+// Phone → WhatsApp format: country code, digits only, no "+" (AU 04xx → 614xx)
+function waPhone(raw) {
+  let d = String(raw || '').replace(/[^0-9+]/g, '');
+  if (d.startsWith('+')) d = d.slice(1);
+  else if (/^0\d{9}$/.test(d)) d = '61' + d.slice(1);
+  return d.replace(/\D/g, '');
+}
+
+function openSms(phone, msg) {
+  const p = (typeof prIntlPhone === 'function') ? prIntlPhone(String(phone)) : String(phone).replace(/\s/g, '');
+  const sep = (typeof prIsIOS === 'function' && prIsIOS()) ? '&' : '?';
+  window.location.href = `sms:${p}${sep}body=${encodeURIComponent(msg)}`;
+}
+
+// app: 'wa' (WhatsApp) or 'wab' (WA Business)
+function openWhatsApp(phone, msg, app) {
+  const num = waPhone(phone);
+  const text = encodeURIComponent(msg);
+  if (isAndroid()) {
+    // Android lets us target the exact app by package name
+    const pkg = app === 'wab' ? 'com.whatsapp.w4b' : 'com.whatsapp';
+    const fallback = encodeURIComponent(`https://wa.me/${num}?text=${text}`);
+    window.location.href = `intent://send/?phone=${num}&text=${text}#Intent;scheme=whatsapp;package=${pkg};S.browser_fallback_url=${fallback};end`;
+  } else {
+    // iPhone / desktop: one WhatsApp link — iOS opens whichever WhatsApp app is installed
+    window.location.href = `whatsapp://send?phone=${num}&text=${text}`;
+    setTimeout(() => { if (!document.hidden) window.location.href = `https://wa.me/${num}?text=${text}`; }, 1500);
+  }
+}
+
+let _svPending = null;
+// Main entry: sends a reminder using the Communication setting.
+// onSent(channel) runs once the chosen app has been opened.
+function sendReminderVia(phone, msg, onSent, who) {
+  if (!isWaChoiceOn()) {
+    openSms(phone, msg);
+    if (onSent) onSent('sms');
+    return;
+  }
+  _svPending = { phone, msg, onSent };
+  const sub = document.getElementById('svSub');
+  if (sub) sub.textContent = who ? `Sending to ${who} · ${phone}` : `Sending to ${phone}`;
+  document.getElementById('svOverlay').classList.add('show');
+}
+function chooseSendVia(channel) {
+  const job = _svPending;
+  closeSendVia();
+  if (!job) return;
+  if (channel === 'sms') openSms(job.phone, job.msg);
+  else openWhatsApp(job.phone, job.msg, channel);
+  if (job.onSent) job.onSent(channel);
+}
+function closeSendVia() {
+  document.getElementById('svOverlay').classList.remove('show');
+  _svPending = null;
 }
 
 // ── REVIEW TEMPLATE ──
@@ -3270,9 +3440,11 @@ function sendPaymentReminder() {
   if (!business || !phone || !amount) { prCheckReady(); return; }
   const msg = prBuildMessage(business, amount, prGetClient());
 
-  // Always open the chat with this number, text pre-filled
-  window.location.href = prSmsUrl(phone, msg);
-
+  // Open the chat (Messages, or WhatsApp / WA Business if enabled in Settings),
+  // then carry on with the PDF step / form reset once a channel is picked.
+  sendReminderVia(phone, msg, () => prAfterSend(business), prGetClient() || business);
+}
+function prAfterSend(business) {
   if (prPdfFile) {
     // Step 2: invoice goes into the same chat via the share sheet
     document.getElementById('prStep2Who').textContent = prGetClient() || business;
@@ -3883,9 +4055,7 @@ function quickReminder(i) {
   const days = daysUntil(client.nextService);
   // Always read the saved template fresh — getSavedReminderTemplate() goes straight to localStorage
   const msg = buildReminderMsg(client, days !== null ? days : 0);
-  const body = encodeURIComponent(msg);
-  const phone = client.phone.replace(/\s/g, '');
-  window.location.href = `sms:${phone}?body=${body}`;
+  sendReminderVia(client.phone, msg, null, client.name);
 }
 
 function updateDueBadge() {
@@ -4108,11 +4278,10 @@ function sendReminderSms(i, phone) {
     msg = ta ? ta.value : '';
   }
   if (!msg) return;
-  const body = encodeURIComponent(msg);
-  const p = phone.replace(/\s/g, '');
-  window.location.href = `sms:${p}?body=${body}`;
-  const badge = document.getElementById('rsent-' + i);
-  if (badge) badge.classList.add('show');
+  sendReminderVia(phone, msg, () => {
+    const badge = document.getElementById('rsent-' + i);
+    if (badge) badge.classList.add('show');
+  }, client ? client.name : '');
 }
 
 function showScriptHelp() {
@@ -5847,7 +6016,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.0 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v2.1.1 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
