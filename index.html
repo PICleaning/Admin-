@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A1A3D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Pi Admin">
 <!-- Device access gate (v2.0.8) — must stay first in <head> -->
 <style id="piGateStyle">
   html.pi-gate, html.pi-gate body { background:#0A1A3D !important; overflow:hidden !important; height:100%; }
@@ -1538,6 +1541,50 @@
   .dev-url-input { width:100%; height:44px; border-radius:10px; border:1px solid var(--line-strong); background:var(--navy); color:var(--white); padding:0 12px; font:500 12px var(--mono); outline:none; box-sizing:border-box; }
   .dev-code-input { width:100%; height:55vh; border-radius:10px; border:1px solid var(--line-strong); background:var(--navy); color:var(--white); padding:10px 12px; font:400 12px/1.55 var(--mono); outline:none; resize:vertical; box-sizing:border-box; white-space:pre; tab-size:2; }
   .dev-url-input:focus, .dev-code-input:focus { border-color:var(--gold); }
+  /* Android: 100vh includes the hidden browser bar — use the real visible height */
+  @supports (height: 100dvh) {
+    body { min-height:100dvh; }
+    .page { min-height:100dvh; }
+    .dashboard-layout { height:calc(100dvh - 64px); }
+    .hero-page { min-height:calc(100dvh - 64px); }
+    .drawer { height:100dvh; }
+    .drawer-nav-menu { max-height:calc(100dvh - 80px); }
+  }
+  html { background:var(--navy); }
+  .topbar { padding-top:env(safe-area-inset-top); height:calc(64px + env(safe-area-inset-top)); box-sizing:border-box; }
+  #page-home { padding-top:calc(64px + env(safe-area-inset-top)); }
+  .drawer { padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); box-sizing:border-box; }
+  :fullscreen { background:var(--navy); }
+  /* Pi Brain */
+  .brain-card { border:1px solid rgba(201,168,76,0.28); background:linear-gradient(180deg, rgba(201,168,76,0.06), rgba(201,168,76,0) 60%), var(--navy-mid); }
+  .brain-read { margin:14px 0 4px; font-size:13.5px; line-height:1.65; color:#DCE1EA; }
+  .brain-read b { color:var(--gold-light); font-weight:600; }
+  .brain-ins { display:flex; gap:10px; padding:10px 0; border-top:1px solid var(--line); font-size:12.5px; line-height:1.6; color:#C9CFDA; }
+  .brain-ins:first-child { margin-top:8px; }
+  .brain-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:7px; }
+  .brain-ask { display:flex; gap:8px; margin-top:12px; }
+  .brain-ask input { flex:1; min-width:0; height:44px; border-radius:12px; border:1px solid var(--line-strong); background:var(--navy); color:var(--white); padding:0 14px; font:400 14px 'Inter',sans-serif; outline:none; }
+  .brain-ask input:focus { border-color:var(--gold); }
+  .brain-ask .lp-btn { height:44px; }
+  .brain-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .brain-chip { min-height:32px; padding:0 11px; border-radius:16px; border:1px solid var(--line-strong); background:transparent; color:#C9CFDA; font:500 11.5px 'Inter',sans-serif; cursor:pointer; }
+  .brain-chip:hover { border-color:var(--gold); color:var(--gold-light); }
+  .brain-chip.recent { border-style:dashed; }
+  .brain-answer { display:none; margin-top:12px; padding:12px 14px; border-radius:12px; background:var(--navy); border:1px solid var(--line); }
+  .brain-q { font-size:12px; color:var(--white-muted); margin-bottom:6px; }
+  .brain-p { margin:0 0 8px; font-size:13px; line-height:1.6; color:#DCE1EA; }
+  .brain-p b { color:var(--gold-light); font-weight:600; }
+  .brain-rows { display:flex; flex-direction:column; }
+  .brain-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
+  .brain-row-main { flex:1; min-width:0; }
+  .brain-row-sub { font-size:11.5px; color:var(--white-muted); margin-top:2px; }
+  .brain-row-val { font-family:var(--mono); font-size:12.5px; font-weight:600; white-space:nowrap; }
+  .brain-health-title { font-size:12px; font-weight:600; color:var(--gold-light); padding:10px 0 4px; }
+  .brain-health { display:grid; grid-template-columns:minmax(0,1fr) 90px 28px; gap:10px; align-items:center; padding:6px 0; font-size:12.5px; }
+  .brain-health span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brain-health b { font-family:var(--mono); font-size:12px; text-align:right; }
+  .brain-usual { display:block; margin-top:6px; font-size:12px; color:var(--white-muted); }
+  .brain-fill { border:1px solid rgba(201,168,76,0.45); background:transparent; color:var(--gold-light); border-radius:8px; padding:2px 8px; font:600 12px var(--mono); cursor:pointer; }
   .lp-svc { padding:12px 0; border-top:1px solid var(--line); }
   .lp-svc .r { display:flex; justify-content:space-between; gap:10px; font-size:14px; font-weight:500; }
   .lp-svc .f { font-size:11px; font-weight:600; white-space:nowrap; }
@@ -1758,7 +1805,7 @@
   <div class="sp-title">Pi Admin</div>
   <div class="sp-sub">Pi Cleaning Services</div>
   <div class="sp-line"><span></span></div>
-  <div class="splash-version">v3.1.4</div>
+  <div class="splash-version">v3.1.5</div>
 </div>
 
 <!-- Overlay for drawer -->
@@ -1839,7 +1886,7 @@
         <span class="nav-item-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg></span>
         <div class="nav-item-text">
           <div class="nav-item-label">New Features</div>
-          <div class="nav-item-sub">What's new in v3.1.4</div>
+          <div class="nav-item-sub">What's new in v3.1.5</div>
         </div>
         <span class="new-feature-badge">NEW</span>
       </button>
@@ -1876,7 +1923,7 @@
         <span class="nav-item-arrow">›</span>
       </button>
     </div>
-    <div class="drawer-version-bar-inline">Pi Admin · V 3.1.4 · Pi Cleaning Services</div>
+    <div class="drawer-version-bar-inline">Pi Admin · V 3.1.5 · Pi Cleaning Services</div>
   </div>
   <!-- ── PANEL: PAY CALCULATOR ── -->
   <div class="drawer-panel" id="panel-paycalc">
@@ -2409,6 +2456,7 @@
       <div class="jd-field-group">
         <label class="jd-field-label" for="jdInvoiceAmount">Invoice amount ($) <span class="jd-field-optional">(adds an invoice — overdue if unpaid after 7 days)</span></label>
         <input class="field-input" id="jdInvoiceAmount" type="text" inputmode="decimal" placeholder="e.g. 420.00" autocomplete="off" style="font-family:var(--mono);" />
+        <div class="brain-usual" id="jdUsualHint"></div>
       </div>
 
       <div class="jd-existing-notice" id="jdExistingNotice" style="display:none;">
@@ -2725,6 +2773,24 @@
 
     <div class="divider" style="margin:20px 0;"></div>
 
+    <!-- Display (3.1.5) -->
+    <div class="settings-section">
+      <div class="settings-section-title">Display</div>
+      <div class="settings-section-desc">On Android, Pi Admin hides the browser's address bar and fills the whole screen after your first tap. Swipe down from the top to see the bar again. For a permanent full-screen app, use Chrome's menu → <strong style="color:var(--gold-light)">Add to Home screen / Install app</strong>.</div>
+      <label class="settings-toggle-row" onclick="toggleFullscreenPref(event)">
+        <div>
+          <div class="settings-toggle-label">Full screen on Android</div>
+          <div class="settings-toggle-sub" id="fsPrefSub">On</div>
+        </div>
+        <div class="toggle-switch">
+          <input type="checkbox" id="fsPrefToggle" checked />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+    </div>
+
+    <div class="divider" style="margin:20px 0;"></div>
+
     <!-- Developer (3.1.4): every Apps Script the app uses, listed individually -->
     <details class="settings-section dev-folder" id="developerFolder">
       <summary class="dev-head">
@@ -2846,7 +2912,14 @@
   <!-- ── PANEL: NEW FEATURES ── -->
   <div class="drawer-panel" id="panel-newfeatures">
     <div class="section-tag">Latest Update</div>
-    <div class="section-heading">What's New in v3.1.4</div>
+    <div class="section-heading">What's New in v3.1.5</div>
+    <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
+      <div class="nf-icon"></div>
+      <div class="nf-content">
+        <div class="nf-title" style="color:var(--gold);">Pi Brain &amp; Full Screen on Android — v3.1.5</div>
+        <div class="nf-desc">Pi Brain builds a profile of every client — usual job value, service rhythm, how fast they pay and a health score — then forecasts the next 30 days, spots problems (quiet clients, slow payers, undercharged jobs, busy weeks) and remembers how things change day to day. Ask Pi questions in plain English, like “who owes me money?” or a client's name. Log Job Done and Add invoice now suggest each client's usual price. On Android the app now fills the whole screen.</div>
+      </div>
+    </div>
     <div class="new-feature-card" style="border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.07);">
       <div class="nf-icon"></div>
       <div class="nf-content">
@@ -4132,6 +4205,25 @@ function setupSheet() { getInvSheet(); }
       <!-- ═════ RIGHT PANEL ═════ -->
       <aside class="lp-side">
 
+        <!-- Pi Brain (3.1.5) -->
+        <section class="lp-card brain-card" aria-label="Pi Brain">
+          <div class="lp-agent-head">
+            <div class="lp-agent-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 4a3 3 0 0 0-3 3v.2A3 3 0 0 0 4.5 10a3 3 0 0 0 .8 2A3 3 0 0 0 6.5 17a3 3 0 0 0 3 3h0a2.5 2.5 0 0 0 2.5-2.5V6.5A2.5 2.5 0 0 0 9.5 4z"/><path d="M14.5 4a3 3 0 0 1 3 3v.2a3 3 0 0 1 2 2.8 3 3 0 0 1-.8 2 3 3 0 0 1-1.2 5 3 3 0 0 1-3 3h0a2.5 2.5 0 0 1-2.5-2.5"/></svg></div>
+            <div style="flex:1;">
+              <h2 class="lp-h2" style="font-size:15px;">Pi Brain</h2>
+              <div style="font-size:11px;color:var(--white-muted);">Reads your sheets, learns your clients, thinks ahead</div>
+            </div>
+          </div>
+          <p class="brain-read" id="brainRead">Thinking…</p>
+          <div id="brainInsights"></div>
+          <form class="brain-ask" onsubmit="event.preventDefault(); brainAsk();">
+            <input id="brainQ" type="text" placeholder="Ask Pi — e.g. who owes me money?" autocomplete="off" aria-label="Ask Pi a question">
+            <button type="submit" class="lp-btn sm" aria-label="Ask">Ask</button>
+          </form>
+          <div class="brain-chips" id="brainChips"></div>
+          <div class="brain-answer" id="brainAnswer"></div>
+        </section>
+
         <!-- Collection: value of jobs done, last 30 days -->
         <section class="lp-card" aria-label="Collection, last 30 days">
           <div style="display:flex;justify-content:space-between;align-items:baseline;">
@@ -4176,7 +4268,7 @@ function setupSheet() { getInvSheet(); }
       </aside>
     </div>
   </div>
-  <footer class="footer">© 2026 <span>Pi Cleaning Services</span> · Pi Admin v3.1.4</footer>
+  <footer class="footer">© 2026 <span>Pi Cleaning Services</span> · Pi Admin v3.1.5</footer>
 
   <!-- Add invoice modal -->
   <div class="lp-modal" id="lpInvModal" onclick="if(event.target===this) closeInvoiceModal()">
@@ -4185,11 +4277,12 @@ function setupSheet() { getInvSheet(); }
       <div class="lp-modal-sub">Saved to the <strong style="color:var(--gold-light)">Invoices</strong> tab of your Google Sheet. Payment is due 7 days after the issue date.</div>
       <div class="lp-form">
         <label class="full">Client
-          <input id="lpInvClient" list="lpClientList" placeholder="Search a client or type a new one" autocomplete="off">
+          <input id="lpInvClient" list="lpClientList" placeholder="Search a client or type a new one" autocomplete="off" oninput="brainShowUsual(this.value,'lpInvAmount','lpInvUsual')">
           <datalist id="lpClientList"></datalist>
         </label>
         <label>Invoice amount ($)
           <input id="lpInvAmount" class="mono" inputmode="decimal" placeholder="0.00" autocomplete="off">
+          <span class="brain-usual" id="lpInvUsual"></span>
         </label>
         <label>Issue date
           <input id="lpInvDate" type="date">
@@ -5146,6 +5239,7 @@ function openJobDoneModal(rowIndex) {
   document.getElementById('jdNextService').value = client ? auToYmd(client.nextService) : '';
   document.getElementById('jdNotes').value = client ? (client.notes||'') : '';
   document.getElementById('jdInvoiceAmount').value = '';
+  if (typeof brainShowUsual === 'function') brainShowUsual(client ? client.name : '', 'jdInvoiceAmount', 'jdUsualHint');
   document.querySelectorAll('.jd-interval-chip').forEach(b => b.classList.remove('active'));
 
   // "Already added from the Sheet but not from the app" notice — shown whenever
@@ -7388,7 +7482,7 @@ function exportPayPDF() {
   </tbody>
 </table>
 ${gstSummary}
-<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v3.1.4 &nbsp;·&nbsp; Pay Calculator Export</div>
+<div class="footer">PI Cleaning Services Pty Ltd &nbsp;·&nbsp; Pi Admin v3.1.5 &nbsp;·&nbsp; Pay Calculator Export</div>
 </body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -8303,7 +8397,7 @@ function renderAgent(rows, unpaid) {
   const t60 = piToday(); t60.setDate(t60.getDate() - 60);
   const jobsIn = (from, to) => rows.filter(r => { const d = parseDateAU(r.c.serviceDone); return d && d >= from && d < to; }).length;
   const jobsNow = jobsIn(t30, new Date(8.64e15)), jobsPrev = jobsIn(t60, t30);
-  const slow = habits.clients.filter(c => c.n >= 1).sort((a, b) => b.avg - a.avg).slice(0, 3);
+  const slow = habits.clients.filter(c => c.n >= 1 && c.avg > PAY_TERMS_DAYS).sort((a, b) => b.avg - a.avg).slice(0, 3);
   const stat = (label, val, sub) => `<div class="lp-ch"><div class="r"><span>${label}</span><span class="p">${val}</span></div><div class="dt">${sub}</div></div>`;
   box.innerHTML =
     stat('Average time to get paid', habits.overall !== null ? habits.overall + ' days' : '—', habits.count ? `From ${habits.count} paid invoice${habits.count === 1 ? '' : 's'} · terms are ${PAY_TERMS_DAYS} days` : 'Mark invoices paid to measure this') +
@@ -8318,6 +8412,7 @@ function openInvoiceModal() {
   ['lpInvClient', 'lpInvAmount', 'lpInvNote'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('lpInvCount').value = '1';
   document.getElementById('lpInvDate').value = dateToYmd(new Date());
+  document.getElementById('lpInvUsual').innerHTML = '';
   const hint = document.getElementById('lpInvHint');
   hint.textContent = 'All fields except comments are needed.'; hint.className = 'lp-hint';
   document.getElementById('lpInvModal').classList.add('show');
@@ -8594,6 +8689,484 @@ async function checkAppsScript() {
   const [j, i] = await Promise.all([one('jobs', 'Jobs Done'), one('invoices', 'Invoices')]);
   appsScriptMsg(j.text + ' · ' + i.text, j.ok && i.ok);
 }
+
+
+// ══════════════════════════════════════════════════════════════
+//  PI BRAIN (3.1.5)
+//  Builds a profile of every client from your sheets (job values,
+//  service rhythm, payment habits, health), forecasts the next 30
+//  days, spots patterns, keeps a daily memory to track trends, and
+//  answers plain-English questions in "Ask Pi". All on this device —
+//  nothing is sent anywhere.
+// ══════════════════════════════════════════════════════════════
+const BRAIN_MEM_KEY = 'pi_brain_memory_v1';
+function brainMem() {
+  let m; try { m = JSON.parse(localStorage.getItem(BRAIN_MEM_KEY) || '{}') || {}; } catch (e) { m = {}; }
+  m.snaps = m.snaps || {}; m.asks = m.asks || [];
+  return m;
+}
+function brainSave(m) { try { localStorage.setItem(BRAIN_MEM_KEY, JSON.stringify(m)); } catch (e) {} }
+function brainMedian(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); const k = Math.floor(s.length / 2); return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; }
+function brainDaysBetween(a, b) { return Math.round((b - a) / 86400000); }
+function brainDate(au) { const d = parseDateAU(au); if (d) d.setHours(0, 0, 0, 0); return d; }
+function brainPlural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+function brainList(names, max) {
+  max = max || 3;
+  const a = names.slice(0, max);
+  const more = names.length - a.length;
+  if (!a.length) return '';
+  const base = a.length === 1 ? a[0] : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+  return more > 0 ? base + ` +${more} more` : base;
+}
+
+// ── Client profiles ──
+function brainProfiles() {
+  const today = piToday();
+  const map = {};
+  const key = n => String(n || '').trim().toLowerCase();
+  allClients.forEach((c, idx) => { map[key(c.name)] = { name: c.name, c, idx, inv: [] }; });
+  allInvoices.forEach(i => {
+    const k = key(i.client);
+    if (!k) return;
+    if (!map[k]) map[k] = { name: i.client, c: null, idx: -1, inv: [] };
+    map[k].inv.push(i);
+  });
+  const allJobAmts = allInvoices.filter(i => i.source === 'Job').map(i => Number(i.amount) || 0).filter(v => v > 0);
+  const allAmts = allInvoices.map(i => Number(i.amount) || 0).filter(v => v > 0);
+  const globalJob = brainMedian(allJobAmts) || brainMedian(allAmts);
+  const out = Object.values(map).map(p => {
+    const inv = p.inv.map(i => ({ ...i, d: brainDate(i.issueDate), pd: brainDate(i.paidDate), amt: Number(i.amount) || 0 })).sort((a, b) => (a.d || 0) - (b.d || 0));
+    const jobs = inv.filter(i => i.source === 'Job' && i.d);
+    const amts = (jobs.length ? jobs : inv).map(i => i.amt).filter(v => v > 0);
+    const lifetime = inv.reduce((s, i) => s + i.amt, 0);
+    const usual = brainMedian(amts);
+    const last = amts.length ? amts[amts.length - 1] : null;
+    // Service rhythm: gaps between logged jobs, else the gap the sheet uses
+    const gaps = [];
+    for (let k = 1; k < jobs.length; k++) { const g = brainDaysBetween(jobs[k - 1].d, jobs[k].d); if (g >= 7) gaps.push(g); }
+    let cadence = gaps.length ? Math.round(brainMedian(gaps)) : null;
+    if (!cadence && p.c) { const l = brainDate(p.c.lastService), n = brainDate(p.c.nextService); if (l && n && n > l) cadence = brainDaysBetween(l, n); }
+    // Payment habits
+    const paidDays = inv.filter(i => String(i.status).toLowerCase() === 'paid' && i.d && i.pd).map(i => Math.max(0, brainDaysBetween(i.d, i.pd)));
+    const payAvg = paidDays.length ? Math.round(paidDays.reduce((s, v) => s + v, 0) / paidDays.length) : null;
+    const lateRate = paidDays.length ? paidDays.filter(v => v > PAY_TERMS_DAYS).length / paidDays.length : null;
+    const unpaid = inv.filter(i => String(i.status).toLowerCase() !== 'paid' && i.d).map(i => ({ ...i, age: brainDaysBetween(i.d, today) }));
+    const overdueInv = unpaid.filter(i => i.age > PAY_TERMS_DAYS);
+    const overdueAmt = overdueInv.reduce((s, i) => s + i.amt, 0);
+    const oldestLate = overdueInv.length ? Math.max(...overdueInv.map(i => i.age - PAY_TERMS_DAYS)) : 0;
+    // Last seen
+    const seenDates = [];
+    if (p.c) { [p.c.serviceDone, p.c.lastService].forEach(x => { const d = brainDate(x); if (d) seenDates.push(d); }); }
+    if (jobs.length) seenDates.push(jobs[jobs.length - 1].d);
+    const lastSeen = seenDates.length ? new Date(Math.max(...seenDates)) : null;
+    const sinceSeen = lastSeen ? brainDaysBetween(lastSeen, today) : null;
+    const daysToNext = p.c ? daysUntil(p.c.nextService) : null;
+    const quiet = !!(cadence && sinceSeen !== null && sinceSeen > cadence * 1.5 + 7 && (daysToNext === null || daysToNext < 0));
+    // Health score
+    let health = 100;
+    const why = [];
+    if (daysToNext !== null && daysToNext < 0) { health -= Math.min(40, 10 + Math.abs(daysToNext)); why.push(`service ${Math.abs(daysToNext)}d overdue`); }
+    if (oldestLate > 0) { health -= Math.min(35, 10 + oldestLate); why.push(`${piMoney(overdueAmt)} unpaid`); }
+    if (payAvg !== null && payAvg > 21) { health -= 15; why.push(`pays in ~${payAvg}d`); }
+    else if (payAvg !== null && payAvg > 14) { health -= 8; why.push(`pays in ~${payAvg}d`); }
+    if (quiet) { health -= 15; why.push(`quiet for ${sinceSeen}d`); }
+    if (p.c && !p.c.phone) { health -= 5; why.push('no phone'); }
+    health = Math.max(0, Math.min(100, Math.round(health)));
+    const label = health >= 80 ? 'Healthy' : health >= 60 ? 'Steady' : health >= 40 ? 'Watch' : 'At risk';
+    const color = health >= 80 ? 'var(--st-done)' : health >= 60 ? 'var(--st-30)' : health >= 40 ? 'var(--st-soon)' : 'var(--st-old)';
+    return { ...p, inv, jobs, lifetime, usual, last, cadence, payAvg, lateRate, unpaid, overdueAmt, oldestLate,
+      lastSeen, sinceSeen, daysToNext, quiet, health, label, color, why, estJob: usual || globalJob || null };
+  });
+  out.globalJob = globalJob;
+  return out;
+}
+
+// ── Forecasts & trends ──
+function brainForecast(profiles) {
+  const today = piToday();
+  const due30 = profiles.filter(p => p.c && p.daysToNext !== null && p.daysToNext <= 30);
+  const est = due30.reduce((s, p) => s + (p.estJob || 0), 0);
+  const unknown = due30.filter(p => !p.estJob).length;
+  const due7 = profiles.filter(p => p.c && p.daysToNext !== null && p.daysToNext >= 0 && p.daysToNext <= 7);
+  // Money likely to land in the next 14 days, weighted by age & habit
+  let expected = 0;
+  allInvoices.forEach(i => {
+    if (String(i.status).toLowerCase() === 'paid') return;
+    const d = brainDate(i.issueDate); if (!d) return;
+    const age = brainDaysBetween(d, today);
+    const prob = age > 60 ? 0.25 : age > 30 ? 0.45 : age > PAY_TERMS_DAYS ? 0.65 : 0.85;
+    expected += (Number(i.amount) || 0) * prob;
+  });
+  const sumPaid = (from, to) => allInvoices.filter(i => { const pd = brainDate(i.paidDate); return String(i.status).toLowerCase() === 'paid' && pd && pd >= from && pd < to; }).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const sumJobs = (from, to) => allInvoices.filter(i => { const d = brainDate(i.issueDate); return i.source === 'Job' && d && d >= from && d < to; }).reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const d30 = new Date(today); d30.setDate(d30.getDate() - 30);
+  const d60 = new Date(today); d60.setDate(d60.getDate() - 60);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+  return { est: Math.round(est), estCount: due30.length, unknown, due7, expected: Math.round(expected),
+    paidNow: sumPaid(d30, tomorrow), paidPrev: sumPaid(d60, d30), jobsNow: sumJobs(d30, tomorrow), jobsPrev: sumJobs(d60, d30) };
+}
+
+// ── Daily memory: one snapshot a day so the brain can talk about change ──
+function brainSnapshot(profiles, fc) {
+  const m = brainMem();
+  const k = dateToYmd(new Date());
+  const owed = profiles.reduce((s, p) => s + p.overdueAmt, 0);
+  m.snaps[k] = { owed: Math.round(owed), clients: allClients.length, atRisk: profiles.filter(p => p.c && p.health < 40).length, jobs30: Math.round(fc.jobsNow) };
+  const keys = Object.keys(m.snaps).sort();
+  while (keys.length > 120) delete m.snaps[keys.shift()];
+  brainSave(m);
+  return m;
+}
+function brainSnapAgo(m, days) {
+  const t = new Date(); t.setDate(t.getDate() - days);
+  const target = dateToYmd(t);
+  const keys = Object.keys(m.snaps).filter(k => k <= target).sort();
+  return keys.length ? m.snaps[keys[keys.length - 1]] : null;
+}
+
+// ── Pattern spotting ──
+function brainInsights(profiles, fc, mem) {
+  const out = [];
+  const withValue = profiles.filter(p => p.lifetime > 0).sort((a, b) => b.lifetime - a.lifetime);
+  const totalValue = withValue.reduce((s, p) => s + p.lifetime, 0);
+  if (withValue.length >= 4 && totalValue && withValue[0].lifetime / totalValue > 0.35)
+    out.push({ w: 60, kind: 'risk', text: `${withValue[0].name} brings in ${Math.round(withValue[0].lifetime / totalValue * 100)}% of your invoiced revenue. Losing them would hurt — keep them happy and spread the risk with new clients.` });
+  profiles.filter(p => p.jobs.length >= 3 && p.last && p.usual && p.last < p.usual * 0.8).forEach(p =>
+    out.push({ w: 70, kind: 'price', text: `${p.name}'s last job was ${piMoney(p.last)} — below their usual ${piMoney(p.usual)}. Worth checking it wasn't undercharged.`, act: () => openDrawerTab('jobs') }));
+  const quiet = profiles.filter(p => p.c && p.quiet);
+  if (quiet.length) out.push({ w: 75, kind: 'quiet', text: `${brainList(quiet.map(p => p.name))} ${quiet.length === 1 ? 'has' : 'have'} gone quiet — longer than their normal gap between services. A friendly check-in could save the account.` });
+  if (fc.due7.length >= 4) out.push({ w: 55, kind: 'busy', text: `Busy week ahead: ${brainPlural(fc.due7.length, 'service')} fall due in the next 7 days. Line up staff now.` });
+  const slower = profiles.filter(p => p.payAvg !== null && p.unpaid.some(i => i.age > p.payAvg + 10));
+  if (slower.length) out.push({ w: 65, kind: 'pay', text: `${brainList(slower.map(p => p.name))} ${slower.length === 1 ? 'is' : 'are'} paying later than usual. A call usually works better than another text at this point.` });
+  if (fc.jobsPrev > 0) {
+    const ch = Math.round((fc.jobsNow - fc.jobsPrev) / fc.jobsPrev * 100);
+    if (Math.abs(ch) >= 15) out.push({ w: 50, kind: 'trend', text: `Work logged in the last 30 days is ${ch > 0 ? 'up' : 'down'} ${Math.abs(ch)}% (${piMoney(fc.jobsNow)} vs ${piMoney(fc.jobsPrev)}).${ch < 0 ? ' Time to fill the calendar — remind due clients and do some prospecting.' : ' Nice momentum.'}` });
+  }
+  const weekAgo = brainSnapAgo(mem, 7);
+  if (weekAgo) {
+    const owedNow = profiles.reduce((s, p) => s + p.overdueAmt, 0);
+    const diff = Math.round(owedNow - weekAgo.owed);
+    if (Math.abs(diff) >= 100) out.push({ w: 58, kind: 'owed', text: `Overdue money is ${diff > 0 ? 'up' : 'down'} ${piMoney(Math.abs(diff))} on a week ago.${diff > 0 ? ' Chasing is slipping — block 20 minutes for it today.' : ' Good work collecting.'}` });
+  }
+  const t14 = piToday(); t14.setDate(t14.getDate() - 14);
+  const recentOut = allOutreach.filter(o => { const d = brainDate(o.date); return d && d >= t14; }).length;
+  if (allClients.length && recentOut === 0) out.push({ w: 45, kind: 'grow', text: 'No prospecting logged in two weeks. New clients come from steady outreach — even 3 visits a week adds up.', act: () => openOutreachModal() });
+  const best = withValue.find(p => p.c && p.health >= 80);
+  if (best) out.push({ w: 35, kind: 'upsell', text: `${best.name} is your most valuable healthy client (${piMoney(best.lifetime)} so far). They're the best candidate for an add-on service.` });
+  return out.sort((a, b) => b.w - a.w);
+}
+
+// ── Pi Brain card ──
+let brainCache = null;
+function brainRun() {
+  const profiles = brainProfiles();
+  const fc = brainForecast(profiles);
+  const mem = brainSnapshot(profiles, fc);
+  const insights = brainInsights(profiles, fc, mem);
+  brainCache = { profiles, fc, insights, mem };
+  return brainCache;
+}
+function renderBrain() {
+  const box = document.getElementById('brainRead');
+  if (!box) return;
+  const { profiles, fc, insights } = brainRun();
+  const owing = profiles.filter(p => p.overdueAmt > 0).sort((a, b) => b.oldestLate - a.oldestLate);
+  const owed = owing.reduce((s, p) => s + p.overdueAmt, 0);
+  const parts = [];
+  if (owed) parts.push(`You're owed <b>${piMoney(owed)}</b> overdue across ${brainPlural(owing.length, 'client')} — <b>${piEsc(owing[0].name)}</b> is the priority (${owing[0].oldestLate}d late).`);
+  if (fc.due7.length) parts.push(`${brainPlural(fc.due7.length, 'service')} ${fc.due7.length === 1 ? 'is' : 'are'} due this week.`);
+  if (fc.estCount) parts.push(`Based on each client's usual job value, expect about <b>${piMoney(fc.est)}</b> of work in the next 30 days${fc.unknown ? ` (plus ${fc.unknown} with no price yet)` : ''}.`);
+  if (fc.expected) parts.push(`Around <b>${piMoney(fc.expected)}</b> of unpaid invoices is likely to land in the next two weeks.`);
+  if (!parts.length) parts.push(allClients.length ? 'Everything is up to date. A good day to prospect or upsell an existing client.' : 'Tap refresh to load your sheets and I’ll get to work.');
+  box.innerHTML = parts.join(' ');
+  const list = document.getElementById('brainInsights');
+  list.innerHTML = insights.slice(0, 3).map(i => {
+    const ai = i.act ? lpActions.push(i.act) - 1 : -1;
+    return `<div class="brain-ins"><span class="brain-dot"></span><div>${piEsc(i.text)}${ai >= 0 ? ` <button class="ag-link" style="padding:0 2px;min-height:0;color:var(--gold-light)" onclick="lpRun(${ai})">Open</button>` : ''}</div></div>`;
+  }).join('') || '';
+  const recent = brainMem().asks.slice(-3).reverse();
+  const chips = ['Who owes me money?', 'What’s due this week?', 'Forecast next 30 days', 'Who’s at risk?', 'Best clients', 'What should I do today?'];
+  document.getElementById('brainChips').innerHTML = chips.map((c, k) => `<button class="brain-chip" onclick="brainAskChip(${k})">${c}</button>`).join('') +
+    recent.filter(r => chips.indexOf(r) < 0).map(r => `<button class="brain-chip recent" onclick="brainAsk(this.textContent)">${piEsc(r)}</button>`).join('');
+  brainAskChip.list = chips;
+}
+function brainAskChip(k) { brainAsk(brainAskChip.list[k]); }
+
+// ── Ask Pi: plain-English questions, answered from your data ──
+function brainAsk(q) {
+  q = String(q || document.getElementById('brainQ').value || '').trim();
+  if (!q) return;
+  document.getElementById('brainQ').value = '';
+  const m = brainMem(); m.asks = m.asks.filter(x => x !== q).concat([q]).slice(-12); brainSave(m);
+  if (!brainCache) brainRun();
+  const ans = brainAnswer(q, brainCache);
+  const el = document.getElementById('brainAnswer');
+  el.innerHTML = `<div class="brain-q">“${piEsc(q)}”</div>${ans}`;
+  el.style.display = 'block';
+}
+function brainPeriod(t) {
+  const today = piToday();
+  const from = new Date(today), to = new Date(today); to.setDate(to.getDate() + 1);
+  if (/last month/.test(t)) { from.setDate(1); from.setMonth(from.getMonth() - 1); to.setTime(new Date(today.getFullYear(), today.getMonth(), 1).getTime()); return { from, to, label: 'last month' }; }
+  if (/this month|month/.test(t)) { from.setDate(1); return { from, to, label: 'this month' }; }
+  if (/last week/.test(t)) { const dow = (today.getDay() + 6) % 7; to.setTime(today.getTime() - dow * 86400000); from.setTime(to.getTime() - 7 * 86400000); return { from, to, label: 'last week' }; }
+  if (/this week|week/.test(t)) { const dow = (today.getDay() + 6) % 7; from.setDate(from.getDate() - dow); return { from, to, label: 'this week' }; }
+  if (/today/.test(t)) return { from, to, label: 'today' };
+  if (/year/.test(t)) { from.setMonth(0, 1); return { from, to, label: 'this year' }; }
+  from.setDate(from.getDate() - 30); return { from, to, label: 'the last 30 days' };
+}
+function brainAhead(t) {
+  if (/today/.test(t)) return { days: 0, label: 'today' };
+  if (/tomorrow/.test(t)) return { days: 1, label: 'by tomorrow' };
+  if (/fortnight|two weeks|2 weeks/.test(t)) return { days: 14, label: 'in the next 14 days' };
+  if (/month|30/.test(t)) return { days: 30, label: 'in the next 30 days' };
+  return { days: 7, label: 'in the next 7 days' };
+}
+function brainRows(items) {
+  return `<div class="brain-rows">${items.map(r => {
+    const ai = r.act ? lpActions.push(r.act) - 1 : -1;
+    return `<div class="brain-row"><div class="brain-row-main"><div>${r.title}</div>${r.sub ? `<div class="brain-row-sub">${r.sub}</div>` : ''}</div>
+      ${r.val ? `<span class="brain-row-val" style="${r.color ? 'color:' + r.color : ''}">${r.val}</span>` : ''}
+      ${ai >= 0 ? `<button class="lp-btn ghost sm" onclick="lpRun(${ai})">${r.btn || 'Open'}</button>` : ''}</div>`;
+  }).join('')}</div>`;
+}
+function brainAnswer(q, B) {
+  const t = q.toLowerCase().replace(/[’']/g, "'");
+  const { profiles, fc } = B;
+  const P = s => `<p class="brain-p">${s}</p>`;
+  // A client by name?
+  const named = profiles.filter(p => {
+    const n = String(p.name || '').toLowerCase();
+    if (!n) return false;
+    if (t.includes(n)) return true;
+    const first = n.split(/\s+/).filter(w => w.length >= 4 && !/^(cafe|café|the|and|services|centre|center|clinic|real|estate|group|childcare|dental|medical)$/.test(w))[0];
+    return first && new RegExp('\\b' + first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(t);
+  });
+  if (named.length === 1 || (named.length > 1 && !/owe|due|risk|best|top|forecast|slow/.test(t))) {
+    const p = named[0];
+    const acts = [];
+    if (p.c) acts.push({ title: 'Log a job', act: () => openJobDoneModal(p.c.rowIndex), btn: 'Log job' });
+    const firstUnpaid = p.unpaid.filter(i => i.age > PAY_TERMS_DAYS)[0];
+    if (firstUnpaid) acts.push({ title: `Chase ${piMoney(firstUnpaid.amt)}`, act: () => remindInvoice(firstUnpaid.id), btn: 'Remind' });
+    if (p.c && p.c.phone && p.daysToNext !== null && p.daysToNext <= 14) acts.push({ title: 'Service reminder', act: () => quickReminder(p.idx), btn: 'Remind' });
+    const facts = [
+      `<b>${piEsc(p.name)}</b> · <span style="color:${p.color}">${p.label} (${p.health}/100)</span>${p.why.length ? ' — ' + piEsc(p.why.join(', ')) : ''}.`,
+      p.c ? `Next service ${p.daysToNext === null ? 'not set' : p.daysToNext < 0 ? `was due ${Math.abs(p.daysToNext)} days ago` : p.daysToNext === 0 ? 'is today' : `in ${p.daysToNext} days (${formatDateDDMMYY(p.c.nextService)})`}${p.cadence ? `; usually every ~${p.cadence} days` : ''}.` : 'Not in your Clients sheet — invoices only.',
+      p.lifetime ? `Invoiced ${piMoney(p.lifetime)} so far${p.usual ? `, usually ${piMoney(p.usual)} a job` : ''}.` : 'No invoices logged yet.',
+      p.payAvg !== null ? `Pays in about ${p.payAvg} days on average${p.lateRate ? ` (${Math.round(p.lateRate * 100)}% late)` : ''}.` : '',
+      p.overdueAmt ? `<span style="color:var(--st-over)">${piMoney(p.overdueAmt)} overdue right now.</span>` : ''
+    ].filter(Boolean).join(' ');
+    return P(facts) + (acts.length ? brainRows(acts) : '');
+  }
+  if (/owe|owing|overdue|unpaid|debt|chase|outstanding|money.*(out|owed)/.test(t)) {
+    const list = profiles.filter(p => p.overdueAmt > 0).sort((a, b) => b.overdueAmt - a.overdueAmt);
+    if (!list.length) return P('Nobody owes you overdue money right now.');
+    const total = list.reduce((s, p) => s + p.overdueAmt, 0);
+    return P(`${piMoney(total)} overdue across ${brainPlural(list.length, 'client')}:`) + brainRows(list.slice(0, 6).map(p => {
+      const inv = p.unpaid.filter(i => i.age > PAY_TERMS_DAYS).sort((a, b) => b.age - a.age)[0];
+      return { title: piEsc(p.name), sub: `${p.oldestLate}d late${p.payAvg !== null ? ` · usually pays in ${p.payAvg}d` : ''}`, val: piMoney(p.overdueAmt), color: 'var(--st-over)', act: inv ? () => remindInvoice(inv.id) : null, btn: 'Remind' };
+    }));
+  }
+  if (/await|pending|not yet due|within 7/.test(t)) {
+    const list = [];
+    profiles.forEach(p => p.unpaid.filter(i => i.age <= PAY_TERMS_DAYS).forEach(i => list.push({ p, i })));
+    if (!list.length) return P('No invoices are waiting inside their 7 days.');
+    return P(`${brainPlural(list.length, 'invoice')} awaiting payment:`) + brainRows(list.map(x => ({ title: piEsc(x.p.name), sub: `due in ${PAY_TERMS_DAYS - x.i.age}d`, val: piMoney(x.i.amt) })));
+  }
+  if (/forecast|expect|predict|coming up|next month|pipeline|projection/.test(t)) {
+    return P(`Next 30 days: about <b>${piMoney(fc.est)}</b> of work from ${brainPlural(fc.estCount, 'service')} that fall due${fc.unknown ? ` (${fc.unknown} with no price history)` : ''}. Roughly <b>${piMoney(fc.expected)}</b> of unpaid invoices should come in over the next two weeks.`) +
+      P(`Last 30 days you logged ${piMoney(fc.jobsNow)} of jobs${fc.jobsPrev ? ` (${fc.jobsNow >= fc.jobsPrev ? 'up' : 'down'} from ${piMoney(fc.jobsPrev)})` : ''} and collected ${piMoney(fc.paidNow)}.`);
+  }
+  if (/due|book|service|schedule|who.*(need|next)|upcoming|calendar/.test(t)) {
+    const a = brainAhead(t);
+    const list = profiles.filter(p => p.c && p.daysToNext !== null && p.daysToNext <= a.days).sort((x, y) => x.daysToNext - y.daysToNext);
+    if (!list.length) return P(`Nothing is due ${a.label}.`);
+    const est = list.reduce((s, p) => s + (p.estJob || 0), 0);
+    return P(`${brainPlural(list.length, 'client')} due ${a.label}${est ? ` — about ${piMoney(est)} of work` : ''}:`) + brainRows(list.slice(0, 8).map(p => ({
+      title: piEsc(p.name), sub: p.daysToNext < 0 ? `${Math.abs(p.daysToNext)}d overdue` : p.daysToNext === 0 ? 'today' : `in ${p.daysToNext}d`,
+      val: p.estJob ? piMoney(p.estJob) : '', color: lpStatusColor(p.daysToNext),
+      act: p.c.phone ? () => quickReminder(p.idx) : () => openJobDoneModal(p.c.rowIndex), btn: p.c.phone ? 'Remind' : 'Log job' })));
+  }
+  if (/earn|made|make|revenue|income|collect|takings|turnover|how much.*(paid|money)|got paid/.test(t)) {
+    const per = brainPeriod(t);
+    const paid = allInvoices.filter(i => { const d = brainDate(i.paidDate); return String(i.status).toLowerCase() === 'paid' && d && d >= per.from && d < per.to; });
+    const jobs = allInvoices.filter(i => { const d = brainDate(i.issueDate); return i.source === 'Job' && d && d >= per.from && d < per.to; });
+    const ps = paid.reduce((s, i) => s + (Number(i.amount) || 0), 0), js = jobs.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    return P(`For ${per.label}: you collected <b>${piMoney(ps)}</b> from ${brainPlural(paid.length, 'paid invoice')}, and logged <b>${piMoney(js)}</b> of work across ${brainPlural(jobs.length, 'job')}.`) +
+      (allInvoices.length ? '' : P('Tip: enter the invoice amount when you log a job so I can track this.'));
+  }
+  if (/best|top|valuable|biggest|most money|favourite|favorite/.test(t)) {
+    const list = profiles.filter(p => p.lifetime > 0).sort((a, b) => b.lifetime - a.lifetime).slice(0, 5);
+    if (!list.length) return P('I need invoice amounts to rank clients — add them when you log jobs.');
+    return P('Your most valuable clients so far:') + brainRows(list.map(p => ({ title: piEsc(p.name), sub: `${p.label}${p.usual ? ` · usually ${piMoney(p.usual)}` : ''}`, val: piMoney(p.lifetime) })));
+  }
+  if (/risk|lose|losing|churn|quiet|unhappy|worried|health/.test(t)) {
+    const list = profiles.filter(p => p.c && p.health < 60).sort((a, b) => a.health - b.health);
+    if (!list.length) return P('No clients look at risk right now — all scoring 60+ out of 100.');
+    return P(`${brainPlural(list.length, 'client')} need attention:`) + brainRows(list.slice(0, 6).map(p => ({
+      title: piEsc(p.name), sub: piEsc(p.why.join(', ')), val: `${p.health}/100`, color: p.color,
+      act: p.c.phone ? () => { window.location.href = 'tel:' + String(p.c.phone).replace(/\s/g, ''); } : () => openJobDoneModal(p.c.rowIndex), btn: p.c.phone ? 'Call' : 'Open' })));
+  }
+  if (/slow|late pay|pays late|takes long/.test(t)) {
+    const list = profiles.filter(p => p.payAvg !== null).sort((a, b) => b.payAvg - a.payAvg).slice(0, 5);
+    if (!list.length) return P('Mark invoices as paid and I’ll learn how long each client takes to pay.');
+    return P('Slowest payers (days from invoice to paid):') + brainRows(list.map(p => ({ title: piEsc(p.name), sub: p.lateRate ? `${Math.round(p.lateRate * 100)}% of invoices late` : 'always on time', val: p.payAvg + 'd', color: p.payAvg > PAY_TERMS_DAYS ? 'var(--st-over)' : 'var(--st-done)' })));
+  }
+  if (/prospect|outreach|cold|channel|grow|new client|marketing|leads?/.test(t)) {
+    const ranked = agentRankedChannels(); const tg = agentWeeklyTarget();
+    return P(ranked.length ? `${ranked[0].ch} works best for you (${ranked[0].pct}% become quotes or wins). For ${agentMem().goal} new clients a month, aim for about <b>${tg.perWeek} outreach a week</b>.`
+      : `Not enough outreach logged to rank channels yet. Log at least 3 attempts per channel. For now, aim for about ${tg.perWeek} a week.`) +
+      brainRows([{ title: 'Log outreach', act: () => openOutreachModal(), btn: 'Log' }]);
+  }
+  if (/how many client|number of client|client count|total client/.test(t)) {
+    const r = profiles.filter(p => p.c);
+    return P(`You have <b>${allClients.length}</b> clients: ${r.filter(p => p.label === 'Healthy').length} healthy, ${r.filter(p => p.label === 'Steady').length} steady, ${r.filter(p => p.label === 'Watch').length} to watch and ${r.filter(p => p.label === 'At risk').length} at risk.`);
+  }
+  if (/review/.test(t)) {
+    const list = profiles.filter(p => p.c && p.c.phone && p.sinceSeen !== null && p.sinceSeen <= 7 && p.health >= 60);
+    if (!list.length) return P('No recent happy clients to ask for a review right now.');
+    return P('Good people to ask for a Google review:') + brainRows(list.slice(0, 5).map(p => ({ title: piEsc(p.name), sub: `serviced ${p.sinceSeen}d ago`, act: () => requestReviewClient(p.c.name, p.c.phone), btn: 'Ask' })));
+  }
+  if (/upsell|offer|add.?on|services? (to|i should)|expand/.test(t)) {
+    setAgentTab('services');
+    return P('I’ve opened the Services tab in To do with ideas that fit your client base.');
+  }
+  if (/today|plan|focus|priority|priorities|what should|next|do now/.test(t)) {
+    const items = agentTodayItems(lpClientRows(), lpUnpaid()).slice(0, 4);
+    if (!items.length) return P('You’re all caught up. A good moment to prospect or ask a recent client for a review.');
+    return P('Here’s what I’d do, in order:') + brainRows(items.map(it => ({ title: piEsc(it.title), sub: piEsc(it.why), act: it.btn ? it.act : null, btn: it.btn })));
+  }
+  if (/help|what can you|how do/.test(t)) {
+    return P('Ask me things like: “Who owes me money?”, “What’s due next week?”, “How much did I make this month?”, “Forecast”, “Who’s at risk?”, “Slow payers”, “Best clients”, or just type a client’s name.');
+  }
+  return P('I’m not sure about that one yet. Try a client’s name, or ask who owes you money, what’s due, your forecast, or who’s at risk.');
+}
+
+// ── Brain in the To do list ──
+(function () {
+  const _base = agentTodayItems;
+  agentTodayItems = function (rows, unpaid) {
+    const items = _base(rows, unpaid);
+    let B; try { B = brainRun(); } catch (e) { return items; }
+    const m = agentMem();
+    const add = it => { if (!agentHidden(m, it.key, it.kind)) items.push({ ...it, score: it.score * agentKindWeight(m, it.kind) }); };
+    B.profiles.filter(p => p.c && p.quiet).forEach(p => add({ key: 'quiet:' + p.name + ':' + (p.c.nextService || ''), kind: 'risk', score: 70,
+      title: `Check in with ${p.name}`, why: `Usually every ~${p.cadence} days, but it's been ${p.sinceSeen}. A quick call could keep them.`,
+      tag: 'Quiet', color: 'var(--st-soon)', btn: p.c.phone ? 'Call' : 'Open', act: p.c.phone ? () => { window.location.href = 'tel:' + String(p.c.phone).replace(/\s/g, ''); } : () => openDrawerTab('clients-reminders') }));
+    B.profiles.filter(p => p.jobs.length >= 3 && p.last && p.usual && p.last < p.usual * 0.8).forEach(p => add({ key: 'price:' + p.name + ':' + p.last, kind: 'data', score: 40,
+      title: `Check ${p.name}'s last price`, why: `${piMoney(p.last)} vs their usual ${piMoney(p.usual)} — make sure it wasn't undercharged.`,
+      tag: 'Price', color: 'var(--gold)', btn: 'Open Jobs Done', act: () => openDrawerTab('jobs') }));
+    if (B.fc.due7.length >= 4) add({ key: 'busy:' + dateToYmd(agentWeekStart()), kind: 'data', score: 38,
+      title: `Plan staff for ${B.fc.due7.length} services this week`, why: `${brainList(B.fc.due7.map(p => p.name))} are due in the next 7 days.`,
+      tag: 'Plan', color: 'var(--st-30)', btn: null, act: () => {} });
+    return items.sort((a, b) => b.score - a.score);
+  };
+})();
+
+// ── Brain in Insights: forecast + client health ──
+(function () {
+  const _base = renderAgent;
+  renderAgent = function (rows, unpaid) {
+    _base(rows, unpaid);
+    if (lpAgentTab !== 'insights') return;
+    const box = document.getElementById('lpAgent');
+    if (!box) return;
+    let B; try { B = brainCache || brainRun(); } catch (e) { return; }
+    const ranked = B.profiles.filter(p => p.c).sort((a, b) => a.health - b.health);
+    const html = `<div class="lp-ch"><div class="r"><span>Forecast · next 30 days</span><span class="p">${piMoney(B.fc.est)}</span></div>
+        <div class="dt">${brainPlural(B.fc.estCount, 'service')} due, priced from each client's usual job</div></div>
+      <div class="lp-ch"><div class="r"><span>Likely to be paid · 14 days</span><span class="p">${piMoney(B.fc.expected)}</span></div>
+        <div class="dt">Unpaid invoices weighted by how late they are</div></div>
+      <div class="brain-health-title">Client health</div>
+      ${ranked.slice(0, 6).map(p => `<div class="brain-health"><span>${piEsc(p.name)}</span>
+        <div class="lp-bar"><div style="width:${p.health}%;background:${p.color}"></div></div><b style="color:${p.color}">${p.health}</b></div>`).join('')}
+      <div class="dt" style="font-size:11px;color:var(--white-muted);padding:4px 0 8px;">Lowest first. Ask Pi a client's name for the full picture.</div>`;
+    box.insertAdjacentHTML('afterbegin', html);
+  };
+})();
+
+// ── Smart amounts: suggest each client's usual price ──
+function brainUsualFor(name) {
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return null;
+  const amts = allInvoices.filter(i => String(i.client || '').trim().toLowerCase() === n).map(i => Number(i.amount) || 0).filter(v => v > 0);
+  const jobAmts = allInvoices.filter(i => String(i.client || '').trim().toLowerCase() === n && i.source === 'Job').map(i => Number(i.amount) || 0).filter(v => v > 0);
+  const use = jobAmts.length ? jobAmts : amts;
+  return use.length ? { usual: brainMedian(use), last: use[use.length - 1], n: use.length } : null;
+}
+function brainShowUsual(name, inputId, hintId) {
+  const hint = document.getElementById(hintId);
+  if (!hint) return;
+  const u = brainUsualFor(name);
+  if (!u) { hint.innerHTML = ''; return; }
+  const v = Number(u.usual).toFixed(2);
+  hint.innerHTML = `Usual for this client: <button type="button" class="brain-fill" onclick="document.getElementById('${inputId}').value='${v}'">${piMoney(u.usual)}</button>${u.last !== u.usual ? ` · last ${piMoney(u.last)}` : ''} · from ${brainPlural(u.n, 'invoice')}`;
+}
+
+// ── Keep the brain fresh ──
+(function () {
+  const _base = renderLanding;
+  renderLanding = function () { _base(); try { renderBrain(); } catch (e) { console.warn('Pi Brain:', e); } };
+})();
+
+// ══════════════════════════════════════════
+//  FULL SCREEN ON ANDROID (3.1.5)
+//  iPhone already gives the page the whole screen. Android Chrome keeps
+//  its address bar, so: (1) a web-app manifest lets "Add to Home screen /
+//  Install app" open Pi Admin full screen, and (2) in a normal tab the
+//  first tap asks the browser for full screen. Turn off in Settings.
+// ══════════════════════════════════════════
+const FS_PREF_KEY = 'pi_fullscreen_android';
+function piIsAndroid() { return /Android/i.test(navigator.userAgent); }
+function piIsInstalled() { return window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: standalone)').matches; }
+function fsPrefOn() { try { return localStorage.getItem(FS_PREF_KEY) !== 'off'; } catch (e) { return true; } }
+function syncFullscreenPref() {
+  const on = fsPrefOn();
+  const t = document.getElementById('fsPrefToggle'), sub = document.getElementById('fsPrefSub');
+  if (t) t.checked = on;
+  if (sub) sub.textContent = on ? (piIsAndroid() ? 'On — fills the screen after your first tap' : 'On — applies on Android phones') : 'Off — browser bar stays visible';
+}
+function toggleFullscreenPref(e) {
+  if (e) e.preventDefault();
+  try { localStorage.setItem(FS_PREF_KEY, fsPrefOn() ? 'off' : 'on'); } catch (x) {}
+  if (!fsPrefOn() && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  syncFullscreenPref();
+}
+function piEnterFullscreen() {
+  if (!piIsAndroid() || piIsInstalled() || !fsPrefOn() || document.fullscreenElement) return;
+  const el = document.documentElement;
+  if (!el.requestFullscreen) return;
+  el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+}
+document.addEventListener('click', piEnterFullscreen, true);
+(function installManifest() {
+  try {
+    const icon = size => {
+      const c = document.createElement('canvas'); c.width = c.height = size;
+      const x = c.getContext('2d');
+      x.fillStyle = '#0A1A3D'; x.fillRect(0, 0, size, size);
+      x.strokeStyle = '#C9A84C'; x.lineWidth = size * 0.035;
+      x.beginPath(); x.arc(size / 2, size / 2, size * 0.33, 0, Math.PI * 2); x.stroke();
+      x.fillStyle = '#C9A84C'; x.font = `700 ${Math.round(size * 0.3)}px Georgia, serif`;
+      x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Pi', size / 2, size / 2 + size * 0.01);
+      return c.toDataURL('image/png');
+    };
+    const here = location.href.split('#')[0];
+    const scope = here.substring(0, here.lastIndexOf('/') + 1);
+    const manifest = {
+      name: 'Pi Admin', short_name: 'Pi Admin', start_url: here, scope: scope,
+      display: 'fullscreen', display_override: ['fullscreen', 'standalone'], orientation: 'portrait',
+      background_color: '#0A1A3D', theme_color: '#0A1A3D',
+      icons: [{ src: icon(192), sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+              { src: icon(512), sizes: '512x512', type: 'image/png', purpose: 'any maskable' }]
+    };
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+    document.head.appendChild(link);
+  } catch (e) {}
+})();
+document.addEventListener('DOMContentLoaded', syncFullscreenPref);
 
 // Keep the landing page in step with everything else that changes client data
 (function () {
